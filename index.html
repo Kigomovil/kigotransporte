@@ -1,50 +1,267 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>Moto Taxi</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moto y Carro - Cliente</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
 <style>
-*{box-sizing:border-box}body{margin:0;padding:0;font-family:Arial,sans-serif;background:#f3f3f3;color:#222}.app{width:100%;max-width:600px;margin:auto;background:#fff;min-height:100vh}#map{width:100%;height:55vh;min-height:350px}.panel{background:#fff;padding:16px;border-radius:22px 22px 0 0;margin-top:-22px;position:relative;z-index:1000;box-shadow:0 -4px 18px rgba(0,0,0,.15)}.title{font-size:21px;font-weight:bold;margin-bottom:5px}.subtitle{font-size:13px;color:#777;margin-bottom:15px}.step{padding:13px;border-radius:13px;background:#f5f5f5;margin-bottom:10px}.step-title{font-size:12px;color:#777;margin-bottom:5px}.address{font-size:14px;font-weight:bold;line-height:19px}.waiting{color:#999;font-weight:normal}.mode{display:flex;gap:8px;margin-bottom:12px}.mode button{flex:1;margin:0;padding:11px;border-radius:10px;border:1px solid #ddd;background:#fff;color:#555;font-size:13px;font-weight:bold}.mode button.active{background:#e53935;color:#fff;border-color:#e53935}.info{display:flex;gap:8px;margin-top:10px}.info-box{flex:1;background:#f5f5f5;padding:12px 8px;border-radius:12px;text-align:center}.info-label{font-size:11px;color:#777}.info-value{font-size:16px;font-weight:bold;margin-top:5px}.price{margin-top:12px;padding:15px;background:#111;color:#fff;border-radius:14px;display:flex;justify-content:space-between;align-items:center}.price-label{font-size:13px}.price-value{font-size:24px;font-weight:bold}.confirm{width:100%;border:none;padding:16px;border-radius:14px;margin-top:14px;background:#e53935;color:white;font-size:17px;font-weight:bold}.confirm:disabled{background:#aaa}.status{text-align:center;font-size:12px;color:#777;margin-top:9px}.pickup-icon,.destination-icon{width:38px;height:38px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(0,0,0,.35);border:3px solid white}.pickup-icon{background:#e53935}.destination-icon{background:#111}.marker-dot{width:11px;height:11px;background:white;border-radius:50%}.map-message{position:absolute;top:15px;left:50%;transform:translateX(-50%);z-index:999;background:white;padding:9px 14px;border-radius:20px;box-shadow:0 2px 10px rgba(0,0,0,.2);font-size:12px;font-weight:bold;white-space:nowrap}
+:root{--blue:#38bdf8;--black:#0a0a0a;--gray:#f8fafc;--border:#e2e8f0;--green:#16a34a}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,sans-serif}
+body{background:var(--gray);min-height:100vh}
+.header{height:60px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;position:sticky;top:0;z-index:10}
+.input{height:52px;border:1.5px solid var(--border);border-radius:12px;padding:0 14px;width:100%;font-size:15px;background:#fff;font-weight:600}
+.btn{height:52px;border:none;border-radius:12px;font-weight:800;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 16px;width:100%}
+.btn-black{background:var(--black);color:#fff}
+.btn-blue{background:var(--blue);color:#fff}
+.btn-white{background:#fff;border:1.5px solid var(--border)}
+.card{background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:16px}
+.card-select{cursor:pointer;transition:.2s}
+.card-select.active{border-color:var(--black);background:#0a0a0a}
+.card-select.active *{color:#fff!important}
+.card-select.active .price{color:#38bdf8!important}
+.badge{padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700;background:#e0f2fe;color:#0284c7}
+.map-preview{height:180px;background:linear-gradient(135deg,#e0f2fe 0%,#bae6fd 100%);border-radius:16px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;border:1.5px dashed #38bdf8}
+.route-line{position:absolute;width:70%;height:4px;background:var(--black);top:50%;left:15%;border-radius:999px}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--black);position:absolute;top:50%;transform:translateY(-50%)}
+.dot-start{left:15%;background:var(--green)}
+.dot-end{right:15%;background:var(--red)}
+.container{max-width:480px;margin:0 auto;padding:16px;display:grid;gap:14px}
+.label{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:6px;display:block}
+.price{font-size:22px;font-weight:800}
+.small{font-size:12px;color:#64748b}
 </style>
 </head>
 <body>
-<div class="app">
-<div style="position:relative"><div id="map"></div><div id="mapMessage" class="map-message">Toca el mapa para indicar la recogida</div></div>
-<div class="panel">
-<div class="title">Solicita tu moto</div>
-<div id="subtitle" class="subtitle">Selecciona el lugar donde te recogeremos.</div>
-<div class="mode"><button id="pickupMode" class="active">Recogida</button><button id="destinationMode">Destino</button></div>
-<div class="step"><div class="step-title">PUNTO DE RECOGIDA</div><div id="pickupAddress" class="address waiting">Toca el mapa para seleccionar</div></div>
-<div class="step"><div class="step-title">DESTINO</div><div id="destinationAddress" class="address waiting">Toca el mapa para seleccionar</div></div>
-<div class="info"><div class="info-box"><div class="info-label">DISTANCIA</div><div id="distance" class="info-value">—</div></div><div class="info-box"><div class="info-label">TIEMPO APROX.</div><div id="duration" class="info-value">—</div></div></div>
-<div class="price"><div class="price-label">VALOR ESTIMADO</div><div id="price" class="price-value">$0</div></div>
-<button id="confirmButton" class="confirm" disabled>CONFIRMAR VIAJE</button>
-<div id="status" class="status"></div>
+<div class="header">
+<div style="display:flex;align-items:center;gap:10px"><div style="width:36px;height:36px;background:var(--black);border-radius:10px;display:flex;align-items:center;justify-content:center"><i data-lucide="map-pinned" style="color:#fff;width:20px"></i></div><div><b>MOTO & CARRO</b><br><small style="color:#64748b;font-weight:700">¿Cómo te quieres ir?</small></div></div>
+<div style="font-size:10px;background:var(--black);color:#fff;padding:6px 10px;border-radius:999px;font-weight:700">CLIENTE</div>
+</div>
+
+<div class="container">
+<div class="card">
+<label class="label">¿Dónde te recogemos?</label>
+<div style="position:relative"><i data-lucide="map-pin" style="position:absolute;left:12px;top:16px;width:18px;color:#16a34a"></i><input id="origen" class="input" style="padding-left:38px" placeholder="Ej: Centro, Estación, Turbina" value="Centro Dolores" oninput="calcularRuta()"></div>
+<div style="height:12px"></div>
+<label class="label">¿Hasta dónde vas?</label>
+<div style="position:relative"><i data-lucide="flag" style="position:absolute;left:12px;top:16px;width:18px;color:#dc2626"></i><input id="destino" class="input" style="padding-left:38px" placeholder="Ej: Santa Fe, Mercado" value="Santa Fe" oninput="calcularRuta()"></div>
+<button class="btn btn-black" style="margin-top:12px" onclick="calcularRuta()"><i data-lucide="search" style="width:18px;color:#fff"></i> Calcular recorrido</button>
+</div>
+
+<div class="map-preview">
+<div class="route-line"></div>
+<div class="dot dot-start"></div>
+<div class="dot dot-end"></div>
+<div style="text-align:center;z-index:2;background:#fff;padding:8px 12px;border-radius:999px;border:1.5px solid var(--border);font-weight:800;font-size:12px"><span id="distanciaTxt">3.2 km</span> • <span id="tiempoTxt">8 min</span></div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<div id="cardMoto" class="card card-select active" onclick="seleccionar('moto')">
+<div style="display:flex;justify-content:space-between;align-items:center"><i data-lucide="bike" style="width:24px"></i><span class="badge">MÁS BARATO</span></div>
+<div style="margin-top:10px"><b style="font-size:16px">MOTO</b><br><small class="small">1 persona • Rápido</small></div>
+<div style="margin-top:12px"><div class="price" id="precioMoto">$28.00 MXN</div><small class="small" id="detalleMoto">3.2 km • 8 min</small></div>
+<div style="margin-top:10px;display:flex;align-items:center;gap:6px"><i data-lucide="zap" style="width:14px"></i><small style="font-weight:700">Llega en 3 min</small></div>
+</div>
+
+<div id="cardCarro" class="card card-select" onclick="seleccionar('carro')">
+<div style="display:flex;justify-content:space-between;align-items:center"><i data-lucide="car" style="width:24px"></i><span class="badge" style="background:#fef3c7;color:#d97706">MÁS CÓMODO</span></div>
+<div style="margin-top:10px"><b style="font-size:16px">CARRO</b><br><small class="small">Hasta 4 personas • Cajuela</small></div>
+<div style="margin-top:12px"><div class="price" id="precioCarro">$55.00 MXN</div><small class="small" id="detalleCarro">3.2 km • 8 min</small></div>
+<div style="margin-top:10px;display:flex;align-items:center;gap:6px"><i data-lucide="snowflake" style="width:14px"></i><small style="font-weight:700">Aire • Llega en 5 min</small></div>
 </div>
 </div>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<div id="resumenSeleccion" class="card" style="background:var(--black);color:#fff">
+<div style="display:flex;justify-content:space-between;align-items:center"><div><small style="color:#94a3b8">SELECCIONADO</small><br><b style="color:#fff;font-size:18px" id="seleccionTitulo">MOTO • $28.00 MXN</b><br><small style="color:#94a3b8" id="seleccionDetalle">Recorrido: 3.2 km • 8 min • De Centro Dolores a Santa Fe</small></div><div style="width:48px;height:48px;background:#38bdf8;border-radius:12px;display:flex;align-items:center;justify-content:center"><i data-lucide="bike" id="seleccionIcon" style="width:24px;color:#fff"></i></div></div>
+<button class="btn btn-blue" style="margin-top:12px;background:#38bdf8;color:#fff" onclick="confirmarViaje()"><i data-lucide="search" style="width:18px;color:#fff"></i> CONFIRMAR Y BUSCAR CONDUCTOR</button>
+</div>
+
+<div id="buscando" style="display:none" class="card" style="text-align:center">
+<div style="width:56px;height:56px;border:4px solid var(--border);border-top-color:var(--blue);border-radius:50%;margin:0 auto;animation:spin 1s linear infinite"></div>
+<b style="display:block;margin-top:12px">Buscando conductor de <span id="buscandoTipo">MOTO</span>...</b><br><small style="color:#64748b">Conectando con el más cercano</small>
+</div>
+</div>
+
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
 <script>
-const TARIFA_MINIMA=35,VALOR_POR_KM_ADICIONAL=5,NUMERO_WHATSAPP="524182371993";
-let pickupLat=null,pickupLng=null,destinationLat=null,destinationLng=null,pickupAddress="",destinationAddress="",pickupMarker=null,destinationMarker=null,routeLayer=null,modoSeleccion="pickup";
-const map=L.map("map",{zoomControl:false,attributionControl:true});
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(map);
-function iniciarMapa(lat,lng){map.setView([lat,lng],16)}
-if(navigator.geolocation){navigator.geolocation.getCurrentPosition(function(p){iniciarMapa(p.coords.latitude,p.coords.longitude)},function(){iniciarMapa(21.1561,-100.9333)},{enableHighAccuracy:true,timeout:10000})}else{iniciarMapa(21.1561,-100.9333)}
-document.getElementById("pickupMode").addEventListener("click",function(){modoSeleccion="pickup";this.classList.add("active");document.getElementById("destinationMode").classList.remove("active");document.getElementById("mapMessage").innerText="Toca el mapa para indicar la recogida";document.getElementById("subtitle").innerText="Selecciona el lugar donde te recogeremos."});
-document.getElementById("destinationMode").addEventListener("click",function(){modoSeleccion="destination";this.classList.add("active");document.getElementById("pickupMode").classList.remove("active");document.getElementById("mapMessage").innerText="Toca el mapa para indicar el destino";document.getElementById("subtitle").innerText="Selecciona a dónde quieres llegar."});
-map.on("click",function(e){const lat=e.latlng.lat,lng=e.latlng.lng;if(modoSeleccion==="pickup"){pickupLat=lat;pickupLng=lng;if(pickupMarker)map.removeLayer(pickupMarker);pickupMarker=L.marker([lat,lng],{icon:crearIconoRecogida()}).addTo(map);obtenerDireccionRecogida(lat,lng);setTimeout(function(){modoSeleccion="destination";document.getElementById("pickupMode").classList.remove("active");document.getElementById("destinationMode").classList.add("active");document.getElementById("mapMessage").innerText="Ahora toca el mapa para indicar el destino";document.getElementById("subtitle").innerText="Selecciona el lugar donde quieres llegar."},800)}else{destinationLat=lat;destinationLng=lng;if(destinationMarker)map.removeLayer(destinationMarker);destinationMarker=L.marker([lat,lng],{icon:crearIconoDestino()}).addTo(map);obtenerDireccionDestino(lat,lng);if(pickupLat!==null&&pickupLng!==null)calcularRuta()}});
-function crearIconoRecogida(){return L.divIcon({className:"",html:'<div class="pickup-icon"><div class="marker-dot"></div></div>',iconSize:[38,38],iconAnchor:[19,38]})}
-function crearIconoDestino(){return L.divIcon({className:"",html:'<div class="destination-icon"><div class="marker-dot"></div></div>',iconSize:[38,38],iconAnchor:[19,38]})}
-async function obtenerDireccionRecogida(lat,lng){document.getElementById("pickupAddress").innerText="Buscando dirección...";try{const r=await fetch("https://nominatim.openstreetmap.org/reverse?format=json&lat="+lat+"&lon="+lng+"&zoom=18&addressdetails=1&accept-language=es"),d=await r.json();pickupAddress=d.display_name||"Dirección no encontrada";document.getElementById("pickupAddress").innerText=pickupAddress;actualizarGlide()}catch(e){document.getElementById("pickupAddress").innerText="No se pudo obtener la dirección."}}
-async function obtenerDireccionDestino(lat,lng){document.getElementById("destinationAddress").innerText="Buscando dirección...";try{const r=await fetch("https://nominatim.openstreetmap.org/reverse?format=json&lat="+lat+"&lon="+lng+"&zoom=18&addressdetails=1&accept-language=es"),d=await r.json();destinationAddress=d.display_name||"Dirección no encontrada";document.getElementById("destinationAddress").innerText=destinationAddress;actualizarGlide()}catch(e){document.getElementById("destinationAddress").innerText="No se pudo obtener la dirección."}}
-function crearUrlGoogleMaps(){if(pickupLat===null||pickupLng===null||destinationLat===null||destinationLng===null)return"";return"https://www.google.com/maps/dir/?api=1&origin="+pickupLat+","+pickupLng+"&destination="+destinationLat+","+destinationLng+"&travelmode=driving"}
-async function calcularRuta(){if(pickupLat===null||pickupLng===null||destinationLat===null||destinationLng===null)return;document.getElementById("status").innerText="Calculando ruta...";try{const r=await fetch("https://router.project-osrm.org/route/v1/driving/"+pickupLng+","+pickupLat+";"+destinationLng+","+destinationLat+"?overview=full&geometries=geojson"),d=await r.json();if(!d.routes||!d.routes.length){document.getElementById("status").innerText="No encontramos una ruta.";return}const ruta=d.routes[0],km=ruta.distance/1000,min=Math.round(ruta.duration/60);document.getElementById("distance").innerText=km.toFixed(1)+" km";document.getElementById("duration").innerText=min+" min";let valor=TARIFA_MINIMA;if(km>1)valor=TARIFA_MINIMA+Math.ceil(km-1)*VALOR_POR_KM_ADICIONAL;document.getElementById("price").innerText="$"+Math.round(valor);if(routeLayer)map.removeLayer(routeLayer);routeLayer=L.geoJSON(ruta.geometry,{style:{weight:5,opacity:.8}}).addTo(map);map.fitBounds(routeLayer.getBounds(),{padding:[45,45]});document.getElementById("status").innerText="Ruta calculada";document.getElementById("confirmButton").disabled=false;actualizarGlide()}catch(e){document.getElementById("status").innerText="No se pudo calcular la ruta."}}
-function obtenerDatos(){return{direccion_recogida:pickupAddress,latitud_recogida:pickupLat,longitud_recogida:pickupLng,direccion_destino:destinationAddress,latitud_destino:destinationLat,longitud_destino:destinationLng,distancia:document.getElementById("distance").innerText,tiempo_estimado:document.getElementById("duration").innerText,valor_viaje:document.getElementById("price").innerText,url_google_maps:crearUrlGoogleMaps(),estado:"Pendiente"}}
-function actualizarGlide(){window.parent.postMessage({type:"MOTO_TAXI_DATA",data:obtenerDatos()},"*")}
-function enviarWhatsApp(){const d=obtenerDatos(),url=d.url_google_maps,mensaje="NUEVA SOLICITUD DE VIAJE\n\nRUTA EN GOOGLE MAPS:\n"+url+"\n\nRECOGIDA:\n"+d.direccion_recogida+"\n\nDESTINO:\n"+d.direccion_destino+"\n\nDISTANCIA:\n"+d.distancia+"\n\nTIEMPO APROXIMADO:\n"+d.tiempo_estimado+"\n\nPRECIO:\n"+d.valor_viaje;window.open("https://wa.me/"+NUMERO_WHATSAPP+"?text="+encodeURIComponent(mensaje),"_blank")}
-document.getElementById("confirmButton").addEventListener("click",function(){if(pickupLat===null||destinationLat===null){alert("Selecciona la recogida y el destino.");return}actualizarGlide();enviarWhatsApp();document.getElementById("status").innerText="Viaje confirmado."});
+let tipoSeleccionado='moto';
+let distancia=3.2;
+let tiempo=8;
+let precioMotoBase=12;
+let precioCarroBase=25;
+let precioKmMoto=5;
+let precioKmCarro=9;
+
+function calcularRuta(){
+let origen=document.getElementById('origen').value.trim();
+let destino=document.getElementById('destino').value.trim();
+if(!origen || !destino) return;
+distancia = (Math.random()*8+1).toFixed(1);
+tiempo = Math.round(distancia*2.5+3);
+let precioM = Math.round((precioMotoBase + (distancia*precioKmMoto))*10)/10;
+let precioC = Math.round((precioCarroBase + (distancia*precioKmCarro))*10)/10;
+document.getElementById('distanciaTxt').innerText=distancia+' km';
+document.getElementById('tiempoTxt').innerText=tiempo+' min';
+document.getElementById('precioMoto').innerText='$'+precioM.toFixed(2)+' MXN';
+document.getElementById('precioCarro').innerText='$'+precioC.toFixed(2)+' MXN';
+document.getElementById('detalleMoto').innerText=distancia+' km • '+tiempo+' min';
+document.getElementById('detalleCarro').innerText=distancia+' km • '+tiempo+' min';
+actualizarResumen();
+}
+
+function seleccionar(tipo){
+tipoSeleccionado=tipo;
+document.getElementById('cardMoto').classList.toggle('active', tipo==='moto');
+document.getElementById('cardCarro').classList.toggle('active', tipo==='carro');
+actualizarResumen();
+if(window.lucide) lucide.createIcons();
+}
+
+function actualizarResumen(){
+let precioTxt=document.getElementById(tipoSeleccionado==='moto'?'precioMoto':'precioCarro').innerText;
+let origen=document.getElementById('origen').value;
+let destino=document.getElementById('destino').value;
+document.getElementById('seleccionTitulo').innerText=(tipoSeleccionado==='moto'?'MOTO':'CARRO')+' • '+precioTxt;
+document.getElementById('seleccionDetalle').innerText=`Recorrido: ${distancia} km • ${tiempo} min • De ${origen} a ${destino}`;
+let icon=document.getElementById('seleccionIcon');
+if(icon){ icon.setAttribute('data-lucide', tipoSeleccionado==='moto'?'bike':'car'); if(window.lucide) lucide.createIcons(); }
+}
+
+function confirmarViaje(){
+let origen=document.getElementById('origen').value;
+let destino=document.getElementById('destino').value;
+if(!origen || !destino){ alert('Escribe origen y destino'); return; }
+document.getElementById('buscando').style.display='block';
+document.getElementById('buscandoTipo').innerText=tipoSeleccionado.toUpperCase();
+document.getElementById('resumenSeleccion').style.display='none';
+setTimeout(()=>{
+let precio=document.getElementById(tipoSeleccionado==='moto'?'precioMoto':'precioCarro').innerText;
+alert('Viaje confirmado en '+tipoSeleccionado.toUpperCase()+'\nDe: '+origen+'\nA: '+destino+'\nDistancia: '+distancia+' km\nPrecio: '+precio+'\n\nBuscando conductor...');
+document.getElementById('buscando').style.display='none';
+document.getElementById('resumenSeleccion').style.display='block';
+},2000);
+}
+
+calcularRuta();
+if(window.lucide) lucide.createIcons();
 </script>
 </body>
 </html>
+<div id="panelConductor" style="max-width:480px;margin:0 auto;padding:16px;display:grid;gap:14px">
+<div class="card" style="background:var(--black);color:#fff">
+<div style="display:flex;justify-content:space-between;align-items:center"><div><b style="color:#fff">CONDUCTOR</b><br><small style="color:#94a3b8" id="conductorNombre">Laura - Moto</small><br><small style="color:#38bdf8" id="conductorTipo">MOTO • Activo</small></div><button class="btn-s btn-white" style="height:36px;background:#fff;color:#000" onclick="toggleActivo()"><i data-lucide="power" style="width:14px"></i> <span id="estadoTxt">Activo</span></button></div>
+</div>
+<div id="solicitudViaje" class="card" style="border:2px solid var(--black);display:none">
+<div style="display:flex;justify-content:space-between"><span class="badge">NUEVA SOLICITUD • <span id="solTipo">MOTO</span></span><span style="font-size:11px;font-weight:700" id="solTiempo">Hace 5s</span></div>
+<div style="margin-top:12px"><b style="font-size:16px" id="solRuta">Centro Dolores → Santa Fe</b><br><small style="color:#64748b" id="solDist">3.2 km • 8 min • $28.00 MXN</small></div>
+<div style="margin-top:12px;background:var(--gray);border-radius:12px;padding:12px"><div style="display:flex;gap:8px;align-items:center"><i data-lucide="user" style="width:16px"></i><b id="solCliente">Cliente Juan</b> • <small>4.8 ★</small></div><div style="display:flex;gap:8px;margin-top:6px"><i data-lucide="map-pin" style="width:14px;color:#16a34a"></i><small id="solOrigen">Recoge en: Centro Dolores</small></div><div style="display:flex;gap:8px"><i data-lucide="flag" style="width:14px;color:#dc2626"></i><small id="solDestino">Lleva a: Santa Fe</small></div></div>
+<div style="display:flex;gap:8px;margin-top:12px"><button class="btn btn-white" style="flex:1" onclick="rechazarViaje()">Rechazar</button><button class="btn btn-black" style="flex:1" onclick="aceptarViaje()">Aceptar viaje</button></div>
+</div>
+<div id="sinSolicitudes" class="card" style="text-align:center;padding:32px"><i data-lucide="inbox" style="width:32px;color:#cbd5e1"></i><br><b>Sin solicitudes</b><br><small style="color:#94a3b8">Activa tu estado para recibir viajes de <span id="sinTipo">MOTO</span></small></div>
+<div class="card"><b style="font-size:12px">HOY</b><div style="display:flex;justify-content:space-between;margin-top:8px"><div><small style="color:#64748b">Viajes</small><br><b style="font-size:20px" id="cViajes">0</b></div><div><small style="color:#64748b">Ganancia</small><br><b style="font-size:20px;color:var(--green)" id="cGanancia">$0.00</b></div><div><small style="color:#64748b">Horas</small><br><b style="font-size:20px" id="cHoras">0h</b></div></div></div>
+</div>
+<script>
+let conductorActivo=true;
+let conductorTipo='moto';
+let viajesHoy=0;
+let gananciaHoy=0;
+function toggleActivo(){ conductorActivo=!conductorActivo; document.getElementById('estadoTxt').innerText=conductorActivo?'Activo':'Inactivo'; document.getElementById('conductorTipo').innerText=(conductorTipo.toUpperCase())+' • '+(conductorActivo?'Activo':'Inactivo'); if(conductorActivo){ simularSolicitud(); } }
+function simularSolicitud(){
+if(!conductorActivo) return;
+let tipos=['moto','carro'];
+let tipo=conductorTipo;
+if(Math.random()>0.5 && conductorTipo==='moto') tipo='moto';
+if(conductorTipo!==tipo && Math.random()>0.7) return;
+let origenes=['Centro Dolores','Estación','Turbina','Mercado'];
+let destinos=['Santa Fe','Centro','Hospital','Universidad'];
+let origen=origenes[Math.floor(Math.random()*origenes.length)];
+let destino=destinos[Math.floor(Math.random()*destinos.length)];
+let distancia=(Math.random()*6+1).toFixed(1);
+let precio=tipo==='moto'? (12+distancia*5).toFixed(2) : (25+distancia*9).toFixed(2);
+document.getElementById('solTipo').innerText=tipo.toUpperCase();
+document.getElementById('solRuta').innerText=origen+' → '+destino;
+document.getElementById('solDist').innerText=distancia+' km • $'+precio+' MXN';
+document.getElementById('solOrigen').innerText='Recoge en: '+origen;
+document.getElementById('solDestino').innerText='Lleva a: '+destino;
+document.getElementById('solicitudViaje').style.display='block';
+document.getElementById('sinSolicitudes').style.display='none';
+if(window.lucide) lucide.createIcons();
+}
+function rechazarViaje(){ document.getElementById('solicitudViaje').style.display='none'; document.getElementById('sinSolicitudes').style.display='block'; setTimeout(simularSolicitud,3000); }
+function aceptarViaje(){
+let precioTxt=document.getElementById('solDist').innerText.match(/\$([\d.]+)/)[1];
+viajesHoy++; gananciaHoy+=parseFloat(precioTxt);
+document.getElementById('cViajes').innerText=viajesHoy;
+document.getElementById('cGanancia').innerText='$'+gananciaHoy.toFixed(2);
+document.getElementById('cHoras').innerText=(viajesHoy*0.3).toFixed(1)+'h';
+document.getElementById('solicitudViaje').style.display='none';
+document.getElementById('sinSolicitudes').innerHTML='<div style="text-align:center"><div style="width:48px;height:48px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto"><i data-lucide="check" style="color:#16a34a;width:24px"></i></div><br><b>Viaje aceptado</b><br><small>Dirígete al punto de recogida</small><br><button class="btn btn-blue" style="margin-top:12px" onclick="finalizarViaje()">Finalizar viaje</button></div>';
+document.getElementById('sinSolicitudes').style.display='block';
+if(window.lucide) lucide.createIcons();
+}
+function finalizarViaje(){ document.getElementById('sinSolicitudes').innerHTML='<i data-lucide="inbox" style="width:32px;color:#cbd5e1"></i><br><b>Sin solicitudes</b><br><small style="color:#94a3b8">Esperando viajes de '+conductorTipo.toUpperCase()+'</small>'; if(window.lucide) lucide.createIcons(); setTimeout(simularSolicitud,2000); }
+setTimeout(simularSolicitud,2000);
+  </script>
+  <div style="max-width:480px;margin:0 auto;padding:16px;display:grid;gap:14px">
+<div class="card" style="padding:0;overflow:hidden">
+<div style="height:240px;background:linear-gradient(135deg,#e0f2fe 0%,#bae6fd 50%,#f0f9ff 100%);position:relative">
+<div style="position:absolute;top:20px;left:20px;background:#fff;padding:6px 10px;border-radius:999px;font-size:11px;font-weight:800;box-shadow:0 2px 8px rgba(0,0,0,.1)"><i data-lucide="navigation" style="width:12px"></i> EN CURSO</div>
+<div style="position:absolute;top:50%;left:20%;width:14px;height:14px;background:#16a34a;border:3px solid #fff;border-radius:50%;box-shadow:0 0 0 4px rgba(22,163,74,.2)"></div>
+<div style="position:absolute;top:45%;left:22%;width:40%;height:3px;background:#0a0a0a;transform:rotate(-5deg);border-radius:999px"></div>
+<div id="motoIcon" style="position:absolute;top:42%;left:45%;width:32px;height:32px;background:#0a0a0a;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all 2s linear"><i data-lucide="bike" style="width:18px;color:#fff"></i></div>
+<div style="position:absolute;top:38%;right:18%;width:14px;height:14px;background:#dc2626;border:3px solid #fff;border-radius:50%"></div>
+<div style="position:absolute;bottom:16px;left:16px;right:16px;background:#fff;border-radius:12px;padding:10px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 12px rgba(0,0,0,.1)"><div><small style="color:#64748b">Conductor en camino</small><br><b id="trackingNombre">Laura - Moto • 4.9 ★</b><br><small style="color:#16a34a">● Llega en 3 min • Placa: MOTO-123</small></div><button class="btn-s btn-white" style="height:36px" onclick="llamarConductor()"><i data-lucide="phone" style="width:14px"></i> Llamar</button></div>
+</div>
+</div>
+<div class="card">
+<div style="display:flex;gap:12px"><div style="display:flex;flex-direction:column;align-items:center"><div style="width:10px;height:10px;background:#16a34a;border-radius:50%"></div><div style="width:2px;height:40px;background:#e2e8f0;margin:4px 0"></div><div style="width:10px;height:10px;background:#dc2626;border-radius:50%"></div></div><div style="flex:1;display:grid;gap:16px"><div><small style="color:#64748b">ORIGEN</small><br><b id="trackOrigen">Centro Dolores</b></div><div><small style="color:#64748b">DESTINO</small><br><b id="trackDestino">Santa Fe</b></div></div></div>
+<div style="margin-top:12px;display:flex;justify-content:space-between;background:var(--gray);border-radius:12px;padding:10px"><div><small style="color:#64748b">Distancia</small><br><b id="trackDist">3.2 km</b></div><div><small style="color:#64748b">Tiempo</small><br><b id="trackTiempo">8 min</b></div><div><small style="color:#64748b">Precio</small><br><b style="color:var(--green)" id="trackPrecio">$28.00</b></div></div>
+</div>
+<div style="display:flex;gap:8px"><button class="btn btn-white" style="flex:1" onclick="cancelarViaje()"><i data-lucide="x" style="width:16px"></i> Cancelar</button><button class="btn btn-black" style="flex:1" onclick="compartirViaje()"><i data-lucide="share-2" style="width:16px;color:#fff"></i> Compartir</button></div>
+</div>
+<script>
+function llamarConductor(){ alert('Llamando a Laura - Moto...'); }
+function cancelarViaje(){ if(confirm('¿Cancelar viaje?')){ alert('Viaje cancelado'); } }
+function compartirViaje(){ let texto=`Mi viaje en ${conductorTipo.toUpperCase()} de ${document.getElementById('trackOrigen').innerText} a ${document.getElementById('trackDestino').innerText} - $ ${document.getElementById('trackPrecio').innerText}`; window.open('https://wa.me/?text='+encodeURIComponent(texto),'_blank'); }
+let pos=45;
+setInterval(()=>{ pos+=1; if(pos>75) pos=20; let el=document.getElementById('motoIcon'); if(el) el.style.left=pos+'%'; },2000);
+</script>
+<div style="max-width:480px;margin:0 auto;padding:16px;display:grid;gap:14px">
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:center"><b>HISTORIAL DE VIAJES</b><button class="btn-s btn-white" style="height:32px;font-size:11px" onclick="filtrarHistorial()"><i data-lucide="filter" style="width:12px"></i> Filtrar</button></div>
+<div style="margin-top:12px;display:grid;gap:8px" id="listaViajes">
+<div class="card" style="background:var(--gray);padding:12px"><div style="display:flex;justify-content:space-between"><div><b style="font-size:13px">Centro → Santa Fe</b><br><small style="color:#64748b">Hoy 10:30 AM • MOTO • Laura</small></div><div style="text-align:right"><b style="color:var(--green)">$28.00</b><br><small style="color:#64748b">3.2 km</small></div></div></div>
+<div class="card" style="background:var(--gray);padding:12px"><div style="display:flex;justify-content:space-between"><div><b style="font-size:13px">Turbina → Centro</b><br><small style="color:#64748b">Ayer 6:15 PM • CARRO • David</small></div><div style="text-align:right"><b style="color:var(--green)">$62.00</b><br><small style="color:#64748b">5.1 km</small></div></div></div>
+</div>
+</div>
+<div class="card">
+<b style="font-size:13px">CONFIGURACIÓN DE TARIFAS</b>
+<div style="margin-top:12px;display:grid;gap:10px">
+<div style="display:flex;justify-content:space-between;align-items:center"><div><b>MOTO</b><br><small style="color:#64748b">Base + km</small></div><div style="display:flex;gap:8px"><input id="tarifaMotoBase" class="input" style="width:70px;height:36px" value="12" type="number"><input id="tarifaMotoKm" class="input" style="width:70px;height:36px" value="5" type="number"></div></div>
+<div style="display:flex;justify-content:space-between;align-items:center"><div><b>CARRO</b><br><small style="color:#64748b">Base + km</small></div><div style="display:flex;gap:8px"><input id="tarifaCarroBase" class="input" style="width:70px;height:36px" value="25" type="number"><input id="tarifaCarroKm" class="input" style="width:70px;height:36px" value="9" type="number"></div></div>
+<button class="btn btn-black" onclick="guardarTarifas()"><i data-lucide="save" style="width:16px;color:#fff"></i> Guardar tarifas</button>
+</div>
+</div>
+<div class="card">
+<b style="font-size:13px">ESTADÍSTICAS</b>
+<div style="display:flex;gap:12px;margin-top:12px">
+<div style="flex:1;background:var(--gray);border-radius:12px;padding:12px;text-align:center"><b style="font-size:20px">24</b><br><small style="color:#64748b">Viajes moto</small></div>
+<div style="flex:1;background:var(--gray);border-radius:12px;padding:12px;text-align:center"><b style="font-size:20px">12</b><br><small style="color:#64748b">Viajes carro</small></div>
+<div style="flex:1;background:#0a0a0a;border-radius:12px;padding:12px;text-align:center"><b style="font-size:20px;color:#fff">$1,240</b><br><small style="color:#94a3b8">Total</small></div>
+</div>
+</div>
+</div>
+<script>
+function filtrarHistorial(){ let tipo=prompt('Filtrar: moto / carro / todos'); alert('Filtrado: '+tipo); }
+function guardarTarifas(){
+let motoBase=document.getElementById('tarifaMotoBase').value;
+let motoKm=document.getElementById('tarifaMotoKm').value;
+let carroBase=document.getElementById('tarifaCarroBase').value;
+let carroKm=document.getElementById('tarifaCarroKm').value;
+localStorage.setItem('tarifaMotoBase',motoBase);
+localStorage.setItem('tarifaMotoKm',motoKm);
+localStorage.setItem('tarifaCarroBase',carroBase);
+localStorage.setItem('tarifaCarroKm',carroKm);
+alert('Tarifas guardadas: Moto Base $'+motoBase+' + $'+motoKm+'/km - Carro Base $'+carroBase+' + $'+carroKm+'/km');
+}
+</script>
