@@ -7,19 +7,17 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/lucide@latest"></script>
 <style>
-:root{--sky:#38bdf8;--dark:#0a0a0a;--dark2:#18181b}
-*{box-sizing:border-box}body{margin:0;font-family:system-ui;background:#f3f4f6;overflow:hidden}
-.app{max-width:500px;margin:0 auto;background:#fff;height:100vh;position:relative;display:flex;flex-direction:column}
-#map{width:100%;height:62vh;transition:.3s}.app.modo-viaje #map{height:52vh}
-.map-container{position:relative;flex:1}
-.top-bar{position:absolute;top:0;left:0;right:0;z-index:1000;padding:12px;display:flex;gap:10px;align-items:center}
-.btn-back{width:42px;height:42px;border-radius:50%;background:#fff;border:none;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.25);cursor:pointer;display:none}
-.logo-center{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:999;background:white;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.25)}
-.app.modo-viaje.logo-center{display:none}
-.dest-bar{flex:1;background:#fff;border-radius:999px;padding:10px 14px;display:flex;align-items:center;gap:8px;box-shadow:0 4px 12px rgba(0,0,0,.15);display:none}
-.app.modo-viaje.dest-bar{display:flex}
-.reset-btn{position:absolute;top:12px;left:12px;z-index:999;background:#fff;border:1px solid #ddd;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.2)}
-.app.modo-viaje.reset-btn{display:none}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui;background:#f3f4f6}
+.app{max-width:500px;margin:0 auto;background:#fff;min-height:100vh;display:flex;flex-direction:column}
+#map{width:100%;height:52vh;flex-shrink:0}
+.map-container{position:relative;width:100%;height:52vh;flex-shrink:0;overflow:hidden}
+.panel{padding:16px;border-radius:22px 22px 0 0;margin-top:-22px;position:relative;z-index:1000;background:#fff;flex:1;overflow-y:auto;box-shadow:0 -4px 20px rgba(0,0,0,.12)}
+.step{background:#f7f7f8;border:1px solid #eee;padding:12px;border-radius:14px;margin-bottom:12px}
+.colonia-input{width:100%;padding:14px 14px 14px 38px;border:1.5px solid #ddd;border-radius:12px;font-size:14px;font-weight:600;outline:none}
+.suggestions{position:absolute;left:0;right:0;top:100%;margin-top:6px;background:#fff;border:1px solid #ddd;border-radius:14px;box-shadow:0 10px 25px rgba(0,0,0,.18);z-index:9999;display:none;max-height:260px;overflow-y:auto}
+.suggestions.show{display:block}
+.suggestion{padding:12px 14px;border-bottom:1px solid #f2f2f2;display:flex;gap:10px;align-items:center;cursor:pointer}
+.btn-cotizar{width:100%;padding:16px;border:none;border-radius:14px;background:#E53935;color:#fff;font-weight:900;font-size:15px;margin-top:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
 .weather-widget{position:absolute;top:12px;right:12px;z-index:999;background:#fff;border-radius:20px;padding:6px 12px;font-size:11px;font-weight:900;display:flex;align-items:center;gap:4px;box-shadow:0 2px 10px rgba(0,0,0,.25);border:1px solid #eee}
 .weather-widget.lluvia{background:#dbeafe;color:#1e40af}.weather-widget.tormenta{background:#1e293b;color:#fff}
 .rain-overlay{position:absolute;top:0;left:0;width:100%;height:100%;z-index:400;pointer-events:none;display:none;background:rgba(30,58,138,0.12)}.rain-overlay.active{display:block}
@@ -27,88 +25,39 @@
 @keyframes fall{0%{transform:translateY(0)}100%{transform:translateY(60vh)}}
 .weather-badge{position:absolute;bottom:12px;left:12px;z-index:999;background:#1e3a8a;color:#fff;padding:7px 12px;border-radius:20px;font-size:11px;font-weight:900;display:none;box-shadow:0 2px 8px rgba(0,0,0,.3);align-items:center;gap:6px}.weather-badge.show{display:flex}
 .weather-badge.tormenta{background:#7f1d1d}.weather-badge.moderada{background:#1e40af}.weather-badge.leve{background:#1e3a8a}
-.panel{padding:16px;border-radius:22px 22px 0 0;margin-top:-22px;position:relative;z-index:1000;background:#fff;box-shadow:0 -4px 20px rgba(0,0,0,.12)}
-.panel-2{display:none;flex:1;background:#111;border-radius:28px 28px 0 0;margin-top:-28px;z-index:1001;position:relative;flex-direction:column;padding:0 16px 16px;box-shadow:0 -10px 30px rgba(0,0,0,.4)}
-.app.modo-viaje.panel{display:none}
-.app.modo-viaje.panel-2{display:flex}
-.step{background:#f7f7f8;border:1px solid #eee;padding:12px;border-radius:14px;margin-bottom:12px}
-.colonia-input{width:100%;padding:14px 14px 14px 38px;border:1.5px solid #ddd;border-radius:12px;font-size:14px;font-weight:600;outline:none}
-.suggestions{position:absolute;left:0;right:0;top:100%;margin-top:6px;background:#fff;border:1px solid #ddd;border-radius:14px;box-shadow:0 10px 25px rgba(0,0,0,.18);z-index:9999;display:none;max-height:300px;overflow-y:auto}
-.suggestions.show{display:block}
-.suggestion{padding:12px 14px;border-bottom:1px solid #f2f2f2;display:flex;gap:10px;align-items:center;cursor:pointer}
-.btn-cotizar{width:100%;padding:16px;border:none;border-radius:14px;background:#E53935;color:#fff;font-weight:900;font-size:15px;margin-top:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
-.veh-marker{width:30px;height:30px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.3);border:2px solid var(--sky)}
-.veh-marker.carro{border-color:#fff;background:#111}
-.drag{width:40px;height:4px;background:#3f3f46;border-radius:999px;margin:12px auto 16px}
-.panel-2 h2{color:#fff;margin:0 0 4px;font-size:22px;font-weight:900}
-.sub{color:#a1a1aa;font-size:12px;margin-bottom:16px}
-.card{border-radius:20px;padding:14px;display:flex;gap:14px;align-items:center;background:#1c1c1f;border:2px solid transparent;cursor:pointer;transition:.2s;margin-bottom:12px}
-.card.active{border-color:var(--sky);background:#1e293b;box-shadow:0 0 0 1px var(--sky) inset}
-.card-left{width:92px;height:72px;background:#fff;border-radius:14px;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0}
-.card-left img{width:82px;height:58px;object-fit:contain}
-.card-title{color:#fff;font-weight:800;font-size:15px}
-.card-pass{color:#a1a1aa;font-size:11px;display:flex;align-items:center;gap:4px;margin-top:2px}
-.card-time{color:#71717a;font-size:11px;margin-top:6px}
-.badge-limit{font-size:10px;font-weight:800;background:#f43f5e;color:#fff;padding:3px 8px;border-radius:999px;margin-top:6px;display:inline-block}
-.price{font-size:20px;font-weight:900;color:#fff}
-.check{width:22px;height:22px;border-radius:50%;border:2px solid #3f3f46;display:flex;align-items:center;justify-content:center;margin-left:auto}
+.reset-btn{position:absolute;top:12px;left:12px;z-index:999;background:#fff;border:1px solid #ddd;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.2)}
 </style>
 </head>
 <body>
-<div class="app" id="app">
+<div class="app">
 <div class="map-container">
 <div id="map"></div>
-<div class="logo-center"><img src="https://firebasestorage.googleapis.com/v0/b/glide-prod.appspot.com/o/icon-images%2Fanonymous-ba983199-acce-404e-b058-c75e9633b325.jpeg?alt=media&token=a58284c1-111c-4874-b60f-35380cf5fbe3" style="width:32px;height:32px;border-radius:50%;object-fit:cover"></div>
-<div class="top-bar">
-<button class="btn-back" id="btnBack" style="display:none" onclick="volver()"><i data-lucide="arrow-left" style="width:18px"></i></button>
-<div class="dest-bar" id="destBar"><i data-lucide="navigation" style="width:16px;color:#0ea5e9"></i><div style="flex:1;overflow:hidden"><div style="font-size:9px;color:#71717a;font-weight:700">DESTINO</div><b id="destTxt" style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block">Destino</b></div><div style="text-align:right"><div style="font-size:9px;color:#71717a;font-weight:700">TIEMPO</div><b style="font-size:11px" id="tiempoTxt">--</b></div></div>
+<div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:999;background:white;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.25)">
+<img src="https://firebasestorage.googleapis.com/v0/b/glide-prod.appspot.com/o/icon-images%2Fanonymous-ba983199-acce-404e-b058-c75e9633b325.jpeg?alt=media&token=a58284c1-111c-4874-b60f-35380cf5fbe3" style="width:32px;height:32px;border-radius:50%;object-fit:cover">
 </div>
 <div class="reset-btn" id="resetBtn"><i data-lucide="rotate-ccw" style="width:16px"></i></div>
 <div id="weatherWidget" class="weather-widget"><i data-lucide="sun" style="width:14px"></i> --°C</div>
 <div id="rainOverlay" class="rain-overlay"></div>
 <div id="weatherBadge" class="weather-badge"><i data-lucide="cloud-rain" style="width:14px;color:#fff"></i> <span id="weatherBadgeTxt">LLOVIENDO EN DOLORES</span></div>
 </div>
-
-<div class="panel" id="panel1">
+<div class="panel">
 <div class="step"><div style="font-size:11px;font-weight:800;color:#666;margin-bottom:6px">1. ¿DÓNDE RECOGER?</div><div style="position:relative"><i data-lucide="map-pin" style="position:absolute;left:12px;top:15px;width:16px;color:#16a34a"></i><input id="pickupInput" class="colonia-input" placeholder="Escribe Centro o colonia..." autocomplete="off"><div id="pickupSuggestions" class="suggestions"></div></div></div>
 <div class="step"><div style="font-size:11px;font-weight:800;color:#666;margin-bottom:6px">2. ¿DÓNDE ENTREGAR?</div><div style="position:relative"><i data-lucide="flag" style="position:absolute;left:12px;top:15px;width:16px;color:#dc2626"></i><input id="destinationInput" class="colonia-input" placeholder="Escribe colonia..." autocomplete="off"><div id="destinationSuggestions" class="suggestions"></div></div></div>
-<button id="calculateButton" class="btn-cotizar"><i data-lucide="map-pin" style="width:18px;color:#fff"></i> CONFIRMAR DIRECCIÓN</button>
-</div>
-
-<div class="panel-2" id="panel2">
-<div class="drag"></div>
-<h2>Elige tu viaje</h2>
-<div class="sub" id="rutaSub">Calculando ruta...</div>
-<div id="cardMoto" class="card" onclick="seleccionar('moto')">
-<div class="card-left"><img src="https://img.icons8.com/3d-fluency/94/motorcycle.png"></div>
-<div style="flex:1"><div style="display:flex;justify-content:space-between"><div><div class="card-title">Moto</div><div class="card-pass"><i data-lucide="user" style="width:12px"></i> 1 pasajero</div></div><div class="check"><i data-lucide="check" style="width:12px;display:none" class="ic-check"></i></div></div><div class="card-time" id="motoTime">Tiempo estimado: --</div><div class="badge-limit" id="motoBadge" style="display:none">Disponibilidad limitada</div></div>
-<div class="price" id="motoPrice">$--</div>
-</div>
-<div id="cardCarro" class="card" onclick="seleccionar('carro')">
-<div class="card-left"><img src="https://img.icons8.com/3d-fluency/94/car.png"></div>
-<div style="flex:1"><div style="display:flex;justify-content:space-between"><div><div class="card-title">Carro</div><div class="card-pass"><i data-lucide="users" style="width:12px"></i> Hasta 4 pasajeros</div></div><div class="check"><i data-lucide="check" style="width:12px;display:none" class="ic-check"></i></div></div><div class="card-time" id="carroTime">Tiempo estimado: --</div></div>
-<div class="price" id="carroPrice">$--</div>
-</div>
-<div id="cardEnvio" class="card" onclick="seleccionar('envio')">
-<div class="card-left"><img src="https://img.icons8.com/3d-fluency/94/delivery.png"></div>
-<div style="flex:1"><div style="display:flex;justify-content:space-between"><div><div class="card-title">Envío</div><div class="card-pass">Entrega de paquetes</div></div><div class="check"><i data-lucide="check" style="width:12px;display:none" class="ic-check"></i></div></div><div class="card-time" id="envioTime">Tiempo estimado: --</div></div>
-<div class="price" id="envioPrice">$--</div>
-</div>
-<button id="btnBottom" class="btn-bottom" onclick="confirmarViaje()"><span id="btnTxt">Selecciona una opción</span></button>
+<button id="calculateButton" class="btn-cotizar"><i data-lucide="calculator" style="width:18px;color:#fff"></i> CONFIRMAR DIRECCIÓN</button>
 </div>
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const CENTRO={lat:21.1561,lng:-100.9333};
-let pickupLat=null,pickupLng=null,destinationLat=null,destinationLng=null,pickupMarker=null,destinationMarker=null,routeLayer=null,pickupName="",destName="",tipoSeleccionado='',vehMarkers=[];
-let extraLluvia=0,datosViaje={};
+let pickupLat=null,pickupLng=null,destinationLat=null,destinationLng=null,pickupMarker=null,destinationMarker=null,routeLayer=null,pickupName="",destName="";
+let extraLluvia=0;
 const map=L.map("map",{zoomControl:false}).setView([CENTRO.lat,CENTRO.lng],14);
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19}).addTo(map);
 const pickupInput=document.getElementById("pickupInput"),destinationInput=document.getElementById("destinationInput"),pickupSuggestions=document.getElementById("pickupSuggestions"),destinationSuggestions=document.getElementById("destinationSuggestions");
 const rainOverlay=document.getElementById("rainOverlay"),weatherBadge=document.getElementById("weatherBadge"),weatherWidget=document.getElementById("weatherWidget");
 function distMts(lat1,lon1,lat2,lon2){const R=6371000;const dLat=(lat2-lat1)*Math.PI/180;const dLon=(lon2-lon1)*Math.PI/180;const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
 async function buscarColonias(t){const texto=t.toLowerCase();let resultados=[];if(texto.includes("centro")||texto.includes("cent")){resultados.push({lat:CENTRO.lat,lon:CENTRO.lng,name:"Centro - Zona Centro",direccion:"Centro, Dolores Hidalgo, Gto."});}const q=encodeURIComponent(t+", Dolores Hidalgo Guanajuato Mexico");try{const r=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}&limit=10&countrycodes=mx&accept-language=es`);const d=await r.json();const otros=d.map(x=>({lat:parseFloat(x.lat),lon:parseFloat(x.lon),name:x.display_name.split(",")[0],direccion:x.display_name}));resultados=[...resultados,...otros];}catch(e){}return resultados;}
-  function mostrar(c,res,tipo){c.innerHTML="";if(!res.length){c.innerHTML='<div style="padding:12px;text-align:center">Sin resultados</div>';c.classList.add("show");return;}res.forEach(r=>{const el=document.createElement("div");el.className="suggestion";el.innerHTML=`<div style="width:28px;height:28px;background:#111;border-radius:50%;display:flex;align-items:center;justify-content:center"><i data-lucide="map-pin" style="width:14px;color:#fff"></i></div><div><div style="font-weight:800;font-size:13px">${r.name}</div><div style="font-size:10px;color:#777">${r.direccion.substring(0,70)}</div></div>`;el.onclick=()=>{if(tipo==="pickup"){pickupLat=r.lat;pickupLng=r.lon;pickupName=r.name;pickupInput.value=r.name;pickupSuggestions.classList.remove("show");if(pickupMarker)map.removeLayer(pickupMarker);pickupMarker=L.marker([r.lat,r.lon]).addTo(map).bindPopup("RECOGER: "+r.name).openPopup();map.setView([r.lat,r.lon],16);}else{destinationLat=r.lat;destinationLng=r.lon;destName=r.name;destinationInput.value=r.name;destinationSuggestions.classList.remove("show");if(destinationMarker)map.removeLayer(destinationMarker);destinationMarker=L.marker([r.lat,r.lon]).addTo(map).bindPopup("ENTREGAR: "+r.name).openPopup();map.setView([r.lat,r.lon],16);} lucide.createIcons();};c.appendChild(el);});c.classList.add("show"); lucide.createIcons();}
+function mostrar(c,res,tipo){c.innerHTML="";if(!res.length){c.innerHTML='<div style="padding:12px;text-align:center">Sin resultados</div>';c.classList.add("show");return;}res.forEach(r=>{const el=document.createElement("div");el.className="suggestion";el.innerHTML=`<div style="width:28px;height:28px;background:#111;border-radius:50%;display:flex;align-items:center;justify-content:center"><i data-lucide="map-pin" style="width:14px;color:#fff"></i></div><div><div style="font-weight:800;font-size:13px">${r.name}</div><div style="font-size:10px;color:#777">${r.direccion.substring(0,70)}</div></div>`;el.onclick=()=>{if(tipo==="pickup"){pickupLat=r.lat;pickupLng=r.lon;pickupName=r.name;pickupInput.value=r.name;pickupSuggestions.classList.remove("show");if(pickupMarker)map.removeLayer(pickupMarker);pickupMarker=L.marker([r.lat,r.lon]).addTo(map).bindPopup("RECOGER: "+r.name).openPopup();map.setView([r.lat,r.lon],16);}else{destinationLat=r.lat;destinationLng=r.lon;destName=r.name;destinationInput.value=r.name;destinationSuggestions.classList.remove("show");if(destinationMarker)map.removeLayer(destinationMarker);destinationMarker=L.marker([r.lat,r.lon]).addTo(map).bindPopup("ENTREGAR: "+r.name).openPopup();map.setView([r.lat,r.lon],16);} lucide.createIcons();};c.appendChild(el);});c.classList.add("show"); lucide.createIcons();}
 let t1=null;pickupInput.addEventListener("input",function(){const txt=this.value.trim();if(t1)clearTimeout(t1);if(txt.length<2){pickupSuggestions.classList.remove("show");return;}t1=setTimeout(async()=>{const res=await buscarColonias(txt);mostrar(pickupSuggestions,res,"pickup");},120);});
 let t2=null;destinationInput.addEventListener("input",function(){const txt=this.value.trim();if(t2)clearTimeout(t2);if(txt.length<2){destinationSuggestions.classList.remove("show");return;}t2=setTimeout(async()=>{const res=await buscarColonias(txt);mostrar(destinationSuggestions,res,"destination");},120);});
 for(let i=0;i<70;i++){let d=document.createElement("div");d.className="rain";d.style.left=Math.random()*100+"%";d.style.animationDelay=Math.random()*1.2+"s";d.style.animationDuration=(0.5+Math.random()*0.6)+"s";d.style.opacity=0.6+Math.random()*0.4;rainOverlay.appendChild(d);}
@@ -118,75 +67,16 @@ document.getElementById("calculateButton").onclick=async()=>{
  if(!pickupLat||!destinationLat){alert("Selecciona donde recoger y donde entregar");return;}
  const url=`https://router.project-osrm.org/route/v1/driving/${pickupLng},${pickupLat};${destinationLng},${destinationLat}?overview=full&geometries=geojson`;
  const r=await fetch(url);const d=await r.json();if(!d.routes||!d.routes[0]){alert("No se pudo trazar ruta");return;}
- const route=d.routes[0];
- const km=route.distance/1000; const tiempo=Math.ceil(route.duration/60);
- let baseMoto=35, baseCarro=55, baseEnvio=32;
- if(route.distance>2000){let extra=route.distance-2000;baseMoto=35+Math.ceil(extra/650)*5; baseCarro=55+Math.ceil(extra/650)*8; baseEnvio=32+Math.ceil(extra/650)*5;}
- if(distMts(pickupLat,pickupLng,CENTRO.lat,CENTRO.lng)>800&&distMts(destinationLat,destinationLng,CENTRO.lat,CENTRO.lng)>800){baseMoto+=5; baseCarro+=10; baseEnvio+=5;}
- let esSOP = (pickupName.toLowerCase().includes("sop") && destName.toLowerCase().includes("linda")) || (destName.toLowerCase().includes("sop") && pickupName.toLowerCase().includes("linda"));
- if(esSOP){ baseMoto=45; baseCarro=65; baseEnvio=45; }
- baseMoto+=extraLluvia; baseCarro+=extraLluvia; baseEnvio+=extraLluvia;
- datosViaje={origen:pickupName,destino:destName,origenLat:pickupLat,origenLng:pickupLng,destLat:destinationLat,destLng:destinationLng,distKm:km.toFixed(2),tiempoMin:tiempo,precioMoto:baseMoto,precioCarro:baseCarro,precioEnvio:baseEnvio, ruta:route.geometry};
- document.getElementById('app').classList.add('modo-viaje');
- document.getElementById('btnBack').style.display='flex';
- document.getElementById('destBar').style.display='flex';
- document.getElementById('destTxt').innerText=destName;
- document.getElementById('tiempoTxt').innerText=tiempo+' min';
- document.getElementById('rutaSub').innerText=`${km.toFixed(2)} km • Ruta recomendada • 5 conductores cerca`;
- document.getElementById('motoTime').innerText=`Tiempo estimado: ${tiempo} min`;
- document.getElementById('carroTime').innerText=`Tiempo estimado: ${tiempo+2} min`;
- document.getElementById('envioTime').innerText=`Tiempo estimado: ${tiempo+1} min`;
- document.getElementById('motoPrice').innerText=`$${baseMoto} MXN`;
- document.getElementById('carroPrice').innerText=`$${baseCarro} MXN`;
- document.getElementById('envioPrice').innerText=`$${baseEnvio} MXN`;
- if(baseMoto>50) document.getElementById('motoBadge').style.display='inline-block'; else document.getElementById('motoBadge').style.display='none';
- if(routeLayer)map.removeLayer(routeLayer);
- routeLayer=L.geoJSON(route.geometry,{style:{color:'#38bdf8',weight:6}}).addTo(map);
- map.fitBounds(routeLayer.getBounds(),{padding:[60,60]});
- vehMarkers.forEach(m=>map.removeLayer(m)); vehMarkers=[];
- let tipos=['moto','carro','moto','moto','carro','moto'];
- tipos.forEach(t=>{
-  let idx=Math.floor(route.geometry.coordinates.length * (0.15+Math.random()*0.7));
-  let c=route.geometry.coordinates[idx];
-  let lat=c[1]+(Math.random()-0.5)*0.003;
-  let lng=c[0]+(Math.random()-0.5)*0.003;
-  let html=t==='moto'?`<div class="veh-marker"><i data-lucide="bike" style="width:16px;color:#0a0a0a"></i></div>`:`<div class="veh-marker carro"><i data-lucide="car" style="width:16px;color:#fff"></i></div>`;
-  let icon=L.divIcon({html,className:'',iconSize:[30,30]});
-  let m=L.marker([lat,lng],{icon}).addTo(map); vehMarkers.push(m);
- });
- lucide.createIcons();
+ const route=d.routes[0];const km=route.distance/1000;
+ let precio=35;
+ if(route.distance>2000){let extra=route.distance-2000;precio=35+Math.ceil(extra/650)*5;}
+ if(distMts(pickupLat,pickupLng,CENTRO.lat,CENTRO.lng)>800&&distMts(destinationLat,destinationLng,CENTRO.lat,CENTRO.lng)>800){precio+=5;}
+ let esSOP_Lindavista = (pickupName.toLowerCase().includes("sop") && destName.toLowerCase().includes("linda")) || (destName.toLowerCase().includes("sop") && pickupName.toLowerCase().includes("linda"));
+ if(esSOP_Lindavista){ precio = 45; }
+ if(extraLluvia>0){precio+=extraLluvia;}
+ if(routeLayer)map.removeLayer(routeLayer);routeLayer=L.geoJSON(route.geometry,{style:{color:"#E53935",weight:6}}).addTo(map);map.fitBounds(routeLayer.getBounds(),{padding:[40,40]});
+ alert(`Ruta lista: ${km.toFixed(2)} km - $${precio} MXN - Ahora aquí conectamos la pantalla 2`);
 };
-function volver(){
- document.getElementById('app').classList.remove('modo-viaje');
- document.getElementById('btnBack').style.display='none';
- document.getElementById('destBar').style.display='none';
- vehMarkers.forEach(m=>map.removeLayer(m));
- if(routeLayer)map.removeLayer(routeLayer);
- if(pickupMarker)pickupMarker.addTo(map);
- if(destinationMarker)destinationMarker.addTo(map);
- map.setView([CENTRO.lat,CENTRO.lng],14);
-}
-function seleccionar(t){
- tipoSeleccionado=t;
- document.querySelectorAll('.card').forEach(c=>c.classList.remove('active'));
- document.querySelectorAll('.ic-check').forEach(i=>i.style.display='none');
- let el=document.getElementById('card'+t.charAt(0).toUpperCase()+t.slice(1));
- el.classList.add('active');
- el.querySelector('.ic-check').style.display='block';
- let btn=document.getElementById('btnBottom'); btn.classList.add('ready');
- let txt=document.getElementById('btnTxt');
- if(t==='moto') txt.innerText=`Elegir Moto • $${datosViaje.precioMoto} MXN`;
- if(t==='carro') txt.innerText=`Elegir Carro • $${datosViaje.precioCarro} MXN`;
- if(t==='envio') txt.innerText=`Elegir Envío • $${datosViaje.precioEnvio} MXN`;
- lucide.createIcons();
-}
-function confirmarViaje(){
- if(!tipoSeleccionado){alert('Selecciona Moto, Carro o Envío');return;}
- let precio=tipoSeleccionado==='moto'?datosViaje.precioMoto:tipoSeleccionado==='carro'?datosViaje.precioCarro:datosViaje.precioEnvio;
- let link=`https://www.google.com/maps/dir/${datosViaje.origenLat},${datosViaje.origenLng}/${datosViaje.destLat},${datosViaje.destLng}`;
- let msg=`COTIZACION KIGO ${tipoSeleccionado.toUpperCase()}\nRecoger: ${datosViaje.origen}\nEntregar: ${datosViaje.destino}\nDistancia: ${datosViaje.distKm} km\nPrecio: $${precio} MXN\nRuta: ${link}`;
- window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
-}
 document.getElementById("resetBtn").onclick=()=>{
  pickupLat=null;pickupLng=null;destinationLat=null;destinationLng=null;pickupName="";destName="";
  pickupInput.value="";destinationInput.value="";
