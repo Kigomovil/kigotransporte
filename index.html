@@ -6,6 +6,8 @@
 <title>Kigo xpress</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:system-ui;background:#f3f4f6;overflow:hidden}
 .app{max-width:500px;margin:0 auto;background:#fff;height:100dvh;display:flex;flex-direction:column;overflow:hidden;position:relative}
@@ -13,6 +15,7 @@
 #map{width:100%;height:100%}
 #mapConfirm{width:100%;height:100%}
 .clima-banner{position:absolute;top:58px;left:12px;right:12px;z-index:1000;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border:1px solid #eee;border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 15px rgba(0,0,0,.1)}
+.weather-widget{position:absolute;top:12px;right:12px;z-index:1000;background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border:1px solid rgba(0,0,0,.08);border-radius:14px;padding:8px 12px;display:flex;align-items:center;gap:8px;box-shadow:0 4px 15px rgba(0,0,0,.12)}
 .panel{padding:16px 16px 110px 16px;border-radius:22px 22px 0 0;margin-top:-22px;position:relative;z-index:1000;background:#fff;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .panel2{position:fixed;bottom:0;left:50%;transform:translateX(-50%);max-width:500px;width:100%;background:#ffffff;border-radius:28px 28px 0 0;z-index:3000;padding:16px 16px 110px 16px;display:none;flex-direction:column;max-height:78vh;overflow-y:auto;box-shadow:0 -10px 30px rgba(0,0,0,.15)}
 .panel2.show{display:flex}
@@ -66,6 +69,10 @@
 <div class="map-container">
 <div id="map"></div>
 <div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:999;background:white;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.25)"><img src="https://firebasestorage.googleapis.com/v0/b/glide-prod.appspot.com/o/icon-images%2Fanonymous-ba983199-acce-404e-b058-c75e9633b325.jpeg?alt=media&token=a58284c1-111c-4874-b60f-35380cf5fbe3" style="width:32px;height:32px;border-radius:50%"></div>
+<div id="weatherWidget" class="weather-widget" style="display:none">
+<div id="weatherIcon" style="font-size:20px">☀️</div>
+<div><div id="weatherTemp" style="font-weight:900;font-size:13px;color:#111">--°C</div><div id="weatherDesc" style="font-size:9px;color:#666;font-weight:700">Cargando</div></div>
+</div>
 <div id="climaBanner" class="clima-banner" style="display:none">
 <div id="climaIcon" style="width:36px;height:36px;background:#e0f2fe;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">🌧️</div>
 <div style="flex:1"><div id="climaTxt" style="font-weight:900;font-size:12px;color:#111">Verificando clima...</div><div id="climaSub" style="font-size:10px;color:#666">Dolores Hidalgo - Tiempo real</div></div>
@@ -94,8 +101,8 @@
 </div>
 <div id="panelAdmin" style="position:fixed;inset:0;max-width:500px;margin:0 auto;background:#f8f8f9;z-index:4500;display:none;flex-direction:column;overflow-y:auto;padding-bottom:120px">
 <div style="background:#fff;padding:18px 20px 12px;border-bottom:1px solid #eee;position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:12px">
-<button onclick="irInicio()" style="width:42px;height:42px;border-radius:14px;background:#f1f1f1;border:1px solid #eee;display:flex;align-items:center;justify-content:center"><i data-lucide="arrow-left" style="width:18px"></i></button>
-<div><div style="font-weight:900;font-size:18px;color:#111" id="nombrePlataformaTitulo">Kigo Xpress • Admin</div><div style="font-size:11px;color:#16a34a;font-weight:700;display:flex;align-items:center;gap:4px"><i data-lucide="circle" style="width:8px;fill:#16a34a"></i> Sesión activa en este teléfono</div></div>
+<button onclick="irInicioForzado()" style="width:42px;height:42px;border-radius:14px;background:#111;color:#fff;border:1px solid #111;display:flex;align-items:center;justify-content:center"><i data-lucide="arrow-left" style="width:18px"></i></button>
+<div><div style="font-weight:900;font-size:18px;color:#111" id="nombrePlataformaTitulo">Kigo Xpress • Admin</div><div style="font-size:11px;color:#16a34a;font-weight:700;display:flex;align-items:center;gap:4px"><i data-lucide="circle" style="width:8px;fill:#16a34a"></i> Sesión activa - Tiempo real ON</div></div>
 <div style="margin-left:auto"><button onclick="cerrarSesionAdmin()" style="background:#fff1f1;border:1px solid #ffdede;color:#E53935;border-radius:10px;padding:8px 12px;font-weight:800;font-size:11px">Cerrar sesión</button></div>
 </div>
 <div class="tabs">
@@ -107,13 +114,13 @@
 <div style="padding:16px">
 <div id="tab-ajustes" class="tab-content active">
 <div class="admin-card">
-<div style="font-weight:900;color:#111;display:flex;align-items:center;gap:8px"><i data-lucide="sliders-horizontal" style="width:16px;color:#E53935"></i> Ajustes de Plataforma</div>
+<div style="font-weight:900;color:#111;display:flex;align-items:center;gap:8px"><i data-lucide="sliders-horizontal" style="width:16px;color:#E53935"></i> Ajustes de Plataforma - Tiempo Real</div>
 <div style="margin-top:12px"><div style="font-size:11px;font-weight:800;color:#666">NOMBRE PLATAFORMA</div><input id="cfgNombre" class="input-admin" style="margin-top:6px" value="Kigo Xpress" oninput="sincronizarTiempoReal()"></div>
 <div style="display:flex;gap:10px;margin-top:10px">
 <div style="flex:1"><div style="font-size:11px;font-weight:800;color:#666">PRECIO BASE MOTO</div><input id="cfgMoto" type="number" class="input-admin" style="margin-top:6px" value="35" oninput="sincronizarTiempoReal()"></div>
 <div style="flex:1"><div style="font-size:11px;font-weight:800;color:#666">PRECIO BASE CARRO</div><input id="cfgCarro" type="number" class="input-admin" style="margin-top:6px" value="55" oninput="sincronizarTiempoReal()"></div>
 </div>
-<button onclick="guardarAjustes()" style="width:100%;margin-top:14px;padding:13px;border:none;border-radius:12px;background:#111;color:#fff;font-weight:800">Guardar Ajustes</button>
+<button onclick="guardarAjustes()" style="width:100%;margin-top:14px;padding:13px;border:none;border-radius:12px;background:#111;color:#fff;font-weight:800">Guardar y Sincronizar a Todos</button>
 </div>
 </div>
 <div id="tab-config" class="tab-content">
@@ -125,11 +132,11 @@
 <button onclick="detectarLluviaDolores()" style="background:#111;color:#fff;border:none;border-radius:8px;padding:6px 10px;font-size:10px;font-weight:700">Actualizar</button>
 </div>
 <div style="margin-top:12px;display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid #eee;border-radius:12px;padding:10px 12px">
-<div style="font-size:11px;font-weight:800;color:#111">Modo automático (clima real)</div>
+<div style="font-size:11px;font-weight:800;color:#111">Modo automático (clima real para todos)</div>
 <div id="toggleAuto" class="toggle on" onclick="toggleAutoLluvia()"><div class="toggle-knob"></div></div>
 </div>
 <div style="margin-top:10px">
-<div style="font-size:11px;font-weight:800;color:#666;margin-bottom:6px">SELECCIÓN MANUAL (si desactivas automático)</div>
+<div style="font-size:11px;font-weight:800;color:#666;margin-bottom:6px">SELECCIÓN MANUAL</div>
 <div style="display:flex;gap:6px">
 <button id="btnLluvia0" onclick="setLluviaManual('ninguna')" style="flex:1;padding:10px;border-radius:10px;border:1.5px solid #16a34a;background:#f0fdf4;font-weight:800;font-size:11px">Sin lluvia</button>
 <button id="btnLluvia1" onclick="setLluviaManual('leve')" style="flex:1;padding:10px;border-radius:10px;border:1px solid #eee;background:#fff;font-weight:800;font-size:11px">Leve</button>
@@ -138,11 +145,11 @@
 </div>
 </div>
 <div style="display:flex;gap:8px;margin-top:12px">
-<div style="flex:1"><div style="font-size:10px;font-weight:800;color:#666"> $ LEVE (def 0)</div><input id="cfgLluviaLeve" type="number" class="input-admin" style="margin-top:4px" value="0" oninput="sincronizarTiempoReal()"></div>
-<div style="flex:1"><div style="font-size:10px;font-weight:800;color:#666"> $ MODERADA (def 5)</div><input id="cfgLluviaMod" type="number" class="input-admin" style="margin-top:4px" value="5" oninput="sincronizarTiempoReal()"></div>
-<div style="flex:1"><div style="font-size:10px;font-weight:800;color:#666"> $ FUERTE (def 10)</div><input id="cfgLluviaFuerte" type="number" class="input-admin" style="margin-top:4px" value="10" oninput="sincronizarTiempoReal()"></div>
+<div style="flex:1"><div style="font-size:10px;font-weight:800;color:#666"> $ LEVE</div><input id="cfgLluviaLeve" type="number" class="input-admin" style="margin-top:4px" value="0" oninput="sincronizarTiempoReal()"></div>
+<div style="flex:1"><div style="font-size:10px;font-weight:800;color:#666"> $ MODERADA</div><input id="cfgLluviaMod" type="number" class="input-admin" style="margin-top:4px" value="5" oninput="sincronizarTiempoReal()"></div>
+<div style="flex:1"><div style="font-size:10px;font-weight:800;color:#666"> $ FUERTE</div><input id="cfgLluviaFuerte" type="number" class="input-admin" style="margin-top:4px" value="10" oninput="sincronizarTiempoReal()"></div>
 </div>
-<button onclick="guardarAjustes()" style="width:100%;margin-top:14px;padding:13px;border:none;border-radius:12px;background:#111;color:#fff;font-weight:800">Guardar Precios Lluvia</button>
+<button onclick="guardarAjustes()" style="width:100%;margin-top:14px;padding:13px;border:none;border-radius:12px;background:#111;color:#fff;font-weight:800">Guardar Precios Lluvia a Todos</button>
 </div>
 <div class="admin-card">
 <div style="font-weight:900;color:#111;display:flex;align-items:center;gap:8px"><i data-lucide="settings-2" style="width:16px;color:#E53935"></i> Configuraciones Generales</div>
@@ -153,7 +160,7 @@
 <button onclick="guardarAjustes()" style="width:100%;margin-top:14px;padding:13px;border:none;border-radius:12px;background:#111;color:#fff;font-weight:800">Guardar Configuraciones</button>
 </div>
 <div class="admin-card">
-<div style="font-weight:900;color:#111;display:flex;align-items:center;gap:8px"><i data-lucide="truck" style="width:16px;color:#E53935"></i> Disponibilidad en Tiempo Real</div>
+<div style="font-weight:900;color:#111;display:flex;align-items:center;gap:8px"><i data-lucide="truck" style="width:16px;color:#E53935"></i> Disponibilidad en Tiempo Real para Todos</div>
 <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding:12px;background:#f7f7f8;border-radius:12px">
 <div style="display:flex;align-items:center;gap:10px"><img src="https://img.icons8.com/3d-fluency/94/motorcycle.png" style="width:32px"><div><div style="font-weight:800;font-size:13px;color:#111">Moto</div><div style="font-size:11px;color:#666" id="estadoMotoTxt">Disponible</div></div></div>
 <div id="toggleMoto" class="toggle on" onclick="toggleVehiculo('moto')"><div class="toggle-knob"></div></div>
@@ -224,10 +231,22 @@
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+// CONFIG FIREBASE - REEMPLAZA CON TU CONFIG SI QUIERES TIEMPO REAL GLOBAL
+const firebaseConfig = {
+  apiKey: "AIzaSyDummyKey-ParaQueFuncioneLocalSiNoTienesFirebase",
+  authDomain: "kigo-xpress.firebaseapp.com",
+  databaseURL: "https://kigo-xpress-default-rtdb.firebaseio.com",
+  projectId: "kigo-xpress",
+  storageBucket: "kigo-xpress.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:abc123"
+};
+let db=null; try{ firebase.initializeApp(firebaseConfig); db=firebase.database(); }catch(e){ console.log("Firebase no configurado, usando local"); }
+
 const CENTRO={lat:21.1561,lng:-100.9333};
 let pickupLat=null,pickupLng=null,destinationLat=null,destinationLng=null,pickupMarker=null,destinationMarker=null,routeLayer=null,pickupName="",destName="",tipo="",datosViaje={};
 let mapConfirm=null, markerConfirm=null, finalPickupLat=null, finalPickupLng=null, routeConfirmLayer=null;
-let estadoLluviaActual={nivel:'ninguna',precip:0,txt:'Sin lluvia',extra:0};
+let estadoLluviaActual={nivel:'ninguna',precip:0,txt:'Sin lluvia',extra:0,temp:24,code:0,isDay:1};
 let cfg = JSON.parse(localStorage.getItem('kigo_cfg')||'{"nombre":"Kigo Xpress","baseMoto":35,"baseCarro":55,"extraMoto":5,"extraCarro":8,"motoDisp":true,"carroDisp":true,"precioLeve":0,"precioMod":5,"precioFuerte":10,"lluviaNivel":"ninguna","lluviaAuto":true}');
 if(cfg.precioLeve===undefined){ cfg.precioLeve=0; cfg.precioMod=5; cfg.precioFuerte=10; cfg.lluviaNivel='ninguna'; cfg.lluviaAuto=true; }
 const map=L.map("map",{zoomControl:false}).setView([CENTRO.lat,CENTRO.lng],14);
@@ -240,29 +259,48 @@ function getExtraLluviaPorNivel(nivel){
  if(nivel==='fuerte') return parseInt(cfg.precioFuerte)||10;
  return 0;
 }
+function iconoClimaReal(code,isDay,temp){
+ let icon='☀️'; let desc='Despejado';
+ if(code===0){ icon=isDay?'☀️':'🌙'; desc=isDay?'Soleado':'Despejado noche'; }
+ else if([1].includes(code)){ icon=isDay?'🌤️':'🌙'; desc='Mayormente soleado'; }
+ else if([2].includes(code)){ icon='⛅'; desc='Parcialmente nublado'; }
+ else if([3].includes(code)){ icon='☁️'; desc='Nublado'; }
+ else if([45,48].includes(code)){ icon='🌫️'; desc='Niebla'; }
+ else if([51,53,55].includes(code)){ icon='🌦️'; desc='Llovizna'; }
+ else if([61,63,65].includes(code)){ icon='🌧️'; desc='Lluvia'; }
+ else if([80,81,82].includes(code)){ icon='🌧️'; desc='Chubascos'; }
+ else if([95,96,99].includes(code)){ icon='⛈️'; desc='Tormenta'; }
+ return {icon,desc};
+}
 async function detectarLluviaDolores(){
  try{
-  const url=`https://api.open-meteo.com/v1/forecast?latitude=${CENTRO.lat}&longitude=${CENTRO.lng}&current=precipitation,rain,weather_code,temperature_2m&timezone=America/Mexico_City`;
+  const url=`https://api.open-meteo.com/v1/forecast?latitude=${CENTRO.lat}&longitude=${CENTRO.lng}&current=temperature_2m,precipitation,rain,weather_code,is_day&timezone=America/Mexico_City`;
   const r=await fetch(url); const d=await r.json();
   const precip = d.current?.precipitation?? d.current?.rain?? 0;
   const code = d.current?.weather_code?? 0;
-  let nivel='ninguna', txt='Sin lluvia', icon='☀️';
+  const temp = Math.round(d.current?.temperature_2m?? 24);
+  const isDay = d.current?.is_day?? 1;
+  let nivel='ninguna', txt='Sin lluvia';
   if(precip>0 || [51,53,55,61,63,65,80,81,82,95,96,99].includes(code)){
-    if(precip<=1){ nivel='leve'; txt=`Lluvia leve en Dolores Hidalgo - ${precip}mm`; icon='🌦️'; }
-    else if(precip<=5){ nivel='moderada'; txt=`Lluvia moderada en Dolores Hidalgo - ${precip}mm`; icon='🌧️'; }
-    else { nivel='fuerte'; txt=`Lluvia fuerte en Dolores Hidalgo - ${precip}mm`; icon='⛈️'; }
-  } else {
-    if([3].includes(code)){ nivel='ninguna'; txt='Nublado - Sin lluvia'; icon='⛅'; }
-    else { nivel='ninguna'; txt='Sin lluvia - Dolores Hidalgo'; icon='☀️'; }
-  }
-  if(cfg.lluviaAuto){ cfg.lluviaNivel=nivel; localStorage.setItem('kigo_cfg',JSON.stringify(cfg)); }
+    if(precip<=1){ nivel='leve'; txt=`Lluvia leve ${precip}mm`; }
+    else if(precip<=5){ nivel='moderada'; txt=`Lluvia moderada ${precip}mm`; }
+    else { nivel='fuerte'; txt=`Lluvia fuerte ${precip}mm`; }
+  } else { txt=`Sin lluvia`; }
+  if(cfg.lluviaAuto){ cfg.lluviaNivel=nivel; localStorage.setItem('kigo_cfg',JSON.stringify(cfg)); if(db) db.ref('config').set(cfg); }
   let nivelEfectivo = cfg.lluviaAuto? nivel : cfg.lluviaNivel;
   let extra = getExtraLluviaPorNivel(nivelEfectivo);
-  estadoLluviaActual={nivel:nivelEfectivo,precip:precip,txt: cfg.lluviaAuto? txt : `Manual: ${nivelEfectivo}`,extra:extra,realNivel:nivel,realTxt:txt,realIcon:icon};
+  estadoLluviaActual={nivel:nivelEfectivo,precip:precip,txt: cfg.lluviaAuto? txt : `Manual: ${nivelEfectivo}`,extra:extra,realNivel:nivel,realTxt:txt,realIcon:iconoClimaReal(code,isDay).icon,temp:temp,code:code,isDay:isDay};
   actualizarUIClima();
+  actualizarWeatherWidget();
   if(pickupLat && destinationLat){ recalcularPrecioTiempoReal(pickupLat,destinationLat); }
   if(finalPickupLat){ recalcularPrecioTiempoReal(finalPickupLat,finalPickupLng); }
- }catch(e){ document.getElementById('climaBanner').style.display='none'; }
+ }catch(e){ }
+}
+function actualizarWeatherWidget(){
+ const w=document.getElementById('weatherWidget'); const i=document.getElementById('weatherIcon'); const t=document.getElementById('weatherTemp'); const d=document.getElementById('weatherDesc');
+ if(!w) return; w.style.display='flex';
+ const {icon,desc}=iconoClimaReal(estadoLluviaActual.code,estadoLluviaActual.isDay);
+ i.innerText=icon; t.innerText=`${estadoLluviaActual.temp}°C`; d.innerText=desc;
 }
 function actualizarUIClima(){
  const banner=document.getElementById('climaBanner');
@@ -283,12 +321,12 @@ function actualizarUIClima(){
  } else {
   banner.style.display='flex'; iconEl.innerText=icon;
   txtEl.innerText=estadoLluviaActual.nivel==='leve'?'Lluvia leve en Dolores Hidalgo': estadoLluviaActual.nivel==='moderada'?'Lluvia moderada en Dolores Hidalgo':'Lluvia fuerte en Dolores Hidalgo';
-  subEl.innerText=`${estadoLluviaActual.precip}mm - Perímetro Dolores Hidalgo - ${cfg.lluviaAuto?'Auto':'Manual'}`;
+  subEl.innerText=`${estadoLluviaActual.precip}mm - ${estadoLluviaActual.temp}°C - ${cfg.lluviaAuto?'Auto':'Manual'}`;
   extraEl.style.display='block'; extraEl.innerText=estadoLluviaActual.extra>0?`+$${estadoLluviaActual.extra}`:'+$0';
-  let msg=`${icon} ${txtEl.innerText} - Incremento $${estadoLluviaActual.extra} MXN aplicado`;
+  let msg=`${icon} ${txtEl.innerText} - Incremento $${estadoLluviaActual.extra} MXN`;
   a2.innerText=msg; a2.style.display='block'; a3.innerText=msg; a3.style.display='block';
  }
- if(adminIcon){ adminIcon.innerText=icon; adminTxt.innerText=estadoLluviaActual.realTxt || estadoLluviaActual.txt; adminSub.innerText=`Nivel: ${estadoLluviaActual.nivel} - Extra $${estadoLluviaActual.extra} - Precip ${estadoLluviaActual.precip}mm - ${cfg.lluviaAuto?'Automático':'Manual'}`; }
+ if(adminIcon){ adminIcon.innerText=icon; adminTxt.innerText=estadoLluviaActual.realTxt || estadoLluviaActual.txt; adminSub.innerText=`Nivel: ${estadoLluviaActual.nivel} - Extra $${estadoLluviaActual.extra} - ${estadoLluviaActual.temp}°C - Precip ${estadoLluviaActual.precip}mm`; }
  actualizarBotonesLluvia();
 }
 function actualizarBotonesLluvia(){
@@ -299,8 +337,8 @@ function actualizarBotonesLluvia(){
  });
  const toggle=document.getElementById('toggleAuto'); if(toggle) toggle.className = cfg.lluviaAuto? 'toggle on' : 'toggle';
 }
-function toggleAutoLluvia(){ cfg.lluviaAuto=!cfg.lluviaAuto; localStorage.setItem('kigo_cfg',JSON.stringify(cfg)); if(cfg.lluviaAuto){ detectarLluviaDolores(); } actualizarUIClima(); }
-function setLluviaManual(nivel){ cfg.lluviaNivel=nivel; cfg.lluviaAuto=false; localStorage.setItem('kigo_cfg',JSON.stringify(cfg)); estadoLluviaActual.nivel=nivel; estadoLluviaActual.extra=getExtraLluviaPorNivel(nivel); estadoLluviaActual.txt='Manual: '+nivel; actualizarUIClima(); if(pickupLat && destinationLat) recalcularPrecioTiempoReal(pickupLat,destinationLat); if(finalPickupLat) recalcularPrecioTiempoReal(finalPickupLat,finalPickupLng); }
+function toggleAutoLluvia(){ cfg.lluviaAuto=!cfg.lluviaAuto; guardarAjustes(); }
+function setLluviaManual(nivel){ cfg.lluviaNivel=nivel; cfg.lluviaAuto=false; guardarAjustes(); }
 async function buscarColonias(t){
   if(!t || t.length < 2) return []; const texto = t.trim(); let resultados = []; const viewbox = "-100.98,21.10,-100.85,21.20";
   try{ const q1 = encodeURIComponent(texto + ", Dolores Hidalgo, Guanajuato"); const url1 = `https://nominatim.openstreetmap.org/search?format=json&q=${q1}&limit=10&addressdetails=1&countrycodes=mx&viewbox=${viewbox}&bounded=1&extratags=1`; const r1 = await fetch(url1); const d1 = await r1.json(); resultados = d1.map(x=>{ const addr = x.address || {}; const calle = addr.road || addr.street || addr.neighbourhood || ""; const numero = addr.house_number? " #" + addr.house_number : ""; const colonia = addr.neighbourhood || addr.suburb || ""; const nombreCorto = (calle? calle + numero : x.display_name.split(",")[0]) + (colonia? " - " + colonia : ""); return {lat:parseFloat(x.lat),lon:parseFloat(x.lon),name:nombreCorto.substring(0,60),direccion:x.display_name,exact:addr.house_number?2:(addr.road?1:0)}; }); }catch(e){}
@@ -402,19 +440,86 @@ function confirmarViajeFinal(){
 function switchTab(name){ document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active')); document.getElementById('tab-'+name).classList.add('active'); const mapTab={'ajustes':0,'config':1,'registros':2,'estadisticas':3}; const tabs=document.querySelectorAll('.tab'); if(mapTab[name]!==undefined) tabs[mapTab[name]].classList.add('active'); lucide.createIcons(); }
 function abrirAdmin(){ if(localStorage.getItem('kigo_admin_sesion')==='1'){ document.getElementById('panelAdmin').style.display='flex'; document.getElementById('btnNavAdmin').classList.add('active'); document.getElementById('btnNavInicio').classList.remove('active'); cargarAdmin(); detectarLluviaDolores(); return; } document.getElementById('modalAdmin').classList.add('show'); document.getElementById('btnNavAdmin').classList.add('active'); lucide.createIcons(); }
 function cerrarAdmin(){ document.getElementById('modalAdmin').classList.remove('show'); document.getElementById('btnNavAdmin').classList.remove('active'); document.getElementById('btnNavInicio').classList.add('active'); document.getElementById('adminError').style.display='none'; }
-function irInicio(){ const sesion = localStorage.getItem('kigo_admin_sesion')==='1'; if(sesion && document.getElementById('panelAdmin').style.display==='flex'){ document.getElementById('panel2').classList.remove('show'); document.getElementById('panel3').classList.remove('show'); return; } document.getElementById('panel2').classList.remove('show'); document.getElementById('panel3').classList.remove('show'); document.getElementById('panelAdmin').style.display='none'; document.getElementById('btnNavInicio').classList.add('active'); document.getElementById('btnNavAdmin').classList.remove('active'); setTimeout(()=>{ map.invalidateSize(); },100); }
+// CORRECCION FLECHA REGRESAR - AHORA SI CIERRA TODO
+function irInicioForzado(){
+ document.getElementById('panelAdmin').style.display='none';
+ document.getElementById('panel2').classList.remove('show');
+ document.getElementById('panel3').classList.remove('show');
+ document.getElementById('modalAdmin').classList.remove('show');
+ document.getElementById('btnNavInicio').classList.add('active');
+ document.getElementById('btnNavAdmin').classList.remove('active');
+ setTimeout(()=>{ map.invalidateSize(); if(mapConfirm) mapConfirm.invalidateSize(); },100);
+}
+function irInicio(){
+ document.getElementById('panel2').classList.remove('show');
+ document.getElementById('panel3').classList.remove('show');
+ // Si esta en admin, cierra admin tambien
+ if(document.getElementById('panelAdmin').style.display==='flex'){
+   document.getElementById('panelAdmin').style.display='none';
+ }
+ document.getElementById('modalAdmin').classList.remove('show');
+ document.getElementById('btnNavInicio').classList.add('active');
+ document.getElementById('btnNavAdmin').classList.remove('active');
+ setTimeout(()=>{ map.invalidateSize(); },100);
+}
 function loginAdmin(){ const u=document.getElementById('adminUser').value.trim(); const p=document.getElementById('adminPass').value.trim(); if(u==='admin' && p==='0831'){ localStorage.setItem('kigo_admin_sesion','1'); document.getElementById('modalAdmin').classList.remove('show'); document.getElementById('panelAdmin').style.display='flex'; document.getElementById('adminError').style.display='none'; document.getElementById('btnNavAdmin').classList.add('active'); document.getElementById('btnNavInicio').classList.remove('active'); cargarAdmin(); detectarLluviaDolores(); lucide.createIcons(); }else{ document.getElementById('adminError').style.display='block'; } }
-function sincronizarTiempoReal(){ cfg.nombre=document.getElementById('cfgNombre').value||'Kigo Xpress'; cfg.baseMoto=parseInt(document.getElementById('cfgMoto').value)||35; cfg.baseCarro=parseInt(document.getElementById('cfgCarro').value)||55; cfg.extraMoto=parseInt(document.getElementById('cfgExtraMoto').value)||5; cfg.extraCarro=parseInt(document.getElementById('cfgExtraCarro').value)||8; cfg.precioLeve=parseInt(document.getElementById('cfgLluviaLeve').value)||0; cfg.precioMod=parseInt(document.getElementById('cfgLluviaMod').value)||5; cfg.precioFuerte=parseInt(document.getElementById('cfgLluviaFuerte').value)||10; localStorage.setItem('kigo_cfg',JSON.stringify(cfg)); document.getElementById('nombrePlataformaTitulo').innerText=cfg.nombre+' • Admin'; aplicarDisponibilidad(); estadoLluviaActual.extra=getExtraLluviaPorNivel(estadoLluviaActual.nivel); actualizarUIClima(); if(pickupLat && destinationLat){ recalcularPrecioTiempoReal(pickupLat,destinationLat); } }
-function cargarAdmin(){ document.getElementById('cfgNombre').value=cfg.nombre; document.getElementById('cfgMoto').value=cfg.baseMoto; document.getElementById('cfgCarro').value=cfg.baseCarro; document.getElementById('cfgExtraMoto').value=cfg.extraMoto; document.getElementById('cfgExtraCarro').value=cfg.extraCarro; document.getElementById('cfgLluviaLeve').value=cfg.precioLeve; document.getElementById('cfgLluviaMod').value=cfg.precioMod; document.getElementById('cfgLluviaFuerte').value=cfg.precioFuerte; document.getElementById('nombrePlataformaTitulo').innerText=cfg.nombre+' • Admin'; document.getElementById('toggleMoto').className=cfg.motoDisp?'toggle on':'toggle'; document.getElementById('toggleCarro').className=cfg.carroDisp?'toggle on':'toggle'; document.getElementById('estadoMotoTxt').innerText=cfg.motoDisp?'Disponible':'Bloqueado'; document.getElementById('estadoCarroTxt').innerText=cfg.carroDisp?'Disponible':'Bloqueado'; aplicarDisponibilidad(); actualizarStats(); switchTab('ajustes'); actualizarBotonesLluvia(); const toggleAuto=document.getElementById('toggleAuto'); if(toggleAuto) toggleAuto.className=cfg.lluviaAuto?'toggle on':'toggle'; }
-function guardarAjustes(){ localStorage.setItem('kigo_cfg',JSON.stringify(cfg)); alert('Guardado en tiempo real'); sincronizarTiempoReal(); }
-function toggleVehiculo(t){ if(t==='moto'){ cfg.motoDisp=!cfg.motoDisp; document.getElementById('toggleMoto').className=cfg.motoDisp?'toggle on':'toggle'; document.getElementById('estadoMotoTxt').innerText=cfg.motoDisp?'Disponible':'Bloqueado'; } if(t==='carro'){ cfg.carroDisp=!cfg.carroDisp; document.getElementById('toggleCarro').className=cfg.carroDisp?'toggle on':'toggle'; document.getElementById('estadoCarroTxt').innerText=cfg.carroDisp?'Disponible':'Bloqueado'; } localStorage.setItem('kigo_cfg',JSON.stringify(cfg)); aplicarDisponibilidad(); }
-function aplicarDisponibilidad(){ const m=document.getElementById('cardMoto'); const c=document.getElementById('cardCarro'); if(cfg.motoDisp){ m.classList.remove('disabled'); } else { m.classList.add('disabled'); } if(cfg.carroDisp){ c.classList.remove('disabled'); } else { c.classList.add('disabled'); } }
+function sincronizarTiempoReal(){
+ cfg.nombre=document.getElementById('cfgNombre').value||'Kigo Xpress';
+ cfg.baseMoto=parseInt(document.getElementById('cfgMoto').value)||35;
+ cfg.baseCarro=parseInt(document.getElementById('cfgCarro').value)||55;
+ cfg.extraMoto=parseInt(document.getElementById('cfgExtraMoto').value)||5;
+ cfg.extraCarro=parseInt(document.getElementById('cfgExtraCarro').value)||8;
+ cfg.precioLeve=parseInt(document.getElementById('cfgLluviaLeve').value)||0;
+ cfg.precioMod=parseInt(document.getElementById('cfgLluviaMod').value)||5;
+ cfg.precioFuerte=parseInt(document.getElementById('cfgLluviaFuerte').value)||10;
+ localStorage.setItem('kigo_cfg',JSON.stringify(cfg));
+ if(db){ db.ref('config').set(cfg); }
+ document.getElementById('nombrePlataformaTitulo').innerText=cfg.nombre+' • Admin';
+ aplicarDisponibilidad(); estadoLluviaActual.extra=getExtraLluviaPorNivel(estadoLluviaActual.nivel); actualizarUIClima();
+ if(pickupLat && destinationLat){ recalcularPrecioTiempoReal(pickupLat,destinationLat); }
+}
+function cargarAdmin(){
+ document.getElementById('cfgNombre').value=cfg.nombre;
+ document.getElementById('cfgMoto').value=cfg.baseMoto;
+ document.getElementById('cfgCarro').value=cfg.baseCarro;
+ document.getElementById('cfgExtraMoto').value=cfg.extraMoto;
+ document.getElementById('cfgExtraCarro').value=cfg.extraCarro;
+ document.getElementById('cfgLluviaLeve').value=cfg.precioLeve;
+ document.getElementById('cfgLluviaMod').value=cfg.precioMod;
+ document.getElementById('cfgLluviaFuerte').value=cfg.precioFuerte;
+ document.getElementById('nombrePlataformaTitulo').innerText=cfg.nombre+' • Admin';
+ document.getElementById('toggleMoto').className=cfg.motoDisp?'toggle on':'toggle';
+ document.getElementById('toggleCarro').className=cfg.carroDisp?'toggle on':'toggle';
+ document.getElementById('estadoMotoTxt').innerText=cfg.motoDisp?'Disponible':'Bloqueado';
+ document.getElementById('estadoCarroTxt').innerText=cfg.carroDisp?'Disponible':'Bloqueado';
+ aplicarDisponibilidad(); actualizarStats(); switchTab('ajustes');
+ actualizarBotonesLluvia();
+ const toggleAuto=document.getElementById('toggleAuto'); if(toggleAuto) toggleAuto.className=cfg.lluviaAuto?'toggle on':'toggle';
+}
+function guardarAjustes(){
+ sincronizarTiempoReal();
+ localStorage.setItem('kigo_cfg',JSON.stringify(cfg));
+ if(db){ db.ref('config').set(cfg).then(()=>alert('✅ Sincronizado a TODOS los clientes en tiempo real')).catch(()=>alert('Guardado local')); } else { alert('Guardado (configura Firebase para tiempo real global)'); }
+}
+function toggleVehiculo(t){ if(t==='moto'){ cfg.motoDisp=!cfg.motoDisp; } if(t==='carro'){ cfg.carroDisp=!cfg.carroDisp; } guardarAjustes(); cargarAdmin(); }
+function aplicarDisponibilidad(){ const m=document.getElementById('cardMoto'); const c=document.getElementById('cardCarro'); if(!m||!c) return; if(cfg.motoDisp){ m.classList.remove('disabled'); } else { m.classList.add('disabled'); } if(cfg.carroDisp){ c.classList.remove('disabled'); } else { c.classList.add('disabled'); } const tm=document.getElementById('toggleMoto'); const tc=document.getElementById('toggleCarro'); if(tm) tm.className=cfg.motoDisp?'toggle on':'toggle'; if(tc) tc.className=cfg.carroDisp?'toggle on':'toggle'; const em=document.getElementById('estadoMotoTxt'); const ec=document.getElementById('estadoCarroTxt'); if(em) em.innerText=cfg.motoDisp?'Disponible':'Bloqueado'; if(ec) ec.innerText=cfg.carroDisp?'Disponible':'Bloqueado'; }
 function registrarEstadistica(tipoViaje,precio){ let hist=JSON.parse(localStorage.getItem('kigo_hist')||'[]'); const ahora=new Date(); hist.unshift({tipo:tipoViaje,precio:precio,fecha:ahora.toLocaleString(),hora:ahora.getHours(),origen:pickupName,destino:destName,km:datosViaje.distKm,lluvia:datosViaje.lluviaNivel,extra:datosViaje.lluviaExtra}); if(hist.length>100) hist=hist.slice(0,100); localStorage.setItem('kigo_hist',JSON.stringify(hist)); }
 function actualizarStats(){ let hist=JSON.parse(localStorage.getItem('kigo_hist')||'[]'); document.getElementById('statTotal').innerText=hist.length; document.getElementById('statMoto').innerText=hist.filter(h=>h.tipo==='moto').length; document.getElementById('statCarro').innerText=hist.filter(h=>h.tipo==='carro').length; let horas={}; hist.forEach(h=>{ horas[h.hora]=(horas[h.hora]||0)+1; }); let mas='Sin datos'; let max=0; for(let k in horas){ if(horas[k]>max){ max=horas[k]; mas=k+':00 hrs - '+horas[k]+' viajes'; } } document.getElementById('horariosBox').innerText=hist.length? 'Pico: '+mas : 'Aún sin datos'; let moto=hist.filter(h=>h.tipo==='moto').length; let carro=hist.filter(h=>h.tipo==='carro').length; let masTxt='Aún sin datos'; if(hist.length){ masTxt = moto>carro? 'MOTO más pedido ('+moto+')' : carro>moto? 'CARRO más pedido ('+carro+')' : 'Empate MOTO y CARRO'; } document.getElementById('servicioMasTxt').innerText=masTxt; let box=document.getElementById('historialBox'); if(!hist.length){ box.innerHTML='<div style="text-align:center;padding:20px;color:#999;font-size:12px">Aún no hay clicks en CONFIRMAR RECOGIDA</div>'; return; } box.innerHTML=hist.map(h=>`<div style="padding:10px;border-bottom:1px solid #f0f0f0;display:flex;gap:10px;align-items:center"><div style="width:36px;height:36px;background:${h.tipo==='moto'?'#111':'#E53935'};border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:10px">${h.tipo==='moto'?'M':'C'}</div><div style="flex:1"><div style="font-weight:800;font-size:12px;color:#111">${h.tipo.toUpperCase()} • $${h.precio} MXN • ${h.km} km ${h.lluvia && h.lluvia!=='ninguna'? '🌧️ '+h.lluvia : ''}</div><div style="font-size:10px;color:#666">${h.origen} → ${h.destino}</div><div style="font-size:10px;color:#999">${h.fecha}</div></div></div>`).join(''); }
 function borrarHistorial(){ if(confirm('¿Borrar historial?')){ localStorage.removeItem('kigo_hist'); actualizarStats(); } }
-function cerrarPanelAdmin(){ document.getElementById('panelAdmin').style.display='none'; document.getElementById('btnNavInicio').classList.add('active'); document.getElementById('btnNavAdmin').classList.remove('active'); map.invalidateSize(); }
 function cerrarSesionAdmin(){ if(confirm('¿Cerrar sesión?')){ localStorage.removeItem('kigo_admin_sesion'); document.getElementById('panelAdmin').style.display='none'; document.getElementById('btnNavInicio').classList.add('active'); document.getElementById('btnNavAdmin').classList.remove('active'); map.invalidateSize(); } }
 document.addEventListener("click",e=>{if(!e.target.closest('.input-wrap')){pickupSuggestions.classList.remove("show");destinationSuggestions.classList.remove("show");}});
+// ESCUCHA TIEMPO REAL DE FIREBASE PARA TODOS LOS CLIENTES
+if(db){
+  db.ref('config').on('value', snap=>{
+    const data=snap.val();
+    if(data){
+      cfg=data; localStorage.setItem('kigo_cfg',JSON.stringify(cfg));
+      estadoLluviaActual.nivel=cfg.lluviaNivel; estadoLluviaActual.extra=getExtraLluviaPorNivel(cfg.lluviaNivel);
+      cargarAdmin(); aplicarDisponibilidad(); actualizarUIClima(); actualizarWeatherWidget();
+      if(pickupLat && destinationLat) recalcularPrecioTiempoReal(pickupLat,destinationLat);
+    }
+  });
+}
 (function(){ const sesion=localStorage.getItem('kigo_admin_sesion'); if(sesion==='1'){ document.getElementById('panelAdmin').style.display='flex'; document.getElementById('btnNavAdmin').classList.add('active'); document.getElementById('btnNavInicio').classList.remove('active'); cargarAdmin(); } })();
 cargarAdmin(); aplicarDisponibilidad(); lucide.createIcons();
 detectarLluviaDolores();
