@@ -72,8 +72,8 @@
 <div id="panel3" class="panel3">
 <div style="position:relative;height:62vh;flex-shrink:0">
 <div id="mapConfirm"></div>
-<div style="position:absolute;top:12px;left:12px;right:12px;z-index:999;background:#111;color:#fff;border-radius:16px;padding:12px 14px;display:flex;gap:10px;align-items:center"><button onclick="volverMapa()" style="width:36px;height:36px;border-radius:50%;background:#fff;border:none;display:flex;align-items:center;justify-content:center"><i data-lucide="arrow-left" style="width:16px"></i></button><div><div style="font-weight:900;font-size:13px">Confirma tu punto de recogida</div><div style="font-size:11px;color:#a1a1aa">Toca el mapa para mover el pin</div></div></div>
-<div style="position:absolute;bottom:20px;left:50%;transform:translateX(-50%);z-index:999;background:#fff;border-radius:999px;padding:8px 14px;font-size:11px;font-weight:800;box-shadow:0 4px 15px rgba(0,0,0,.2);display:flex;align-items:center;gap:6px"><i data-lucide="hand" style="width:14px;color:#E53935"></i> Toca cualquier parte del mapa</div>
+<div style="position:absolute;top:12px;left:12px;right:12px;z-index:999;background:#111;color:#fff;border-radius:16px;padding:12px 14px;display:flex;gap:10px;align-items:center"><button onclick="volverMapa()" style="width:36px;height:36px;border-radius:50%;background:#fff;border:none;display:flex;align-items:center;justify-content:center"><i data-lucide="arrow-left" style="width:16px"></i></button><div><div style="font-weight:900;font-size:13px">Confirma tu punto de recogida</div><div style="font-size:11px;color:#a1a1aa">Toca el mapa para ajustar, el precio se actualiza solo</div></div></div>
+<div style="position:absolute;bottom:20px;left:50%;transform:translateX(-50%);z-index:999;background:#fff;border-radius:999px;padding:8px 14px;font-size:11px;font-weight:800;box-shadow:0 4px 15px rgba(0,0,0,.2);display:flex;align-items:center;gap:6px"><i data-lucide="hand" style="width:14px;color:#E53935"></i> Mueve el pin - precio en vivo</div>
 </div>
 <div style="background:#111;flex:1;border-radius:28px 28px 0 0;margin-top:-28px;z-index:1000;padding:20px;display:flex;flex-direction:column">
 <div style="width:40px;height:4px;background:#3f3f46;border-radius:999px;margin:0 auto 16px"></div>
@@ -87,7 +87,7 @@
 <script>
 const CENTRO={lat:21.1561,lng:-100.9333};
 let pickupLat=null,pickupLng=null,destinationLat=null,destinationLng=null,pickupMarker=null,destinationMarker=null,routeLayer=null,pickupName="",destName="",tipo="",datosViaje={};
-let mapConfirm=null, markerConfirm=null, finalPickupLat=null, finalPickupLng=null;
+let mapConfirm=null, markerConfirm=null, finalPickupLat=null, finalPickupLng=null, routeConfirmLayer=null;
 let extraLluvia=0;
 const map=L.map("map",{zoomControl:false}).setView([CENTRO.lat,CENTRO.lng],14);
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19}).addTo(map);
@@ -127,13 +127,13 @@ let t2=null;destinationInput.addEventListener("input",function(){if(t2)clearTime
 function mostrarX(){btnClear.style.display=pickupInput.value.length>0?'flex':'none';}
 function limpiarOrigen(){pickupInput.value="";pickupLat=null;pickupLng=null;pickupName="";btnClear.style.display='none';if(pickupMarker)map.removeLayer(pickupMarker);if(routeLayer)map.removeLayer(routeLayer);pickupInput.focus();}
 async function usarMiUbicacion(){navigator.geolocation.getCurrentPosition(async pos=>{pickupLat=pos.coords.latitude;pickupLng=pos.coords.longitude;try{const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${pickupLat}&lon=${pickupLng}&addressdetails=1`);const d=await r.json();const a=d.address||{};const calle=(a.road||"")+(a.house_number?" #"+a.house_number:"");pickupInput.value=calle? calle+" - "+(a.neighbourhood||a.suburb||"") : d.display_name.split(",").slice(0,2).join(", ");pickupName=pickupInput.value;}catch(e){pickupInput.value="Mi ubicación actual";pickupName="Mi ubicación";}if(pickupMarker)map.removeLayer(pickupMarker);pickupMarker=L.marker([pickupLat,pickupLng]).addTo(map);map.setView([pickupLat,pickupLng],17);mostrarX();});}
-document.getElementById("calculateButton").onclick=async()=>{
+  document.getElementById("calculateButton").onclick=async()=>{
  if(!pickupLat||!destinationLat){alert("Llena Dirección de Origen y Dirección de Destino");return;}
  let km=1.5, tiempo=8, baseMoto=35, baseCarro=55;
  try{
   const url=`https://router.project-osrm.org/route/v1/driving/${pickupLng},${pickupLat};${destinationLng},${destinationLat}?overview=full&geometries=geojson`;
   const r=await fetch(url);const d=await r.json();
-  if(d.routes&&d.routes[0]){ const route=d.routes[0]; km=route.distance/1000; tiempo=Math.ceil(route.duration/60); if(route.distance>2000){let extra=route.distance-2000;baseMoto=35+Math.ceil(extra/650)*5; baseCarro=55+Math.ceil(extra/650)*8;} if(distMts(pickupLat,pickupLng,CENTRO.lat,CENTRO.lng)>800&&distMts(destinationLat,destinationLng,CENTRO.lat,CENTRO.lng)>800){baseMoto+=5; baseCarro+=10;} if((pickupName.toLowerCase().includes("sop")&&destName.toLowerCase().includes("linda"))||(destName.toLowerCase().includes("sop")&&pickupName.toLowerCase().includes("linda"))){baseMoto=45; baseCarro=65;} baseMoto+=extraLluvia; baseCarro+=extraLluvia; if(routeLayer)map.removeLayer(routeLayer);routeLayer=L.geoJSON(route.geometry,{style:{color:"#E53935",weight:6}}).addTo(map);map.fitBounds(routeLayer.getBounds(),{padding:[40,40]}); }
+  if(d.routes&&d.routes[0]){ const route=d.routes[0]; km=route.distance/1000; tiempo=Math.ceil(route.duration/60); if(route.distance>2000){let extra=route.distance-2000;baseMoto=35+Math.ceil(extra/650)*5; baseCarro=55+Math.ceil(extra/650)*8;} if(distMts(pickupLat,pickupLng,CENTRO.lat,CENTRO.lng)>800&&distMts(destinationLat,destinationLng,CENTRO.lat,CENTRO.lng)>800){baseMoto+=5; baseCarro+=10;} baseMoto+=extraLluvia; baseCarro+=extraLluvia; if(routeLayer)map.removeLayer(routeLayer);routeLayer=L.geoJSON(route.geometry,{style:{color:"#E53935",weight:6}}).addTo(map);map.fitBounds(routeLayer.getBounds(),{padding:[40,40]}); }
  }catch(e){}
  datosViaje={origen:pickupName,destino:destName,distKm:km.toFixed(2),tiempoMin:tiempo,precioMoto:baseMoto,precioCarro:baseCarro,origenLat:pickupLat,origenLng:pickupLng,destLat:destinationLat,destLng:destinationLng};
  document.getElementById('panel2').classList.add('show');
@@ -166,8 +166,42 @@ function abrirMapaConfirm(){
      mapConfirm.on('click', function(e){ finalPickupLat = e.latlng.lat; finalPickupLng = e.latlng.lng; markerConfirm.setLatLng(e.latlng); actualizarDireccionConfirm(e.latlng.lat,e.latlng.lng); });
    }else{ mapConfirm.setView([pickupLat,pickupLng],18); markerConfirm.setLatLng([pickupLat,pickupLng]); }
    mapConfirm.invalidateSize();
+   recalcularPrecioTiempoReal(pickupLat,pickupLng);
  },200);
  lucide.createIcons();
+}
+async function recalcularPrecioTiempoReal(lat,lng){
+ try{
+  const url=`https://router.project-osrm.org/route/v1/driving/${lng},${lat};${destinationLng},${destinationLat}?overview=full&geometries=geojson`;
+  const r=await fetch(url); const d=await r.json();
+  if(d.routes && d.routes[0]){
+   const route=d.routes[0];
+   const km = route.distance/1000;
+   const tiempo = Math.ceil(route.duration/60);
+   let baseMoto = 35, baseCarro = 55;
+   if(route.distance>2000){ let extra=route.distance-2000; baseMoto=35+Math.ceil(extra/650)*5; baseCarro=55+Math.ceil(extra/650)*8; }
+   if(distMts(lat,lng,CENTRO.lat,CENTRO.lng)>800 && distMts(destinationLat,destinationLng,CENTRO.lat,CENTRO.lng)>800){ baseMoto+=5; baseCarro+=10; }
+   baseMoto+=extraLluvia; baseCarro+=extraLluvia;
+   datosViaje.distKm = km.toFixed(2);
+   datosViaje.tiempoMin = tiempo;
+   datosViaje.precioMoto = baseMoto;
+   datosViaje.precioCarro = baseCarro;
+   datosViaje.origenLat = lat;
+   datosViaje.origenLng = lng;
+   document.getElementById('txtDistConfirm').innerText = km.toFixed(2)+' km';
+   document.getElementById('txtPrecioConfirm').innerText = tipo==='moto'? `$${baseMoto} MXN` : `$${baseCarro} MXN`;
+   document.getElementById('motoPrice').innerText = `$${baseMoto} MXN`;
+   document.getElementById('carroPrice').innerText = `$${baseCarro} MXN`;
+   document.getElementById('rutaSub').innerText = `${km.toFixed(2)} km • Ruta actualizada`;
+   document.getElementById('tiempoTxt').innerText = tiempo+' min';
+   document.getElementById('motoTime').innerText = `Tiempo estimado: ${tiempo} min`;
+   document.getElementById('carroTime').innerText = `Tiempo estimado: ${tiempo+2} min`;
+   if(tipo==='moto') document.getElementById('btnTxt').innerText = `Elegir Moto • $${baseMoto} MXN`;
+   else document.getElementById('btnTxt').innerText = `Elegir Carro • $${baseCarro} MXN`;
+   if(routeConfirmLayer) mapConfirm.removeLayer(routeConfirmLayer);
+   routeConfirmLayer = L.geoJSON(route.geometry,{style:{color:"#E53935",weight:6}}).addTo(mapConfirm);
+  }
+ }catch(e){}
 }
 async function actualizarDireccionConfirm(lat,lng){
  try{
@@ -175,6 +209,7 @@ async function actualizarDireccionConfirm(lat,lng){
   const d=await r.json(); const a=d.address||{}; const txt = (a.road? a.road + (a.house_number? " #"+a.house_number : "") : "") + (a.neighbourhood? " - "+a.neighbourhood : "");
   document.getElementById('txtPickupConfirm').innerText = txt || d.display_name.split(",").slice(0,3).join(", ");
  }catch(e){ document.getElementById('txtPickupConfirm').innerText = lat.toFixed(6)+", "+lng.toFixed(6); }
+ recalcularPrecioTiempoReal(lat,lng);
 }
 function usarMiUbicacionConfirm(){
  navigator.geolocation.getCurrentPosition(pos=>{
