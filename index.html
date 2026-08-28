@@ -13,7 +13,7 @@
 #map{width:100%;height:100%}
 #mapConfirm{width:100%;height:100%}
 .panel{padding:16px;border-radius:22px 22px 0 0;margin-top:-22px;position:relative;z-index:1000;background:#fff;flex:1;overflow-y:auto}
-.panel2{position:fixed;bottom:0;left:50%;transform:translateX(-50%);max-width:500px;width:100%;background:#111;border-radius:28px 28px 0 0;z-index:3000;padding:16px;display:none;flex-direction:column;max-height:70vh;overflow-y:auto}
+.panel2{position:fixed;bottom:0;left:50%;transform:translateX(-50%);max-width:500px;width:100%;background:#ffffff;border-radius:28px 28px 0 0;z-index:3000;padding:16px;display:none;flex-direction:column;max-height:70vh;overflow-y:auto;box-shadow:0 -10px 30px rgba(0,0,0,.15)}
 .panel2.show{display:flex}
 .panel3{position:fixed;inset:0;max-width:500px;margin:0 auto;width:100%;background:#fff;z-index:4000;display:none;flex-direction:column}
 .panel3.show{display:flex}
@@ -27,13 +27,13 @@
 .suggestions.show{display:block}
 .suggestion{padding:12px 14px;border-bottom:1px solid #f2f2f2;display:flex;gap:10px;align-items:center;cursor:pointer}
 .btn-cotizar{width:100%;padding:16px;border:none;border-radius:14px;background:#E53935;color:#fff;font-weight:900;font-size:15px;margin-top:10px;cursor:pointer}
-.card{border-radius:20px;padding:16px;display:flex;gap:14px;align-items:center;background:#1c1c1f;border:2px solid transparent;cursor:pointer;margin-bottom:14px;transition:.2s}
-.card.active{border-color:#E53935;background:#2a1212;box-shadow:0 0 0 2px rgba(229,57,53,.3), 0 0 18px rgba(229,57,53,.35)}
-.card-left{width:88px;height:68px;background:#fff;border-radius:14px;display:flex;align-items:center;justify-content:center}
-.card-title{color:#fff;font-weight:800;font-size:16px}.card-pass{color:#a1a1aa;font-size:12px;margin-top:3px;display:flex;align-items:center;gap:4px}
-.price{font-size:20px;font-weight:900;color:#fff;margin-left:auto}
-.btn-elegir{margin-top:12px;width:100%;height:56px;border-radius:16px;border:none;background:#27272a;color:#71717a;font-weight:900;font-size:15px}
-.btn-elegir.ready{background:#E53935;color:#fff;box-shadow:0 0 18px rgba(229,57,53,.5)}
+.card{border-radius:20px;padding:16px;display:flex;gap:14px;align-items:center;background:#ffffff;border:2px solid #eeeeee;cursor:pointer;margin-bottom:14px;transition:.2s;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+.card.active{border-color:#E53935;background:#fff5f5;box-shadow:0 0 0 2px rgba(229,57,53,.15), 0 0 22px rgba(229,57,53,.25)}
+.card-left{width:88px;height:68px;background:#f7f7f8;border-radius:14px;display:flex;align-items:center;justify-content:center;border:1px solid #eee}
+.card-title{color:#111;font-weight:900;font-size:16px}.card-pass{color:#666;font-size:12px;margin-top:3px;display:flex;align-items:center;gap:4px}
+.price{font-size:22px;font-weight:900;color:#E53935;margin-left:auto;text-shadow:0 0 8px rgba(229,57,53,.35)}
+.btn-elegir{margin-top:12px;width:100%;height:56px;border-radius:16px;border:none;background:#eeeeee;color:#999;font-weight:900;font-size:15px}
+.btn-elegir.ready{background:#E53935;color:#fff;box-shadow:0 0 20px rgba(229,57,53,.45)}
 </style>
 </head>
 <body>
@@ -50,20 +50,20 @@
 </div>
 <div id="panel2" class="panel2">
 <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-<button onclick="volver()" style="width:42px;height:42px;border-radius:50%;background:#fff;border:none;display:flex;align-items:center;justify-content:center"><i data-lucide="arrow-left" style="width:18px"></i></button>
-<div style="flex:1;background:#fff;border-radius:999px;padding:8px 12px;display:flex;align-items:center;gap:6px"><i data-lucide="navigation" style="width:14px;color:#E53935"></i><b id="destTxt" style="font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Destino</b><b id="tiempoTxt" style="font-size:11px;margin-left:auto">--</b></div>
+<button onclick="volver()" style="width:42px;height:42px;border-radius:50%;background:#f1f1f1;border:1px solid #e5e7eb;display:flex;align-items:center;justify-content:center"><i data-lucide="arrow-left" style="width:18px;color:#111"></i></button>
+<div style="flex:1;background:#f7f7f8;border:1px solid #eee;border-radius:999px;padding:8px 12px;display:flex;align-items:center;gap:6px"><i data-lucide="navigation" style="width:14px;color:#E53935"></i><b id="destTxt" style="font-size:11px;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Destino</b><b id="tiempoTxt" style="font-size:11px;color:#111;margin-left:auto">--</b></div>
 </div>
-<div style="width:40px;height:4px;background:#3f3f46;border-radius:999px;margin:8px auto 12px"></div>
-<h2 style="color:#fff;margin:0 0 4px;font-size:22px;font-weight:900">Elige tu viaje</h2>
-<div id="rutaSub" style="color:#a1a1aa;font-size:12px;margin-bottom:14px">Selecciona tu transporte</div>
+<div style="width:40px;height:4px;background:#e5e7eb;border-radius:999px;margin:8px auto 12px"></div>
+<h2 style="color:#111;margin:0 0 4px;font-size:22px;font-weight:900">Elige tu viaje</h2>
+<div id="rutaSub" style="color:#666;font-size:12px;margin-bottom:14px">Selecciona tu transporte</div>
 <div id="cardMoto" class="card" onclick="seleccionar('moto')">
 <div class="card-left"><img src="https://img.icons8.com/3d-fluency/94/motorcycle.png" style="width:70px"></div>
-<div style="flex:1"><div class="card-title">Moto</div><div class="card-pass"><i data-lucide="user" style="width:12px"></i> 1 pasajero</div><div style="color:#71717a;font-size:11px;margin-top:4px" id="motoTime">--</div></div>
+<div style="flex:1"><div class="card-title">Moto</div><div class="card-pass"><i data-lucide="user" style="width:12px"></i> 1 pasajero</div><div style="color:#888;font-size:11px;margin-top:4px" id="motoTime">--</div></div>
 <div class="price" id="motoPrice">$--</div>
 </div>
 <div id="cardCarro" class="card" onclick="seleccionar('carro')">
 <div class="card-left"><img src="https://img.icons8.com/3d-fluency/94/car.png" style="width:70px"></div>
-<div style="flex:1"><div class="card-title">Carro</div><div class="card-pass"><i data-lucide="users" style="width:12px"></i> Hasta 4 pasajeros</div><div style="color:#71717a;font-size:11px;margin-top:4px" id="carroTime">--</div></div>
+<div style="flex:1"><div class="card-title">Carro</div><div class="card-pass"><i data-lucide="users" style="width:12px"></i> Hasta 4 pasajeros</div><div style="color:#888;font-size:11px;margin-top:4px" id="carroTime">--</div></div>
 <div class="price" id="carroPrice">$--</div>
 </div>
 <button id="btnElegir" class="btn-elegir" onclick="abrirMapaConfirm()"><span id="btnTxt">Selecciona una opción</span></button>
@@ -72,14 +72,14 @@
 <div id="panel3" class="panel3">
 <div style="position:relative;height:62vh;flex-shrink:0">
 <div id="mapConfirm"></div>
-<div style="position:absolute;top:12px;left:12px;right:12px;z-index:999;background:#111;color:#fff;border-radius:16px;padding:12px 14px;display:flex;gap:10px;align-items:center"><button onclick="volverMapa()" style="width:36px;height:36px;border-radius:50%;background:#fff;border:none;display:flex;align-items:center;justify-content:center"><i data-lucide="arrow-left" style="width:16px"></i></button><div><div style="font-weight:900;font-size:13px">Confirma tu punto de recogida</div><div style="font-size:11px;color:#a1a1aa">Toca el mapa para ajustar, el precio se actualiza solo</div></div></div>
-<div style="position:absolute;bottom:20px;left:50%;transform:translateX(-50%);z-index:999;background:#fff;border-radius:999px;padding:8px 14px;font-size:11px;font-weight:800;box-shadow:0 4px 15px rgba(0,0,0,.2);display:flex;align-items:center;gap:6px"><i data-lucide="hand" style="width:14px;color:#E53935"></i> Mueve el pin - precio en vivo</div>
+<div style="position:absolute;top:12px;left:12px;right:12px;z-index:999;background:#ffffff;color:#111;border:1px solid #eee;border-radius:16px;padding:12px 14px;display:flex;gap:10px;align-items:center;box-shadow:0 4px 15px rgba(0,0,0,.1)"><button onclick="volverMapa()" style="width:36px;height:36px;border-radius:50%;background:#f1f1f1;border:1px solid #e5e7eb;display:flex;align-items:center;justify-content:center"><i data-lucide="arrow-left" style="width:16px;color:#111"></i></button><div><div style="font-weight:900;font-size:13px;color:#111">Confirma tu punto de recogida</div><div style="font-size:11px;color:#666">Toca el mapa para ajustar, el precio se actualiza solo</div></div></div>
+<div style="position:absolute;bottom:20px;left:50%;transform:translateX(-50%);z-index:999;background:#111;color:#fff;border-radius:999px;padding:8px 14px;font-size:11px;font-weight:800;box-shadow:0 4px 15px rgba(0,0,0,.2);display:flex;align-items:center;gap:6px"><i data-lucide="hand" style="width:14px;color:#E53935"></i> Mueve el pin - precio en vivo</div>
 </div>
-<div style="background:#111;flex:1;border-radius:28px 28px 0 0;margin-top:-28px;z-index:1000;padding:20px;display:flex;flex-direction:column">
-<div style="width:40px;height:4px;background:#3f3f46;border-radius:999px;margin:0 auto 16px"></div>
-<div style="background:#1c1c1f;border-radius:16px;padding:14px;display:flex;gap:10px;align-items:center;margin-bottom:14px"><div style="width:40px;height:40px;background:#E53935;border-radius:10px;display:flex;align-items:center;justify-content:center"><i data-lucide="map-pin" style="width:18px;color:#fff"></i></div><div style="flex:1"><div style="color:#fff;font-weight:800;font-size:13px">Punto de recogida</div><div id="txtPickupConfirm" style="color:#a1a1aa;font-size:11px">Cargando...</div></div><button onclick="usarMiUbicacionConfirm()" style="background:#27272a;border:none;color:#fff;border-radius:8px;padding:8px 10px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:4px"><i data-lucide="crosshair" style="width:12px"></i> Mi ubicación</button></div>
-<div style="background:#1c1c1f;border-radius:16px;padding:14px;display:flex;gap:10px;align-items:center;margin-bottom:18px"><div style="width:40px;height:40px;background:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center"><img id="imgTransporteConfirm" src="" style="width:32px"></div><div><div id="txtTransporteConfirm" style="color:#fff;font-weight:800;font-size:14px">Moto</div><div id="txtPrecioConfirm" style="color:#a1a1aa;font-size:12px">$35 MXN</div></div><div id="txtDistConfirm" style="margin-left:auto;color:#fff;font-weight:800;font-size:12px">1.5 km</div></div>
-<button onclick="confirmarViajeFinal()" style="width:100%;height:56px;border-radius:16px;border:none;background:#E53935;color:#fff;font-weight:900;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px"><i data-lucide="check" style="width:18px"></i> CONFIRMAR RECOGIDA</button>
+<div style="background:#ffffff;flex:1;border-radius:28px 28px 0 0;margin-top:-28px;z-index:1000;padding:20px;display:flex;flex-direction:column;box-shadow:0 -10px 30px rgba(0,0,0,.12);border-top:1px solid #eee">
+<div style="width:40px;height:4px;background:#e5e7eb;border-radius:999px;margin:0 auto 16px"></div>
+<div style="background:#f7f7f8;border:1px solid #eee;border-radius:16px;padding:14px;display:flex;gap:10px;align-items:center;margin-bottom:14px"><div style="width:40px;height:40px;background:#E53935;border-radius:10px;display:flex;align-items:center;justify-content:center"><i data-lucide="map-pin" style="width:18px;color:#fff"></i></div><div style="flex:1"><div style="color:#111;font-weight:800;font-size:13px">Punto de recogida</div><div id="txtPickupConfirm" style="color:#666;font-size:11px">Cargando...</div></div><button onclick="usarMiUbicacionConfirm()" style="background:#111;border:none;color:#fff;border-radius:8px;padding:8px 10px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:4px"><i data-lucide="crosshair" style="width:12px"></i> Mi ubicación</button></div>
+<div style="background:#ffffff;border:1px solid #eee;border-radius:16px;padding:14px;display:flex;gap:10px;align-items:center;margin-bottom:18px;box-shadow:0 2px 10px rgba(0,0,0,.04)"><div style="width:40px;height:40px;background:#f7f7f8;border:1px solid #eee;border-radius:10px;display:flex;align-items:center;justify-content:center"><img id="imgTransporteConfirm" src="" style="width:32px"></div><div><div id="txtTransporteConfirm" style="color:#111;font-weight:800;font-size:14px">Moto</div><div id="txtPrecioConfirm" style="color:#E53935;font-size:13px;font-weight:900;text-shadow:0 0 8px rgba(229,57,53,.3)">$35 MXN</div></div><div id="txtDistConfirm" style="margin-left:auto;color:#111;font-weight:900;font-size:13px">1.5 km</div></div>
+<button onclick="confirmarViajeFinal()" style="width:100%;height:56px;border-radius:16px;border:none;background:#E53935;color:#fff;font-weight:900;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 0 20px rgba(229,57,53,.35)"><i data-lucide="check" style="width:18px"></i> CONFIRMAR RECOGIDA</button>
 </div>
 </div>
 
