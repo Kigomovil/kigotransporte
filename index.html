@@ -8,12 +8,12 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:system-ui;background:#f3f4f6;height:100vh;overflow:hidden}
-.app{max-width:500px;margin:0 auto;background:#fff;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.app{max-width:500px;margin:0 auto;background:#fff;height:100vh;display:flex;flex-direction:column;overflow:hidden;position:relative}
 .map-container{position:relative;width:100%;height:52vh;flex-shrink:0}
 #map{width:100%;height:100%}
 #mapConfirm{width:100%;height:100%}
-.panel{padding:16px;border-radius:22px 22px 0 0;margin-top:-22px;position:relative;z-index:1000;background:#fff;flex:1;overflow-y:auto}
-.panel2{position:fixed;bottom:0;left:50%;transform:translateX(-50%);max-width:500px;width:100%;background:#ffffff;border-radius:28px 28px 0 0;z-index:3000;padding:16px;display:none;flex-direction:column;max-height:70vh;overflow-y:auto;box-shadow:0 -10px 30px rgba(0,0,0,.15)}
+.panel{padding:16px 16px 90px 16px;border-radius:22px 22px 0 0;margin-top:-22px;position:relative;z-index:1000;background:#fff;flex:1;overflow-y:auto}
+.panel2{position:fixed;bottom:0;left:50%;transform:translateX(-50%);max-width:500px;width:100%;background:#ffffff;border-radius:28px 28px 0 0;z-index:3000;padding:16px 16px 90px 16px;display:none;flex-direction:column;max-height:70vh;overflow-y:auto;box-shadow:0 -10px 30px rgba(0,0,0,.15)}
 .panel2.show{display:flex}
 .panel3{position:fixed;inset:0;max-width:500px;margin:0 auto;width:100%;background:#fff;z-index:4000;display:none;flex-direction:column}
 .panel3.show{display:flex}
@@ -34,6 +34,18 @@
 .price{font-size:22px;font-weight:900;color:#E53935;margin-left:auto;text-shadow:0 0 8px rgba(229,57,53,.35)}
 .btn-elegir{margin-top:12px;width:100%;height:56px;border-radius:16px;border:none;background:#eeeeee;color:#999;font-weight:900;font-size:15px}
 .btn-elegir.ready{background:#E53935;color:#fff;box-shadow:0 0 20px rgba(229,57,53,.45)}
+/* BOTONES INICIO ADMIN */
+.bottom-nav{position:absolute;bottom:0;left:0;right:0;max-width:500px;margin:0 auto;background:#fff;border-top:1px solid #eee;padding:10px 16px 14px;display:flex;gap:10px;z-index:2000}
+.btn-nav{flex:1;height:48px;border-radius:14px;border:1px solid #eee;background:#f7f7f8;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;color:#111}
+.btn-nav.active{background:#111;color:#fff;border-color:#111}
+.btn-nav.admin{border-color:#E53935;color:#E53935}
+.btn-nav.admin.active{background:#E53935;color:#fff}
+/* MODAL ADMIN */
+.modal-admin{position:fixed;inset:0;max-width:500px;margin:0 auto;background:rgba(0,0,0,.6);z-index:5000;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-admin.show{display:flex}
+.box-admin{background:#fff;border-radius:22px;padding:22px;width:100%;max-width:360px;box-shadow:0 20px 40px rgba(0,0,0,.2)}
+.input-admin{width:100%;padding:14px 14px;border:1.5px solid #ddd;border-radius:12px;margin-top:10px;font-size:14px;font-weight:600;outline:none}
+.btn-login{width:100%;padding:14px;border:none;border-radius:12px;background:#E53935;color:#fff;font-weight:900;margin-top:14px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -47,8 +59,31 @@
 <div class="step"><div style="font-size:11px;font-weight:800;color:#666;margin-bottom:6px">Dirección de Destino.</div><div style="position:relative"><i data-lucide="flag" style="position:absolute;left:12px;top:15px;width:16px;color:#dc2626"></i><input id="destinationInput" class="colonia-input" style="padding-right:14px" placeholder="Ej: Guerrero 20, Lindavista..." autocomplete="off"><div id="destinationSuggestions" class="suggestions"></div></div></div>
 <button id="calculateButton" class="btn-cotizar">CONFIRMAR DIRECCIÓN</button>
 </div>
+
+<div class="bottom-nav">
+<button id="btnNavInicio" class="btn-nav active" onclick="irInicio()"><i data-lucide="home" style="width:16px"></i> Inicio</button>
+<button id="btnNavAdmin" class="btn-nav admin" onclick="abrirAdmin()"><i data-lucide="shield" style="width:16px"></i> Admin</button>
 </div>
-<div id="panel2" class="panel2">
+
+</div>
+
+<div id="modalAdmin" class="modal-admin">
+<div class="box-admin">
+<div style="display:flex;justify-content:space-between;align-items:center"><div style="font-weight:900;font-size:18px;color:#111">Acceso Admin</div><button onclick="cerrarAdmin()" style="width:32px;height:32px;border-radius:50%;border:1px solid #eee;background:#fff;display:flex;align-items:center;justify-content:center"><i data-lucide="x" style="width:14px"></i></button></div>
+<div style="font-size:12px;color:#666;margin-top:4px">Usuario: admin / Contraseña: 0831</div>
+<input id="adminUser" class="input-admin" placeholder="Usuario">
+<input id="adminPass" type="password" class="input-admin" placeholder="Contraseña">
+<button class="btn-login" onclick="loginAdmin()">INGRESAR</button>
+<div id="adminError" style="color:#E53935;font-size:12px;font-weight:700;margin-top:10px;display:none">Usuario o contraseña incorrectos</div>
+</div>
+</div>
+
+<div id="panelAdmin" style="position:fixed;inset:0;max-width:500px;margin:0 auto;background:#fff;z-index:4500;display:none;flex-direction:column;padding:20px">
+<div style="display:flex;align-items:center;gap:10px"><button onclick="cerrarPanelAdmin()" style="width:42px;height:42px;border-radius:50%;background:#f1f1f1;border:1px solid #eee;display:flex;align-items:center;justify-content:center"><i data-lucide="arrow-left" style="width:18px"></i></button><div style="font-weight:900;font-size:18px;color:#111">Panel Admin - Kigo</div></div>
+<div style="margin-top:20px;background:#f7f7f8;border:1px solid #eee;border-radius:16px;padding:16px"><div style="font-weight:800;color:#111">Bienvenido, admin</div><div style="font-size:12px;color:#666;margin-top:4px">Aquí podrás gestionar tus viajes, precios y conductores más adelante.</div></div>
+<button onclick="cerrarSesionAdmin()" style="margin-top:16px;width:100%;padding:14px;border:1px solid #E53935;border-radius:12px;background:#fff;color:#E53935;font-weight:800">Cerrar sesión</button>
+  </div>
+  <div id="panel2" class="panel2">
 <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
 <button onclick="volver()" style="width:42px;height:42px;border-radius:50%;background:#f1f1f1;border:1px solid #e5e7eb;display:flex;align-items:center;justify-content:center"><i data-lucide="arrow-left" style="width:18px;color:#111"></i></button>
 <div style="flex:1;background:#f7f7f8;border:1px solid #eee;border-radius:999px;padding:8px 12px;display:flex;align-items:center;gap:6px"><i data-lucide="navigation" style="width:14px;color:#E53935"></i><b id="destTxt" style="font-size:11px;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Destino</b><b id="tiempoTxt" style="font-size:11px;color:#111;margin-left:auto">--</b></div>
@@ -75,7 +110,7 @@
 <div style="position:absolute;top:12px;left:12px;right:12px;z-index:999;background:#ffffff;color:#111;border:1px solid #eee;border-radius:16px;padding:12px 14px;display:flex;gap:10px;align-items:center;box-shadow:0 4px 15px rgba(0,0,0,.1)"><button onclick="volverMapa()" style="width:36px;height:36px;border-radius:50%;background:#f1f1f1;border:1px solid #e5e7eb;display:flex;align-items:center;justify-content:center"><i data-lucide="arrow-left" style="width:16px;color:#111"></i></button><div><div style="font-weight:900;font-size:13px;color:#111">Confirma tu punto de recogida</div><div style="font-size:11px;color:#666">Toca el mapa para ajustar, el precio se actualiza solo</div></div></div>
 <div style="position:absolute;bottom:20px;left:50%;transform:translateX(-50%);z-index:999;background:#111;color:#fff;border-radius:999px;padding:8px 14px;font-size:11px;font-weight:800;box-shadow:0 4px 15px rgba(0,0,0,.2);display:flex;align-items:center;gap:6px"><i data-lucide="hand" style="width:14px;color:#E53935"></i> Mueve el pin - precio en vivo</div>
 </div>
-<div style="background:#ffffff;flex:1;border-radius:28px 28px 0 0;margin-top:-28px;z-index:1000;padding:20px;display:flex;flex-direction:column;box-shadow:0 -10px 30px rgba(0,0,0,.12);border-top:1px solid #eee">
+<div style="background:#ffffff;flex:1;border-radius:28px 28px 0 0;margin-top:-28px;z-index:1000;padding:20px 20px 90px 20px;display:flex;flex-direction:column;box-shadow:0 -10px 30px rgba(0,0,0,.12);border-top:1px solid #eee">
 <div style="width:40px;height:4px;background:#e5e7eb;border-radius:999px;margin:0 auto 16px"></div>
 <div style="background:#f7f7f8;border:1px solid #eee;border-radius:16px;padding:14px;display:flex;gap:10px;align-items:center;margin-bottom:14px"><div style="width:40px;height:40px;background:#E53935;border-radius:10px;display:flex;align-items:center;justify-content:center"><i data-lucide="map-pin" style="width:18px;color:#fff"></i></div><div style="flex:1"><div style="color:#111;font-weight:800;font-size:13px">Punto de recogida</div><div id="txtPickupConfirm" style="color:#666;font-size:11px">Cargando...</div></div><button onclick="usarMiUbicacionConfirm()" style="background:#111;border:none;color:#fff;border-radius:8px;padding:8px 10px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:4px"><i data-lucide="crosshair" style="width:12px"></i> Mi ubicación</button></div>
 <div style="background:#ffffff;border:1px solid #eee;border-radius:16px;padding:14px;display:flex;gap:10px;align-items:center;margin-bottom:18px;box-shadow:0 2px 10px rgba(0,0,0,.04)"><div style="width:40px;height:40px;background:#f7f7f8;border:1px solid #eee;border-radius:10px;display:flex;align-items:center;justify-content:center"><img id="imgTransporteConfirm" src="" style="width:32px"></div><div><div id="txtTransporteConfirm" style="color:#111;font-weight:800;font-size:14px">Moto</div><div id="txtPrecioConfirm" style="color:#E53935;font-size:13px;font-weight:900;text-shadow:0 0 8px rgba(229,57,53,.3)">$35 MXN</div></div><div id="txtDistConfirm" style="margin-left:auto;color:#111;font-weight:900;font-size:13px">1.5 km</div></div>
@@ -226,6 +261,26 @@ function confirmarViajeFinal(){
  let msg=`KIGO ${tipo.toUpperCase()}\nOrigen: ${pickupName}\nPunto exacto: https://www.google.com/maps?q=${finalPickupLat},${finalPickupLng}\nDestino: ${datosViaje.destino}\nDistancia: ${datosViaje.distKm} km\nPrecio: $${precio} MXN\nRuta: ${link}`;
  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
 }
+// FUNCIONES ADMIN
+function abrirAdmin(){ document.getElementById('modalAdmin').classList.add('show'); document.getElementById('btnNavAdmin').classList.add('active'); lucide.createIcons(); }
+function cerrarAdmin(){ document.getElementById('modalAdmin').classList.remove('show'); document.getElementById('btnNavAdmin').classList.remove('active'); document.getElementById('adminError').style.display='none'; }
+function irInicio(){ document.getElementById('panel2').classList.remove('show'); document.getElementById('panel3').classList.remove('show'); document.getElementById('panelAdmin').style.display='none'; document.getElementById('btnNavInicio').classList.add('active'); document.getElementById('btnNavAdmin').classList.remove('active'); map.invalidateSize(); }
+function loginAdmin(){
+ const u=document.getElementById('adminUser').value.trim();
+ const p=document.getElementById('adminPass').value.trim();
+ if(u==='admin' && p==='0831'){
+  document.getElementById('modalAdmin').classList.remove('show');
+  document.getElementById('panelAdmin').style.display='flex';
+  document.getElementById('adminError').style.display='none';
+  document.getElementById('adminUser').value=''; document.getElementById('adminPass').value='';
+  lucide.createIcons();
+ }else{
+  document.getElementById('adminError').style.display='block';
+ }
+}
+function cerrarPanelAdmin(){ document.getElementById('panelAdmin').style.display='none'; irInicio(); }
+function cerrarSesionAdmin(){ document.getElementById('panelAdmin').style.display='none'; irInicio(); }
+
 document.addEventListener("click",e=>{if(!e.target.closest('.input-wrap')){pickupSuggestions.classList.remove("show");destinationSuggestions.classList.remove("show");}});
 lucide.createIcons();
 </script>
