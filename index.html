@@ -7,73 +7,149 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/lucide@latest"></script>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:system-ui;background:#f3f4f6;height:100vh;overflow:hidden}
-.app{max-width:500px;margin:0 auto;background:#fff;height:100vh;display:flex;flex-direction:column;overflow:hidden}
-.map-container{position:relative;width:100%;height:38vh;min-height:240px;flex-shrink:0;overflow:hidden}
-#map{width:100%;height:100%}
-.panel{padding:16px 16px 24px;border-radius:22px 22px 0 0;margin-top:-18px;position:relative;z-index:1000;background:#fff;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui;background:#f3f4f6}
+.app{max-width:500px;margin:auto;background:#fff;min-height:100vh;display:flex;flex-direction:column}
+#map{width:100%;height:52vh}.map-container{position:relative;overflow:hidden}
+.panel{padding:16px;border-radius:22px 22px 0 0;margin-top:-18px;position:relative;z-index:1000;background:#fff;flex:1;box-shadow:0 -4px 20px rgba(0,0,0,.12)}
 .step{background:#f7f7f8;border:1px solid #eee;padding:12px;border-radius:14px;margin-bottom:12px}
 .colonia-input{width:100%;padding:14px 14px 14px 38px;border:1.5px solid #ddd;border-radius:12px;font-size:14px;font-weight:600;outline:none}
-.suggestions{position:absolute;left:0;right:0;top:100%;margin-top:6px;background:#fff;border:1px solid #ddd;border-radius:14px;box-shadow:0 10px 25px rgba(0,0,0,.18);z-index:9999;display:none;max-height:220px;overflow-y:auto}
+.suggestions{position:absolute;left:0;right:0;top:100%;margin-top:6px;background:#fff;border:1px solid #ddd;border-radius:14px;box-shadow:0 10px 25px rgba(0,0,0,.18);z-index:9999;display:none;max-height:300px;overflow-y:auto}
 .suggestions.show{display:block}
 .suggestion{padding:12px 14px;border-bottom:1px solid #f2f2f2;display:flex;gap:10px;align-items:center;cursor:pointer}
-.btn-cotizar{width:100%;padding:16px;border:none;border-radius:14px;background:#E53935;color:#fff;font-weight:900;font-size:15px;margin-top:6px;margin-bottom:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;position:sticky;bottom:0}
+.btn-cotizar{width:100%;padding:16px;border:none;border-radius:14px;background:#E53935;color:#fff;font-weight:900;font-size:15px;margin-top:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-whatsapp{width:100%;padding:14px;border:1.5px solid #25D366;border-radius:14px;background:#fff;color:#25D366;font-weight:800;font-size:13px;margin-top:10px;cursor:pointer;display:none;align-items:center;justify-content:center;gap:8px}
+.btn-whatsapp.show{display:flex}
+.price-box{margin-top:12px;padding:16px;background:#111;color:#fff;border-radius:14px;display:flex;justify-content:space-between;font-weight:900}
+.input-wrapper{position:relative}
+.info{display:flex;gap:10px;margin-top:12px}.info-box{flex:1;background:#f7f7f8;padding:12px;border-radius:12px;text-align:center;border:1px solid #eee}
 .weather-widget{position:absolute;top:12px;right:12px;z-index:999;background:#fff;border-radius:20px;padding:6px 12px;font-size:11px;font-weight:900;display:flex;align-items:center;gap:4px;box-shadow:0 2px 10px rgba(0,0,0,.25);border:1px solid #eee}
 .weather-widget.lluvia{background:#dbeafe;color:#1e40af}.weather-widget.tormenta{background:#1e293b;color:#fff}
 .rain-overlay{position:absolute;top:0;left:0;width:100%;height:100%;z-index:400;pointer-events:none;display:none;background:rgba(30,58,138,0.12)}.rain-overlay.active{display:block}
 .rain{position:absolute;top:-20px;width:2px;height:16px;background:linear-gradient(to bottom, transparent, #9ec3ff);animation:fall linear infinite}
 @keyframes fall{0%{transform:translateY(0)}100%{transform:translateY(60vh)}}
 .weather-badge{position:absolute;bottom:12px;left:12px;z-index:999;background:#1e3a8a;color:#fff;padding:7px 12px;border-radius:20px;font-size:11px;font-weight:900;display:none;box-shadow:0 2px 8px rgba(0,0,0,.3);align-items:center;gap:6px}.weather-badge.show{display:flex}
+.weather-badge.tormenta{background:#7f1d1d}.weather-badge.moderada{background:#1e40af}.weather-badge.leve{background:#1e3a8a}
 .reset-btn{position:absolute;top:12px;left:12px;z-index:999;background:#fff;border:1px solid #ddd;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.top-actions{display:flex;gap:8px;margin-bottom:12px}
+.btn-top{flex:1;height:44px;border-radius:12px;border:1.5px solid #111;background:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer}
+.btn-top.active{background:#111;color:#fff}
 </style>
 </head>
 <body>
 <div class="app">
 <div class="map-container">
 <div id="map"></div>
-<div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:999;background:white;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.25)">
-<img src="https://firebasestorage.googleapis.com/v0/b/glide-prod.appspot.com/o/icon-images%2Fanonymous-ba983199-acce-404e-b058-c75e9633b325.jpeg?alt=media&token=a58284c1-111c-4874-b60f-35380cf5fbe3" style="width:32px;height:32px;border-radius:50%;object-fit:cover">
+<div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:999;background:white; width:42px; height:42px; border-radius:50%; display:flex; align-items:center; justify-content:center; padding:2px; box-shadow:0 2px 10px rgba(0,0,0,.25);">
+  <img src="https://firebasestorage.googleapis.com/v0/b/glide-prod.appspot.com/o/icon-images%2Fanonymous-ba983199-acce-404e-b058-c75e9633b325.jpeg?alt=media&token=a58284c1-111c-4874-b60f-35380cf5fbe3" style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
 </div>
 <div class="reset-btn" id="resetBtn"><i data-lucide="rotate-ccw" style="width:16px"></i></div>
 <div id="weatherWidget" class="weather-widget"><i data-lucide="sun" style="width:14px"></i> --°C</div>
 <div id="rainOverlay" class="rain-overlay"></div>
-<div id="weatherBadge" class="weather-badge"><i data-lucide="cloud-rain" style="width:14px;color:#fff"></i> <span id="weatherBadgeTxt">LLOVIENDO</span></div>
+<div id="weatherBadge" class="weather-badge"><i data-lucide="cloud-rain" style="width:14px;color:#fff"></i> <span id="weatherBadgeTxt">LLOVIENDO EN DOLORES</span></div>
 </div>
 <div class="panel">
-<div class="step"><div style="font-size:11px;font-weight:800;color:#666;margin-bottom:6px">1. ¿DÓNDE RECOGER?</div><div style="position:relative"><i data-lucide="map-pin" style="position:absolute;left:12px;top:15px;width:16px;color:#16a34a"></i><input id="pickupInput" class="colonia-input" placeholder="Escribe Centro o colonia..." autocomplete="off"><div id="pickupSuggestions" class="suggestions"></div></div></div>
-<div class="step"><div style="font-size:11px;font-weight:800;color:#666;margin-bottom:6px">2. ¿DÓNDE ENTREGAR?</div><div style="position:relative"><i data-lucide="flag" style="position:absolute;left:12px;top:15px;width:16px;color:#dc2626"></i><input id="destinationInput" class="colonia-input" placeholder="Escribe colonia..." autocomplete="off"><div id="destinationSuggestions" class="suggestions"></div></div></div>
-<button id="calculateButton" class="btn-cotizar"><i data-lucide="calculator" style="width:18px;color:#fff"></i> CONFIRMAR DIRECCIÓN</button>
-<div style="height:20px"></div>
+<div class="top-actions">
+<button id="btnTopRecoger" class="btn-top active" onclick="focusInput('pickup')"><i data-lucide="map-pin" style="width:16px"></i> RECOGER</button>
+<button id="btnTopDestino" class="btn-top" onclick="focusInput('destination')"><i data-lucide="flag" style="width:16px"></i> DESTINO</button>
+</div>
+
+<div class="step"><div style="font-size:11px;font-weight:800;color:#666;margin-bottom:6px">1. ¿DÓNDE RECOGER?</div><div class="input-wrapper"><i data-lucide="map-pin" style="position:absolute;left:12px;top:15px;width:16px;color:#16a34a"></i><input id="pickupInput" class="colonia-input" placeholder="Escribe Centro o colonia..." autocomplete="off"><div id="pickupSuggestions" class="suggestions"></div></div></div>
+<div class="step"><div style="font-size:11px;font-weight:800;color:#666;margin-bottom:6px">2. ¿DÓNDE ENTREGAR?</div><div class="input-wrapper"><i data-lucide="flag" style="position:absolute;left:12px;top:15px;width:16px;color:#dc2626"></i><input id="destinationInput" class="colonia-input" placeholder="Escribe colonia..." autocomplete="off"><div id="destinationSuggestions" class="suggestions"></div></div></div>
+<button id="calculateButton" class="btn-cotizar"><i data-lucide="calculator" style="width:18px;color:#fff"></i> COTIZAR SERVICIO</button>
+<button id="whatsappButton" class="btn-whatsapp"><i data-lucide="message-circle" style="width:18px"></i> Compartir cotización por WhatsApp</button>
+<div class="info"><div class="info-box"><div style="font-size:9px;color:#888;font-weight:700">DISTANCIA MOTO</div><div id="distance" style="font-weight:800">—</div></div><div class="info-box"><div style="font-size:9px;color:#888;font-weight:700">TIEMPO</div><div id="duration" style="font-weight:800">—</div></div></div>
+<div class="price-box"><span>PRECIO</span><span id="price">POR COTIZAR</span></div>
 </div>
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const CENTRO={lat:21.1561,lng:-100.9333};
-let pickupLat=null,pickupLng=null,destinationLat=null,destinationLng=null,pickupMarker=null,destinationMarker=null,routeLayer=null,pickupName="",destName="";
+let pickupLat=null,pickupLng=null,destinationLat=null,destinationLng=null,pickupMarker=null,destinationMarker=null,routeLayer=null,ultimaDistancia="",ultimoPrecio="",pickupName="",destName="";
 let extraLluvia=0;
 const map=L.map("map",{zoomControl:false}).setView([CENTRO.lat,CENTRO.lng],14);
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19}).addTo(map);
 const pickupInput=document.getElementById("pickupInput"),destinationInput=document.getElementById("destinationInput"),pickupSuggestions=document.getElementById("pickupSuggestions"),destinationSuggestions=document.getElementById("destinationSuggestions");
 const rainOverlay=document.getElementById("rainOverlay"),weatherBadge=document.getElementById("weatherBadge"),weatherWidget=document.getElementById("weatherWidget");
-function distMts(a,b,c,d){const R=6371000;const dLat=(c-a)*Math.PI/180;const dLon=(d-b)*Math.PI/180;const x=Math.sin(dLat/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dLon/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
-async function buscarColonias(t){let r=[];if(t.toLowerCase().includes("cent")) r.push({lat:CENTRO.lat,lon:CENTRO.lng,name:"Centro - Zona Centro",direccion:"Centro, Dolores Hidalgo"});const q=encodeURIComponent(t+", Dolores Hidalgo Guanajuato Mexico");try{const f=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}&limit=8&countrycodes=mx`);const d=await f.json();r=[...r,...d.map(x=>({lat:parseFloat(x.lat),lon:parseFloat(x.lon),name:x.display_name.split(",")[0],direccion:x.display_name}))];}catch(e){}return r;}
-function mostrar(c,res,tipo){c.innerHTML="";if(!res.length){c.innerHTML='<div style="padding:12px;text-align:center">Sin resultados</div>';c.classList.add("show");return;}res.forEach(r=>{const el=document.createElement("div");el.className="suggestion";el.innerHTML=`<div style="width:28px;height:28px;background:#111;border-radius:50%;display:flex;align-items:center;justify-content:center"><i data-lucide="map-pin" style="width:14px;color:#fff"></i></div><div><div style="font-weight:800;font-size:13px">${r.name}</div><div style="font-size:10px;color:#777">${r.direccion.substring(0,60)}</div></div>`;el.onclick=()=>{if(tipo==="pickup"){pickupLat=r.lat;pickupLng=r.lon;pickupName=r.name;pickupInput.value=r.name;pickupSuggestions.classList.remove("show");if(pickupMarker)map.removeLayer(pickupMarker);pickupMarker=L.marker([r.lat,r.lon]).addTo(map);map.setView([r.lat,r.lon],15);}else{destinationLat=r.lat;destinationLng=r.lon;destName=r.name;destinationInput.value=r.name;destinationSuggestions.classList.remove("show");if(destinationMarker)map.removeLayer(destinationMarker);destinationMarker=L.marker([r.lat,r.lon]).addTo(map);map.setView([r.lat,r.lon],15);} lucide.createIcons();};c.appendChild(el);});c.classList.add("show"); lucide.createIcons();}
-let t1=null;pickupInput.addEventListener("input",function(){const txt=this.value.trim();if(t1)clearTimeout(t1);if(txt.length<2){pickupSuggestions.classList.remove("show");return;}t1=setTimeout(async()=>{const res=await buscarColonias(txt);mostrar(pickupSuggestions,res,"pickup");},120);});
-let t2=null;destinationInput.addEventListener("input",function(){const txt=this.value.trim();if(t2)clearTimeout(t2);if(txt.length<2){destinationSuggestions.classList.remove("show");return;}t2=setTimeout(async()=>{const res=await buscarColonias(txt);mostrar(destinationSuggestions,res,"destination");},120);});
-for(let i=0;i<60;i++){let d=document.createElement("div");d.className="rain";d.style.left=Math.random()*100+"%";d.style.animationDelay=Math.random()*1.2+"s";d.style.animationDuration=(0.5+Math.random()*0.6)+"s";d.style.opacity=0.6;rainOverlay.appendChild(d);}
-async function checarLluvia(){try{const r=await fetch("https://api.open-meteo.com/v1/forecast?latitude=21.1561&longitude=-100.9333&current=temperature_2m,precipitation,weather_code&timezone=America/Mexico_City");const data=await r.json();const precip=data.current.precipitation;const temp=Math.round(data.current.temperature_2m);const code=data.current.weather_code;let llueve=precip>0||(code>=51&&code<=99);if(!llueve){extraLluvia=0;rainOverlay.classList.remove("active");weatherBadge.classList.remove("show");weatherWidget.className="weather-widget";weatherWidget.innerHTML=`<i data-lucide="sun" style="width:14px"></i> ${temp}°C`;lucide.createIcons();return;}extraLluvia=precip>7.5?10:precip>=2.5?5:0;weatherWidget.className="weather-widget lluvia";weatherWidget.innerHTML=`<i data-lucide="cloud-rain" style="width:14px"></i> ${temp}°C`;document.getElementById('weatherBadgeTxt').innerText=`LLOVIENDO +$${extraLluvia}`;weatherBadge.className="weather-badge show";rainOverlay.classList.add("active");lucide.createIcons();}catch(e){}}
-checarLluvia();
+function focusInput(tipo){ if(tipo==='pickup'){ document.getElementById('btnTopRecoger').classList.add('active'); document.getElementById('btnTopDestino').classList.remove('active'); pickupInput.focus(); } else { document.getElementById('btnTopDestino').classList.add('active'); document.getElementById('btnTopRecoger').classList.remove('active'); destinationInput.focus(); } }
+function distMts(lat1,lon1,lat2,lon2){const R=6371000;const dLat=(lat2-lat1)*Math.PI/180;const dLon=(lon2-lon1)*Math.PI/180;const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
+async function buscarColonias(t){const texto=t.toLowerCase();let resultados=[];if(texto.includes("centro")||texto.includes("cent")){resultados.push({lat:CENTRO.lat,lon:CENTRO.lng,name:"Centro - Zona Centro",direccion:"Centro, Dolores Hidalgo, Gto."});}const q=encodeURIComponent(t+", Dolores Hidalgo Guanajuato Mexico");try{const r=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}&limit=10&countrycodes=mx&accept-language=es`);const d=await r.json();const otros=d.map(x=>({lat:parseFloat(x.lat),lon:parseFloat(x.lon),name:x.display_name.split(",")[0],direccion:x.display_name}));resultados=[...resultados,...otros];}catch(e){}return resultados;}
+function mostrar(c,res,tipo){c.innerHTML="";if(!res.length){c.innerHTML='<div style="padding:12px;text-align:center">Sin resultados</div>';c.classList.add("show");return;}res.forEach(r=>{const el=document.createElement("div");el.className="suggestion";el.innerHTML=`<div style="width:28px;height:28px;background:#111;border-radius:50%;display:flex;align-items:center;justify-content:center"><i data-lucide="bike" style="width:14px;color:#fff"></i></div><div><div style="font-weight:800;font-size:13px">${r.name}</div><div style="font-size:10px;color:#777">${r.direccion.substring(0,70)}</div></div>`;el.onclick=()=>{if(tipo==="pickup"){pickupLat=r.lat;pickupLng=r.lon;pickupName=r.name;pickupInput.value=r.name;pickupSuggestions.classList.remove("show");if(pickupMarker)map.removeLayer(pickupMarker);pickupMarker=L.marker([r.lat,r.lon]).addTo(map).bindPopup("RECOGER: "+r.name).openPopup();map.setView([r.lat,r.lon],16);}else{destinationLat=r.lat;destinationLng=r.lon;destName=r.name;destinationInput.value=r.name;destinationSuggestions.classList.remove("show");if(destinationMarker)map.removeLayer(destinationMarker);destinationMarker=L.marker([r.lat,r.lon]).addTo(map).bindPopup("ENTREGAR: "+r.name).openPopup();map.setView([r.lat,r.lon],16);} lucide.createIcons();};c.appendChild(el);});c.classList.add("show"); lucide.createIcons();}
+let t1=null;pickupInput.addEventListener("input",function(){const txt=this.value.trim();if(t1)clearTimeout(t1);if(txt.length<2){pickupSuggestions.classList.remove("show");return;}pickupSuggestions.classList.add("show");pickupSuggestions.innerHTML='<div style="padding:10px;text-align:center;font-size:11px">Buscando...</div>';t1=setTimeout(async()=>{const res=await buscarColonias(txt);mostrar(pickupSuggestions,res,"pickup");},350);});
+let t2=null;destinationInput.addEventListener("input",function(){const txt=this.value.trim();if(t2)clearTimeout(t2);if(txt.length<2){destinationSuggestions.classList.remove("show");return;}destinationSuggestions.classList.add("show");destinationSuggestions.innerHTML='<div style="padding:10px;text-align:center;font-size:11px">Buscando...</div>';t2=setTimeout(async()=>{const res=await buscarColonias(txt);mostrar(destinationSuggestions,res,"destination");},350);});
+for(let i=0;i<70;i++){let d=document.createElement("div");d.className="rain";d.style.left=Math.random()*100+"%";d.style.animationDelay=Math.random()*1.2+"s";d.style.animationDuration=(0.5+Math.random()*0.6)+"s";d.style.opacity=0.6+Math.random()*0.4;rainOverlay.appendChild(d);}
+async function checarLluvia(){
+try{
+const r=await fetch("https://api.open-meteo.com/v1/forecast?latitude=21.1561&longitude=-100.9333&current=temperature_2m,precipitation,rain,weather_code&timezone=America/Mexico_City");
+const data=await r.json();
+const precip=data.current.precipitation;
+const temp=Math.round(data.current.temperature_2m);
+const code=data.current.weather_code;
+let estaLloviendo=precip>0||(code>=51&&code<=99);
+if(!estaLloviendo){
+extraLluvia=0;
+rainOverlay.classList.remove("active");
+weatherBadge.classList.remove("show");
+weatherWidget.className="weather-widget";
+weatherWidget.innerHTML=`<i data-lucide="sun" style="width:14px"></i> ${temp}°C`;
+lucide.createIcons();
+return;
+}
+if(code>=95||precip>7.5||code==65||code==82){
+extraLluvia=10;
+weatherWidget.className="weather-widget tormenta";
+weatherWidget.innerHTML=`<i data-lucide="cloud-lightning" style="width:14px;color:#fff"></i> ${temp}°C Fuerte`;
+document.getElementById('weatherBadgeTxt').innerText=`LLOVIENDO EN DOLORES - Fuerte (${precip}mm) +$10`;
+weatherBadge.className="weather-badge show tormenta";
+}else if(code==53||code==63||code==81||code==55||(precip>=2.5&&precip<=7.5)){
+extraLluvia=5;
+weatherWidget.className="weather-widget lluvia";
+weatherWidget.innerHTML=`<i data-lucide="cloud-rain" style="width:14px"></i> ${temp}°C Moderada`;
+document.getElementById('weatherBadgeTxt').innerText=`LLOVIENDO EN DOLORES - Moderada (${precip}mm) +$5`;
+weatherBadge.className="weather-badge show moderada";
+}else{
+extraLluvia=0;
+weatherWidget.className="weather-widget lluvia";
+weatherWidget.innerHTML=`<i data-lucide="cloud-drizzle" style="width:14px"></i> ${temp}°C Leve`;
+document.getElementById('weatherBadgeTxt').innerText=`LLOVIENDO EN DOLORES - Leve (${precip}mm) +$0`;
+weatherBadge.className="weather-badge show leve";
+}
+rainOverlay.classList.add("active");
+lucide.createIcons();
+}catch(e){weatherWidget.innerHTML=`<i data-lucide="sun" style="width:14px"></i> --°C`; lucide.createIcons();}
+}
+checarLluvia(); setInterval(checarLluvia,600000);
+
 document.getElementById("calculateButton").onclick=async()=>{
- if(!pickupLat||!destinationLat){alert("Selecciona origen y destino");return;}
- const url=`https://router.project-osrm.org/route/v1/driving/${pickupLng},${pickupLat};${destinationLng},${destinationLat}?overview=full&geometries=geojson`;
+ if(!pickupLat||!destinationLat){alert("Selecciona donde recoger y donde entregar");return;}
+ const url=`https://router.project-osrm.org/route/v1/foot/${pickupLng},${pickupLat};${destinationLng},${destinationLat}?overview=full&geometries=geojson`;
  const r=await fetch(url);const d=await r.json();if(!d.routes||!d.routes[0]){alert("No se pudo trazar ruta");return;}
- const route=d.routes[0];const km=route.distance/1000;let precio=35;if(route.distance>2000){precio=35+Math.ceil((route.distance-2000)/650)*5;}if(distMts(pickupLat,pickupLng,CENTRO.lat,CENTRO.lng)>800&&distMts(destinationLat,destinationLng,CENTRO.lat,CENTRO.lng)>800){precio+=5;}if((pickupName.toLowerCase().includes("sop")&&destName.toLowerCase().includes("linda"))||(destName.toLowerCase().includes("sop")&&pickupName.toLowerCase().includes("linda"))){precio=45;}precio+=extraLluvia;
+ const route=d.routes[0];const km=route.distance/1000;
+ let precio=35;
+ if(route.distance>2000){let extra=route.distance-2000;precio=35+Math.ceil(extra/650)*5;}
+ if(distMts(pickupLat,pickupLng,CENTRO.lat,CENTRO.lng)>800&&distMts(destinationLat,destinationLng,CENTRO.lat,CENTRO.lng)>800){precio+=5;}
+ let esSOP_Lindavista = (pickupName.toLowerCase().includes("sop") && destName.toLowerCase().includes("linda")) || (destName.toLowerCase().includes("sop") && pickupName.toLowerCase().includes("linda")) || (pickupName.toLowerCase().includes("sop") && destName.toLowerCase().includes("lindavista")) || (destName.toLowerCase().includes("sop") && pickupName.toLowerCase().includes("lindavista"));
+ if(esSOP_Lindavista){ precio = 45; }
+ if(extraLluvia>0){precio+=extraLluvia;}
  if(routeLayer)map.removeLayer(routeLayer);routeLayer=L.geoJSON(route.geometry,{style:{color:"#E53935",weight:6}}).addTo(map);map.fitBounds(routeLayer.getBounds(),{padding:[40,40]});
- localStorage.setItem('kigo_datos',JSON.stringify({pickupLat,pickupLng,destinationLat,destinationLng,pickupName,destName,km:km.toFixed(2),precio}));
- alert(`Ruta: ${km.toFixed(2)}km $${precio} MXN - Listo para pantalla 2`);
+ document.getElementById("distance").innerText=km.toFixed(2)+" km";document.getElementById("duration").innerText=Math.ceil(route.duration/60)+" min";document.getElementById("price").innerText="$"+precio+" MXN";
+ ultimaDistancia=km.toFixed(2)+" km";ultimoPrecio="$"+precio+" MXN";
+ document.getElementById("whatsappButton").classList.add("show");
 };
-document.getElementById("resetBtn").onclick=()=>{pickupLat=null;pickupLng=null;destinationLat=null;destinationLng=null;pickupInput.value="";destinationInput.value="";if(pickupMarker)map.removeLayer(pickupMarker);if(destinationMarker)map.removeLayer(destinationMarker);if(routeLayer)map.removeLayer(routeLayer);map.setView([CENTRO.lat,CENTRO.lng],14);};
-document.addEventListener("click",e=>{if(!e.target.closest('[style*="position:relative"]')){pickupSuggestions.classList.remove("show");destinationSuggestions.classList.remove("show");}});
+document.getElementById("whatsappButton").onclick=()=>{
+ const linkRuta=`https://www.google.com/maps/dir/${pickupLat},${pickupLng}/${destinationLat},${destinationLng}`;
+ const mensaje=`COTIZACION KIGO XPRESS\n\nRecoger: ${pickupName}\nEntregar: ${destName}\nDistancia: ${ultimaDistancia}\nValor: ${ultimoPrecio}\n\nVer ruta: ${linkRuta}\n\nConfirmamos servicio?`;
+ const url=`https://wa.me/?text=${encodeURIComponent(mensaje)}`;
+ window.open(url,"_blank");
+};
+document.getElementById("resetBtn").onclick=()=>{
+ pickupLat=null;pickupLng=null;destinationLat=null;destinationLng=null;pickupName="";destName="";
+ pickupInput.value="";destinationInput.value="";
+ document.getElementById("distance").innerText="—";document.getElementById("duration").innerText="—";document.getElementById("price").innerText="$ POR COTIZAR";
+ document.getElementById("whatsappButton").classList.remove("show");
+ if(pickupMarker)map.removeLayer(pickupMarker);if(destinationMarker)map.removeLayer(destinationMarker);if(routeLayer)map.removeLayer(routeLayer);
+ map.setView([CENTRO.lat,CENTRO.lng],14);
+};
+document.addEventListener("click",e=>{if(!e.target.closest(".input-wrapper")){pickupSuggestions.classList.remove("show");destinationSuggestions.classList.remove("show");}});
 lucide.createIcons();
 </script>
 </body>
