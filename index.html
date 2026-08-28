@@ -246,28 +246,23 @@ async function detectarLluviaDolores(){
   const r=await fetch(url); const d=await r.json();
   const precip = d.current?.precipitation?? d.current?.rain?? 0;
   const code = d.current?.weather_code?? 0;
-  let nivel='ninguna', txt='Sin lluvia', icon='☀️', color='#f0fdf4';
+  let nivel='ninguna', txt='Sin lluvia', icon='☀️';
   if(precip>0 || [51,53,55,61,63,65,80,81,82,95,96,99].includes(code)){
-    if(precip<=1){ nivel='leve'; txt=`Lluvia leve en Dolores Hidalgo - ${precip}mm`; icon='🌦️'; color='#e0f2fe'; }
-    else if(precip<=5){ nivel='moderada'; txt=`Lluvia moderada en Dolores Hidalgo - ${precip}mm`; icon='🌧️'; color='#bfdbfe'; }
-    else { nivel='fuerte'; txt=`Lluvia fuerte en Dolores Hidalgo - ${precip}mm`; icon='⛈️'; color='#93c5fd'; }
+    if(precip<=1){ nivel='leve'; txt=`Lluvia leve en Dolores Hidalgo - ${precip}mm`; icon='🌦️'; }
+    else if(precip<=5){ nivel='moderada'; txt=`Lluvia moderada en Dolores Hidalgo - ${precip}mm`; icon='🌧️'; }
+    else { nivel='fuerte'; txt=`Lluvia fuerte en Dolores Hidalgo - ${precip}mm`; icon='⛈️'; }
   } else {
-    if([3].includes(code)){ nivel='ninguna'; txt='Nublado - Sin lluvia'; icon='⛅'; color='#f1f5f9'; }
-    else { nivel='ninguna'; txt='Sin lluvia - Dolores Hidalgo'; icon='☀️'; color='#f0fdf4'; }
+    if([3].includes(code)){ nivel='ninguna'; txt='Nublado - Sin lluvia'; icon='⛅'; }
+    else { nivel='ninguna'; txt='Sin lluvia - Dolores Hidalgo'; icon='☀️'; }
   }
-  if(cfg.lluviaAuto){
-    cfg.lluviaNivel=nivel;
-    localStorage.setItem('kigo_cfg',JSON.stringify(cfg));
-  }
+  if(cfg.lluviaAuto){ cfg.lluviaNivel=nivel; localStorage.setItem('kigo_cfg',JSON.stringify(cfg)); }
   let nivelEfectivo = cfg.lluviaAuto? nivel : cfg.lluviaNivel;
   let extra = getExtraLluviaPorNivel(nivelEfectivo);
   estadoLluviaActual={nivel:nivelEfectivo,precip:precip,txt: cfg.lluviaAuto? txt : `Manual: ${nivelEfectivo}`,extra:extra,realNivel:nivel,realTxt:txt,realIcon:icon};
   actualizarUIClima();
   if(pickupLat && destinationLat){ recalcularPrecioTiempoReal(pickupLat,destinationLat); }
   if(finalPickupLat){ recalcularPrecioTiempoReal(finalPickupLat,finalPickupLng); }
- }catch(e){
-  document.getElementById('climaBanner').style.display='none';
- }
+ }catch(e){ document.getElementById('climaBanner').style.display='none'; }
 }
 function actualizarUIClima(){
  const banner=document.getElementById('climaBanner');
@@ -284,69 +279,45 @@ function actualizarUIClima(){
  let icon = iconMap[estadoLluviaActual.nivel] || '☀️';
  if(estadoLluviaActual.realIcon && cfg.lluviaAuto) icon = estadoLluviaActual.realIcon;
  if(estadoLluviaActual.nivel==='ninguna'){
-  banner.style.display='none';
-  a2.style.display='none'; a3.style.display='none';
+  banner.style.display='none'; a2.style.display='none'; a3.style.display='none';
  } else {
-  banner.style.display='flex';
-  iconEl.innerText=icon;
+  banner.style.display='flex'; iconEl.innerText=icon;
   txtEl.innerText=estadoLluviaActual.nivel==='leve'?'Lluvia leve en Dolores Hidalgo': estadoLluviaActual.nivel==='moderada'?'Lluvia moderada en Dolores Hidalgo':'Lluvia fuerte en Dolores Hidalgo';
   subEl.innerText=`${estadoLluviaActual.precip}mm - Perímetro Dolores Hidalgo - ${cfg.lluviaAuto?'Auto':'Manual'}`;
-  extraEl.style.display='block';
-  extraEl.innerText=estadoLluviaActual.extra>0?`+$${estadoLluviaActual.extra}`:'+$0';
+  extraEl.style.display='block'; extraEl.innerText=estadoLluviaActual.extra>0?`+$${estadoLluviaActual.extra}`:'+$0';
   let msg=`${icon} ${txtEl.innerText} - Incremento $${estadoLluviaActual.extra} MXN aplicado`;
-  a2.innerText=msg; a2.style.display='block';
-  a3.innerText=msg; a3.style.display='block';
+  a2.innerText=msg; a2.style.display='block'; a3.innerText=msg; a3.style.display='block';
  }
  if(adminIcon){ adminIcon.innerText=icon; adminTxt.innerText=estadoLluviaActual.realTxt || estadoLluviaActual.txt; adminSub.innerText=`Nivel: ${estadoLluviaActual.nivel} - Extra $${estadoLluviaActual.extra} - Precip ${estadoLluviaActual.precip}mm - ${cfg.lluviaAuto?'Automático':'Manual'}`; }
  actualizarBotonesLluvia();
 }
 function actualizarBotonesLluvia(){
  ['ninguna','leve','moderada','fuerte'].forEach((n,i)=>{
-  const btn=document.getElementById('btnLluvia'+i);
-  if(!btn) return;
+  const btn=document.getElementById('btnLluvia'+i); if(!btn) return;
   if(cfg.lluviaNivel===n){ btn.style.border='2px solid #E53935'; btn.style.background='#fff5f5'; }
   else { btn.style.border='1px solid #eee'; btn.style.background='#fff'; }
  });
- const toggle=document.getElementById('toggleAuto');
- if(toggle) toggle.className = cfg.lluviaAuto? 'toggle on' : 'toggle';
+ const toggle=document.getElementById('toggleAuto'); if(toggle) toggle.className = cfg.lluviaAuto? 'toggle on' : 'toggle';
 }
 function toggleAutoLluvia(){ cfg.lluviaAuto=!cfg.lluviaAuto; localStorage.setItem('kigo_cfg',JSON.stringify(cfg)); if(cfg.lluviaAuto){ detectarLluviaDolores(); } actualizarUIClima(); }
 function setLluviaManual(nivel){ cfg.lluviaNivel=nivel; cfg.lluviaAuto=false; localStorage.setItem('kigo_cfg',JSON.stringify(cfg)); estadoLluviaActual.nivel=nivel; estadoLluviaActual.extra=getExtraLluviaPorNivel(nivel); estadoLluviaActual.txt='Manual: '+nivel; actualizarUIClima(); if(pickupLat && destinationLat) recalcularPrecioTiempoReal(pickupLat,destinationLat); if(finalPickupLat) recalcularPrecioTiempoReal(finalPickupLat,finalPickupLng); }
 async function buscarColonias(t){
-  if(!t || t.length < 2) return [];
-  const texto = t.trim(); let resultados = []; const viewbox = "-100.98,21.10,-100.85,21.20";
-  try{
-    const q1 = encodeURIComponent(texto + ", Dolores Hidalgo, Guanajuato");
-    const url1 = `https://nominatim.openstreetmap.org/search?format=json&q=${q1}&limit=10&addressdetails=1&countrycodes=mx&viewbox=${viewbox}&bounded=1&extratags=1`;
-    const r1 = await fetch(url1); const d1 = await r1.json();
-    resultados = d1.map(x=>{ const addr = x.address || {}; const calle = addr.road || addr.street || addr.neighbourhood || ""; const numero = addr.house_number? " #" + addr.house_number : ""; const colonia = addr.neighbourhood || addr.suburb || ""; const nombreCorto = (calle? calle + numero : x.display_name.split(",")[0]) + (colonia? " - " + colonia : ""); return {lat:parseFloat(x.lat),lon:parseFloat(x.lon),name:nombreCorto.substring(0,60),direccion:x.display_name,exact:addr.house_number?2:(addr.road?1:0)}; });
-  }catch(e){}
+  if(!t || t.length < 2) return []; const texto = t.trim(); let resultados = []; const viewbox = "-100.98,21.10,-100.85,21.20";
+  try{ const q1 = encodeURIComponent(texto + ", Dolores Hidalgo, Guanajuato"); const url1 = `https://nominatim.openstreetmap.org/search?format=json&q=${q1}&limit=10&addressdetails=1&countrycodes=mx&viewbox=${viewbox}&bounded=1&extratags=1`; const r1 = await fetch(url1); const d1 = await r1.json(); resultados = d1.map(x=>{ const addr = x.address || {}; const calle = addr.road || addr.street || addr.neighbourhood || ""; const numero = addr.house_number? " #" + addr.house_number : ""; const colonia = addr.neighbourhood || addr.suburb || ""; const nombreCorto = (calle? calle + numero : x.display_name.split(",")[0]) + (colonia? " - " + colonia : ""); return {lat:parseFloat(x.lat),lon:parseFloat(x.lon),name:nombreCorto.substring(0,60),direccion:x.display_name,exact:addr.house_number?2:(addr.road?1:0)}; }); }catch(e){}
   if(texto.toLowerCase().includes("cent") && resultados.length < 3){ resultados.unshift({lat:CENTRO.lat,lon:CENTRO.lng,name:"Centro - Zona Centro",direccion:"Centro, Dolores Hidalgo, Guanajuato",exact:1}); }
-  if(resultados.length < 4){
-    try{
-      const q2 = encodeURIComponent(texto); const url2 = `https://photon.komoot.io/api/?q=${q2}&lat=21.1561&lon=-100.9333&limit=6&lang=es`; const r2 = await fetch(url2); const d2 = await r2.json();
-      if(d2.features){ d2.features.forEach(f=>{ if(f.geometry && f.properties){ const p = f.properties; const calle = p.street || p.name || ""; const num = p.housenumber? " #" + p.housenumber : ""; const col = p.district || p.locality || ""; if(calle){ resultados.push({lat:f.geometry.coordinates[1],lon:f.geometry.coordinates[0],name:(calle+num+(col?" - "+col:"")).substring(0,60),direccion:[calle+num,col,p.city||"Dolores Hidalgo",p.state].filter(Boolean).join(", "),exact:p.housenumber?2:1}); } } }); }
-    }catch(e){}
-  }
+  if(resultados.length < 4){ try{ const q2 = encodeURIComponent(texto); const url2 = `https://photon.komoot.io/api/?q=${q2}&lat=21.1561&lon=-100.9333&limit=6&lang=es`; const r2 = await fetch(url2); const d2 = await r2.json(); if(d2.features){ d2.features.forEach(f=>{ if(f.geometry && f.properties){ const p = f.properties; const calle = p.street || p.name || ""; const num = p.housenumber? " #" + p.housenumber : ""; const col = p.district || p.locality || ""; if(calle){ resultados.push({lat:f.geometry.coordinates[1],lon:f.geometry.coordinates[0],name:(calle+num+(col?" - "+col:"")).substring(0,60),direccion:[calle+num,col,p.city||"Dolores Hidalgo",p.state].filter(Boolean).join(", "),exact:p.housenumber?2:1}); } } }); } }catch(e){} }
   resultados.sort((a,b)=> b.exact - a.exact); const unicos=[];const seen=new Set(); for(let r of resultados){const key=r.lat.toFixed(5)+","+r.lon.toFixed(5);if(!seen.has(key)){seen.add(key);unicos.push(r);}} return unicos.slice(0,8);
 }
 function mostrar(c,res,tipoS){
  c.innerHTML=""; if(!res.length){c.innerHTML='<div style="padding:14px;text-align:center;font-size:12px;color:#777">Escribe calle y número, ej: Hidalgo 12, Centro</div>';c.classList.add("show");return;}
- res.forEach(r=>{
-  const el=document.createElement("div");el.className="suggestion";
-  el.innerHTML=`<div style="width:32px;height:32px;background:${r.exact>=1? '#16a34a' : '#111'};border-radius:50%;display:flex;align-items:center;justify-content:center"><i data-lucide="map-pin" style="width:16px;color:#fff"></i></div><div style="flex:1;overflow:hidden"><div style="font-weight:800;font-size:13px">${r.name}</div><div style="font-size:11px;color:#666">${r.direccion.substring(0,70)}</div>${r.exact>=1? '<div style="font-size:9px;color:#16a34a;font-weight:700;margin-top:2px">📍 Dirección exacta</div>' : ''}</div>`;
-  el.onclick=async()=>{
-   if(tipoS==="pickup"){ pickupLat=r.lat;pickupLng=r.lon;pickupName=r.name;pickupInput.value=r.name;pickupSuggestions.classList.remove("show"); if(pickupMarker)map.removeLayer(pickupMarker);pickupMarker=L.marker([r.lat,r.lon]).addTo(map); mostrarX(); }else{ destinationLat=r.lat;destinationLng=r.lon;destName=r.name;destinationInput.value=r.name;destinationSuggestions.classList.remove("show"); if(destinationMarker)map.removeLayer(destinationMarker);destinationMarker=L.marker([r.lat,r.lon]).addTo(map); }
-   if(pickupLat && destinationLat){ try{ const url=`https://router.project-osrm.org/route/v1/driving/${pickupLng},${pickupLat};${destinationLng},${destinationLat}?overview=full&geometries=geojson`; const rr=await fetch(url);const dd=await rr.json(); if(dd.routes&&dd.routes[0]){ if(routeLayer)map.removeLayer(routeLayer); routeLayer=L.geoJSON(dd.routes[0].geometry,{style:{color:"#E53935",weight:6}}).addTo(map); map.fitBounds(routeLayer.getBounds(),{padding:[40,40]}); } }catch(e){} }else{ if(pickupLat) map.setView([pickupLat,pickupLng],16); if(destinationLat) map.setView([destinationLat,destinationLng],16); } lucide.createIcons();
-  }; c.appendChild(el);
- }); c.classList.add("show"); lucide.createIcons();
+ res.forEach(r=>{ const el=document.createElement("div");el.className="suggestion"; el.innerHTML=`<div style="width:32px;height:32px;background:${r.exact>=1? '#16a34a' : '#111'};border-radius:50%;display:flex;align-items:center;justify-content:center"><i data-lucide="map-pin" style="width:16px;color:#fff"></i></div><div style="flex:1;overflow:hidden"><div style="font-weight:800;font-size:13px">${r.name}</div><div style="font-size:11px;color:#666">${r.direccion.substring(0,70)}</div>${r.exact>=1? '<div style="font-size:9px;color:#16a34a;font-weight:700;margin-top:2px">📍 Dirección exacta</div>' : ''}</div>`; el.onclick=async()=>{ if(tipoS==="pickup"){ pickupLat=r.lat;pickupLng=r.lon;pickupName=r.name;pickupInput.value=r.name;pickupSuggestions.classList.remove("show"); if(pickupMarker)map.removeLayer(pickupMarker);pickupMarker=L.marker([r.lat,r.lon]).addTo(map); mostrarX(); }else{ destinationLat=r.lat;destinationLng=r.lon;destName=r.name;destinationInput.value=r.name;destinationSuggestions.classList.remove("show"); if(destinationMarker)map.removeLayer(destinationMarker);destinationMarker=L.marker([r.lat,r.lon]).addTo(map); } if(pickupLat && destinationLat){ try{ const url=`https://router.project-osrm.org/route/v1/driving/${pickupLng},${pickupLat};${destinationLng},${destinationLat}?overview=full&geometries=geojson`; const rr=await fetch(url);const dd=await rr.json(); if(dd.routes&&dd.routes[0]){ if(routeLayer)map.removeLayer(routeLayer); routeLayer=L.geoJSON(dd.routes[0].geometry,{style:{color:"#E53935",weight:6}}).addTo(map); map.fitBounds(routeLayer.getBounds(),{padding:[40,40]}); } }catch(e){} }else{ if(pickupLat) map.setView([pickupLat,pickupLng],16); if(destinationLat) map.setView([destinationLat,destinationLng],16); } lucide.createIcons(); }; c.appendChild(el); }); c.classList.add("show"); lucide.createIcons();
 }
 let t1=null;pickupInput.addEventListener("input",function(){mostrarX();if(t1)clearTimeout(t1);if(this.value.trim().length<2){pickupSuggestions.classList.remove("show");return;}t1=setTimeout(async()=>{const res=await buscarColonias(this.value.trim());mostrar(pickupSuggestions,res,"pickup");},180);});
 let t2=null;destinationInput.addEventListener("input",function(){if(t2)clearTimeout(t2);if(this.value.trim().length<2){destinationSuggestions.classList.remove("show");return;}t2=setTimeout(async()=>{const res=await buscarColonias(this.value.trim());mostrar(destinationSuggestions,res,"destination");},180);});
 function mostrarX(){btnClear.style.display=pickupInput.value.length>0?'flex':'none';}
 function limpiarOrigen(){pickupInput.value="";pickupLat=null;pickupLng=null;pickupName="";btnClear.style.display='none';if(pickupMarker)map.removeLayer(pickupMarker);if(routeLayer)map.removeLayer(routeLayer);pickupInput.focus();}
 async function usarMiUbicacion(){navigator.geolocation.getCurrentPosition(async pos=>{pickupLat=pos.coords.latitude;pickupLng=pos.coords.longitude;try{const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${pickupLat}&lon=${pickupLng}&addressdetails=1`);const d=await r.json();const a=d.address||{};const calle=(a.road||"")+(a.house_number?" #"+a.house_number:"");pickupInput.value=calle? calle+" - "+(a.neighbourhood||a.suburb||"") : d.display_name.split(",").slice(0,2).join(", ");pickupName=pickupInput.value;}catch(e){pickupInput.value="Mi ubicación actual";pickupName="Mi ubicación";}if(pickupMarker)map.removeLayer(pickupMarker);pickupMarker=L.marker([pickupLat,pickupLng]).addTo(map);map.setView([pickupLat,pickupLng],17);mostrarX();});}
-  document.getElementById("calculateButton").onclick=async()=>{
+ document.getElementById("calculateButton").onclick=async()=>{
  if(!pickupLat||!destinationLat){alert("Llena Dirección de Origen y Dirección de Destino");return;}
  let km=1.5, tiempo=8, baseMoto=cfg.baseMoto, baseCarro=cfg.baseCarro;
  let extraLluvia = getExtraLluviaPorNivel(estadoLluviaActual.nivel);
@@ -387,174 +358,54 @@ function abrirMapaConfirm(){
      markerConfirm.on('dragend', function(e){ const pos = e.target.getLatLng(); finalPickupLat = pos.lat; finalPickupLng = pos.lng; actualizarDireccionConfirm(pos.lat,pos.lng); });
      mapConfirm.on('click', function(e){ finalPickupLat = e.latlng.lat; finalPickupLng = e.latlng.lng; markerConfirm.setLatLng(e.latlng); actualizarDireccionConfirm(e.latlng.lat,e.latlng.lng); });
    }else{ mapConfirm.setView([pickupLat,pickupLng],18); markerConfirm.setLatLng([pickupLat,pickupLng]); }
-   mapConfirm.invalidateSize();
-   recalcularPrecioTiempoReal(pickupLat,pickupLng);
- },200);
- lucide.createIcons();
+   mapConfirm.invalidateSize(); recalcularPrecioTiempoReal(pickupLat,pickupLng);
+ },200); lucide.createIcons();
 }
 async function recalcularPrecioTiempoReal(lat,lng){
  try{
   const url=`https://router.project-osrm.org/route/v1/driving/${lng},${lat};${destinationLng},${destinationLat}?overview=full&geometries=geojson`;
   const r=await fetch(url); const d=await r.json();
   if(d.routes && d.routes[0]){
-   const route=d.routes[0];
-   const km = route.distance/1000;
-   const tiempo = Math.ceil(route.duration/60);
+   const route=d.routes[0]; const km = route.distance/1000; const tiempo = Math.ceil(route.duration/60);
    let baseMoto = cfg.baseMoto, baseCarro = cfg.baseCarro;
    if(route.distance>2000){ let extra=route.distance-2000; baseMoto=cfg.baseMoto+Math.ceil(extra/650)*cfg.extraMoto; baseCarro=cfg.baseCarro+Math.ceil(extra/650)*cfg.extraCarro; }
    if(distMts(lat,lng,CENTRO.lat,CENTRO.lng)>800 && distMts(destinationLat,destinationLng,CENTRO.lat,CENTRO.lng)>800){ baseMoto+=5; baseCarro+=10; }
    let extraLluvia = getExtraLluviaPorNivel(estadoLluviaActual.nivel);
    baseMoto+=extraLluvia; baseCarro+=extraLluvia;
-   datosViaje.distKm = km.toFixed(2);
-   datosViaje.tiempoMin = tiempo;
-   datosViaje.precioMoto = baseMoto;
-   datosViaje.precioCarro = baseCarro;
-   datosViaje.origenLat = lat;
-   datosViaje.origenLng = lng;
-   datosViaje.lluviaNivel = estadoLluviaActual.nivel;
-   datosViaje.lluviaExtra = extraLluvia;
-   datosViaje.lluviaTxt = estadoLluviaActual.txt;
+   datosViaje.distKm = km.toFixed(2); datosViaje.tiempoMin = tiempo; datosViaje.precioMoto = baseMoto; datosViaje.precioCarro = baseCarro; datosViaje.origenLat = lat; datosViaje.origenLng = lng; datosViaje.lluviaNivel = estadoLluviaActual.nivel; datosViaje.lluviaExtra = extraLluvia; datosViaje.lluviaTxt = estadoLluviaActual.txt;
    document.getElementById('txtDistConfirm').innerText = km.toFixed(2)+' km';
    document.getElementById('txtPrecioConfirm').innerText = tipo==='moto'? `$${baseMoto} MXN` : `$${baseCarro} MXN`;
-   document.getElementById('motoPrice').innerText = `$${baseMoto} MXN`;
-   document.getElementById('carroPrice').innerText = `$${baseCarro} MXN`;
-   document.getElementById('rutaSub').innerText = `${km.toFixed(2)} km • Ruta actualizada`;
-   document.getElementById('tiempoTxt').innerText = tiempo+' min';
-   document.getElementById('motoTime').innerText = `Tiempo estimado: ${tiempo} min`;
-   document.getElementById('carroTime').innerText = `Tiempo estimado: ${tiempo+2} min`;
-   if(tipo==='moto') document.getElementById('btnTxt').innerText = `Elegir Moto • $${baseMoto} MXN`;
-   else document.getElementById('btnTxt').innerText = `Elegir Carro • $${baseCarro} MXN`;
-   if(routeConfirmLayer) mapConfirm.removeLayer(routeConfirmLayer);
-   routeConfirmLayer = L.geoJSON(route.geometry,{style:{color:"#E53935",weight:6}}).addTo(mapConfirm);
+   document.getElementById('motoPrice').innerText = `$${baseMoto} MXN`; document.getElementById('carroPrice').innerText = `$${baseCarro} MXN`;
+   document.getElementById('rutaSub').innerText = `${km.toFixed(2)} km • Ruta actualizada`; document.getElementById('tiempoTxt').innerText = tiempo+' min';
+   document.getElementById('motoTime').innerText = `Tiempo estimado: ${tiempo} min`; document.getElementById('carroTime').innerText = `Tiempo estimado: ${tiempo+2} min`;
+   if(tipo==='moto') document.getElementById('btnTxt').innerText = `Elegir Moto • $${baseMoto} MXN`; else document.getElementById('btnTxt').innerText = `Elegir Carro • $${baseCarro} MXN`;
+   if(routeConfirmLayer) mapConfirm.removeLayer(routeConfirmLayer); routeConfirmLayer = L.geoJSON(route.geometry,{style:{color:"#E53935",weight:6}}).addTo(mapConfirm);
   }
  }catch(e){}
 }
 async function actualizarDireccionConfirm(lat,lng){
- try{
-  const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`);
-  const d=await r.json(); const a=d.address||{}; const txt = (a.road? a.road + (a.house_number? " #"+a.house_number : "") : "") + (a.neighbourhood? " - "+a.neighbourhood : "");
-  document.getElementById('txtPickupConfirm').innerText = txt || d.display_name.split(",").slice(0,3).join(", ");
- }catch(e){ document.getElementById('txtPickupConfirm').innerText = lat.toFixed(6)+", "+lng.toFixed(6); }
- recalcularPrecioTiempoReal(lat,lng);
+ try{ const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`); const d=await r.json(); const a=d.address||{}; const txt = (a.road? a.road + (a.house_number? " #"+a.house_number : "") : "") + (a.neighbourhood? " - "+a.neighbourhood : ""); document.getElementById('txtPickupConfirm').innerText = txt || d.display_name.split(",").slice(0,3).join(", "); }catch(e){ document.getElementById('txtPickupConfirm').innerText = lat.toFixed(6)+", "+lng.toFixed(6); } recalcularPrecioTiempoReal(lat,lng);
 }
-function usarMiUbicacionConfirm(){
- navigator.geolocation.getCurrentPosition(pos=>{
-  finalPickupLat = pos.coords.latitude; finalPickupLng = pos.coords.longitude;
-  markerConfirm.setLatLng([finalPickupLat,finalPickupLng]);
-  mapConfirm.setView([finalPickupLat,finalPickupLng],18);
-  actualizarDireccionConfirm(finalPickupLat,finalPickupLng);
- });
-}
+function usarMiUbicacionConfirm(){ navigator.geolocation.getCurrentPosition(pos=>{ finalPickupLat = pos.coords.latitude; finalPickupLng = pos.coords.longitude; markerConfirm.setLatLng([finalPickupLat,finalPickupLng]); mapConfirm.setView([finalPickupLat,finalPickupLng],18); actualizarDireccionConfirm(finalPickupLat,finalPickupLng); }); }
 function volverMapa(){ document.getElementById('panel3').classList.remove('show'); document.getElementById('panel2').classList.add('show'); }
 function confirmarViajeFinal(){
  let precio=tipo==='moto'?datosViaje.precioMoto:datosViaje.precioCarro;
- let contador = parseInt(localStorage.getItem('kigo_contador')||'0')+1;
- localStorage.setItem('kigo_contador',contador.toString());
- let ahora = new Date();
- let hora = ahora.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit',hour12:true});
- let fecha = ahora.toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'});
+ let contador = parseInt(localStorage.getItem('kigo_contador')||'0')+1; localStorage.setItem('kigo_contador',contador.toString());
+ let ahora = new Date(); let hora = ahora.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit',hour12:true}); let fecha = ahora.toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'});
  let linkRuta = `https://www.google.com/maps/dir/${finalPickupLat},${finalPickupLng}/${datosViaje.destLat},${datosViaje.destLng}`;
  let linkPunto = `https://www.google.com/maps?q=${finalPickupLat},${finalPickupLng}`;
  registrarEstadistica(tipo,precio);
- let lluviaLinea='';
- if(datosViaje.lluviaExtra>0){
-   lluviaLinea=`🌧️ *CONDICIÓN CLIMA:* ${datosViaje.lluviaNivel.toUpperCase()} - ${datosViaje.lluviaTxt}\n💧 *EXTRA LLUVIA:* +$${datosViaje.lluviaExtra} MXN aplicado\n`;
- }
- let msg = `🏢 *${cfg.nombre.toUpperCase()}*
-━━━━━━━━━━━━━━━━━━━━
-⏰ *HORA:* ${hora} - ${fecha}
-🔢 *SERVICIO No.:* #${contador.toString().padStart(4,'0')}
-🚦 *TIPO:* ${tipo.toUpperCase()} ${tipo==='moto'?'🏍️':'🚗'}
-${lluviaLinea}━━━━━━━━━━━━━━━━━━━━
-📍 *RECOGIDA:*
-${pickupName}
-📌 ${linkPunto}
-
-🏁 *DESTINO:*
-${datosViaje.destino}
-
-🗺️ *RUTA:*
-${linkRuta}
-━━━━━━━━━━━━━━━━━━━━
-📏 *DISTANCIA:* ${datosViaje.distKm} km
-💰 *PRECIO:* $${precio} MXN
-━━━━━━━━━━━━━━━━━━━━
-✅ Cliente esperando`;
+ let lluviaLinea=''; if(datosViaje.lluviaExtra>0){ lluviaLinea=`🌧️ *CONDICIÓN CLIMA:* ${datosViaje.lluviaNivel.toUpperCase()} - ${datosViaje.lluviaTxt}\n💧 *EXTRA LLUVIA:* +$${datosViaje.lluviaExtra} MXN aplicado\n`; }
+ let msg = `🏢 *${cfg.nombre.toUpperCase()}*\n━━━━━━━━━━━━━━━━━━━━\n⏰ *HORA:* ${hora} - ${fecha}\n🔢 *SERVICIO No.:* #${contador.toString().padStart(4,'0')}\n🚦 *TIPO:* ${tipo.toUpperCase()} ${tipo==='moto'?'🏍️':'🚗'}\n${lluviaLinea}━━━━━━━━━━━━━━━━━━━━\n📍 *RECOGIDA:*\n${pickupName}\n📌 ${linkPunto}\n\n🏁 *DESTINO:*\n${datosViaje.destino}\n\n🗺️ *RUTA:*\n${linkRuta}\n━━━━━━━━━━━━━━━━━━━━\n📏 *DISTANCIA:* ${datosViaje.distKm} km\n💰 *PRECIO:* $${precio} MXN\n━━━━━━━━━━━━━━━━━━━━\n✅ Cliente esperando`;
  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
 }
-function switchTab(name){
- document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
- document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
- document.getElementById('tab-'+name).classList.add('active');
- const mapTab={'ajustes':0,'config':1,'registros':2,'estadisticas':3};
- const tabs=document.querySelectorAll('.tab');
- if(mapTab[name]!==undefined) tabs[mapTab[name]].classList.add('active');
- lucide.createIcons();
-}
-function abrirAdmin(){
- if(localStorage.getItem('kigo_admin_sesion')==='1'){
-  document.getElementById('panelAdmin').style.display='flex';
-  document.getElementById('btnNavAdmin').classList.add('active');
-  document.getElementById('btnNavInicio').classList.remove('active');
-  cargarAdmin(); detectarLluviaDolores(); return;
- }
- document.getElementById('modalAdmin').classList.add('show'); document.getElementById('btnNavAdmin').classList.add('active'); lucide.createIcons();
-}
+function switchTab(name){ document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active')); document.getElementById('tab-'+name).classList.add('active'); const mapTab={'ajustes':0,'config':1,'registros':2,'estadisticas':3}; const tabs=document.querySelectorAll('.tab'); if(mapTab[name]!==undefined) tabs[mapTab[name]].classList.add('active'); lucide.createIcons(); }
+function abrirAdmin(){ if(localStorage.getItem('kigo_admin_sesion')==='1'){ document.getElementById('panelAdmin').style.display='flex'; document.getElementById('btnNavAdmin').classList.add('active'); document.getElementById('btnNavInicio').classList.remove('active'); cargarAdmin(); detectarLluviaDolores(); return; } document.getElementById('modalAdmin').classList.add('show'); document.getElementById('btnNavAdmin').classList.add('active'); lucide.createIcons(); }
 function cerrarAdmin(){ document.getElementById('modalAdmin').classList.remove('show'); document.getElementById('btnNavAdmin').classList.remove('active'); document.getElementById('btnNavInicio').classList.add('active'); document.getElementById('adminError').style.display='none'; }
-function irInicio(){
- const sesion = localStorage.getItem('kigo_admin_sesion')==='1';
- if(sesion && document.getElementById('panelAdmin').style.display==='flex'){
-  document.getElementById('panel2').classList.remove('show'); document.getElementById('panel3').classList.remove('show'); return;
- }
- document.getElementById('panel2').classList.remove('show'); document.getElementById('panel3').classList.remove('show'); document.getElementById('panelAdmin').style.display='none'; document.getElementById('btnNavInicio').classList.add('active'); document.getElementById('btnNavAdmin').classList.remove('active'); setTimeout(()=>{ map.invalidateSize(); },100);
-}
-function loginAdmin(){
- const u=document.getElementById('adminUser').value.trim();
- const p=document.getElementById('adminPass').value.trim();
- if(u==='admin' && p==='0831'){
-  localStorage.setItem('kigo_admin_sesion','1');
-  document.getElementById('modalAdmin').classList.remove('show');
-  document.getElementById('panelAdmin').style.display='flex';
-  document.getElementById('adminError').style.display='none';
-  document.getElementById('btnNavAdmin').classList.add('active');
-  document.getElementById('btnNavInicio').classList.remove('active');
-  cargarAdmin(); detectarLluviaDolores(); lucide.createIcons();
- }else{ document.getElementById('adminError').style.display='block'; }
-}
-function sincronizarTiempoReal(){
- cfg.nombre=document.getElementById('cfgNombre').value||'Kigo Xpress';
- cfg.baseMoto=parseInt(document.getElementById('cfgMoto').value)||35;
- cfg.baseCarro=parseInt(document.getElementById('cfgCarro').value)||55;
- cfg.extraMoto=parseInt(document.getElementById('cfgExtraMoto').value)||5;
- cfg.extraCarro=parseInt(document.getElementById('cfgExtraCarro').value)||8;
- cfg.precioLeve=parseInt(document.getElementById('cfgLluviaLeve').value)||0;
- cfg.precioMod=parseInt(document.getElementById('cfgLluviaMod').value)||5;
- cfg.precioFuerte=parseInt(document.getElementById('cfgLluviaFuerte').value)||10;
- localStorage.setItem('kigo_cfg',JSON.stringify(cfg));
- document.getElementById('nombrePlataformaTitulo').innerText=cfg.nombre+' • Admin';
- aplicarDisponibilidad();
- estadoLluviaActual.extra=getExtraLluviaPorNivel(estadoLluviaActual.nivel);
- actualizarUIClima();
- if(pickupLat && destinationLat){ recalcularPrecioTiempoReal(pickupLat,destinationLat); }
-}
-function cargarAdmin(){
- document.getElementById('cfgNombre').value=cfg.nombre;
- document.getElementById('cfgMoto').value=cfg.baseMoto;
- document.getElementById('cfgCarro').value=cfg.baseCarro;
- document.getElementById('cfgExtraMoto').value=cfg.extraMoto;
- document.getElementById('cfgExtraCarro').value=cfg.extraCarro;
- document.getElementById('cfgLluviaLeve').value=cfg.precioLeve;
- document.getElementById('cfgLluviaMod').value=cfg.precioMod;
- document.getElementById('cfgLluviaFuerte').value=cfg.precioFuerte;
- document.getElementById('nombrePlataformaTitulo').innerText=cfg.nombre+' • Admin';
- document.getElementById('toggleMoto').className=cfg.motoDisp?'toggle on':'toggle';
- document.getElementById('toggleCarro').className=cfg.carroDisp?'toggle on':'toggle';
- document.getElementById('estadoMotoTxt').innerText=cfg.motoDisp?'Disponible':'Bloqueado';
- document.getElementById('estadoCarroTxt').innerText=cfg.carroDisp?'Disponible':'Bloqueado';
- aplicarDisponibilidad(); actualizarStats(); switchTab('ajustes');
- actualizarBotonesLluvia();
- const toggleAuto=document.getElementById('toggleAuto'); if(toggleAuto) toggleAuto.className=cfg.lluviaAuto?'toggle on':'toggle';
-}
+function irInicio(){ const sesion = localStorage.getItem('kigo_admin_sesion')==='1'; if(sesion && document.getElementById('panelAdmin').style.display==='flex'){ document.getElementById('panel2').classList.remove('show'); document.getElementById('panel3').classList.remove('show'); return; } document.getElementById('panel2').classList.remove('show'); document.getElementById('panel3').classList.remove('show'); document.getElementById('panelAdmin').style.display='none'; document.getElementById('btnNavInicio').classList.add('active'); document.getElementById('btnNavAdmin').classList.remove('active'); setTimeout(()=>{ map.invalidateSize(); },100); }
+function loginAdmin(){ const u=document.getElementById('adminUser').value.trim(); const p=document.getElementById('adminPass').value.trim(); if(u==='admin' && p==='0831'){ localStorage.setItem('kigo_admin_sesion','1'); document.getElementById('modalAdmin').classList.remove('show'); document.getElementById('panelAdmin').style.display='flex'; document.getElementById('adminError').style.display='none'; document.getElementById('btnNavAdmin').classList.add('active'); document.getElementById('btnNavInicio').classList.remove('active'); cargarAdmin(); detectarLluviaDolores(); lucide.createIcons(); }else{ document.getElementById('adminError').style.display='block'; } }
+function sincronizarTiempoReal(){ cfg.nombre=document.getElementById('cfgNombre').value||'Kigo Xpress'; cfg.baseMoto=parseInt(document.getElementById('cfgMoto').value)||35; cfg.baseCarro=parseInt(document.getElementById('cfgCarro').value)||55; cfg.extraMoto=parseInt(document.getElementById('cfgExtraMoto').value)||5; cfg.extraCarro=parseInt(document.getElementById('cfgExtraCarro').value)||8; cfg.precioLeve=parseInt(document.getElementById('cfgLluviaLeve').value)||0; cfg.precioMod=parseInt(document.getElementById('cfgLluviaMod').value)||5; cfg.precioFuerte=parseInt(document.getElementById('cfgLluviaFuerte').value)||10; localStorage.setItem('kigo_cfg',JSON.stringify(cfg)); document.getElementById('nombrePlataformaTitulo').innerText=cfg.nombre+' • Admin'; aplicarDisponibilidad(); estadoLluviaActual.extra=getExtraLluviaPorNivel(estadoLluviaActual.nivel); actualizarUIClima(); if(pickupLat && destinationLat){ recalcularPrecioTiempoReal(pickupLat,destinationLat); } }
+function cargarAdmin(){ document.getElementById('cfgNombre').value=cfg.nombre; document.getElementById('cfgMoto').value=cfg.baseMoto; document.getElementById('cfgCarro').value=cfg.baseCarro; document.getElementById('cfgExtraMoto').value=cfg.extraMoto; document.getElementById('cfgExtraCarro').value=cfg.extraCarro; document.getElementById('cfgLluviaLeve').value=cfg.precioLeve; document.getElementById('cfgLluviaMod').value=cfg.precioMod; document.getElementById('cfgLluviaFuerte').value=cfg.precioFuerte; document.getElementById('nombrePlataformaTitulo').innerText=cfg.nombre+' • Admin'; document.getElementById('toggleMoto').className=cfg.motoDisp?'toggle on':'toggle'; document.getElementById('toggleCarro').className=cfg.carroDisp?'toggle on':'toggle'; document.getElementById('estadoMotoTxt').innerText=cfg.motoDisp?'Disponible':'Bloqueado'; document.getElementById('estadoCarroTxt').innerText=cfg.carroDisp?'Disponible':'Bloqueado'; aplicarDisponibilidad(); actualizarStats(); switchTab('ajustes'); actualizarBotonesLluvia(); const toggleAuto=document.getElementById('toggleAuto'); if(toggleAuto) toggleAuto.className=cfg.lluviaAuto?'toggle on':'toggle'; }
 function guardarAjustes(){ localStorage.setItem('kigo_cfg',JSON.stringify(cfg)); alert('Guardado en tiempo real'); sincronizarTiempoReal(); }
 function toggleVehiculo(t){ if(t==='moto'){ cfg.motoDisp=!cfg.motoDisp; document.getElementById('toggleMoto').className=cfg.motoDisp?'toggle on':'toggle'; document.getElementById('estadoMotoTxt').innerText=cfg.motoDisp?'Disponible':'Bloqueado'; } if(t==='carro'){ cfg.carroDisp=!cfg.carroDisp; document.getElementById('toggleCarro').className=cfg.carroDisp?'toggle on':'toggle'; document.getElementById('estadoCarroTxt').innerText=cfg.carroDisp?'Disponible':'Bloqueado'; } localStorage.setItem('kigo_cfg',JSON.stringify(cfg)); aplicarDisponibilidad(); }
 function aplicarDisponibilidad(){ const m=document.getElementById('cardMoto'); const c=document.getElementById('cardCarro'); if(cfg.motoDisp){ m.classList.remove('disabled'); } else { m.classList.add('disabled'); } if(cfg.carroDisp){ c.classList.remove('disabled'); } else { c.classList.add('disabled'); } }
