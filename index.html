@@ -12,7 +12,7 @@
 .map-container{position:relative;width:100%;height:48vh;min-height:300px;flex-shrink:0}
 #map{width:100%;height:100%}
 #mapConfirm{width:100%;height:100%}
-.panel{padding:16px 16px 110px 16px;border-radius:22px 22px 0 0;margin-top:-22px;position:relative;z-index:1000;background:#fff;flex:1;overflow-y:auto}
+.panel{padding:16px 16px 110px 16px;border-radius:22px 22px 0 0;margin-top:-22px;position:relative;z-index:1000;background:#fff;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .panel2{position:fixed;bottom:0;left:50%;transform:translateX(-50%);max-width:500px;width:100%;background:#ffffff;border-radius:28px 28px 0 0;z-index:3000;padding:16px 16px 110px 16px;display:none;flex-direction:column;max-height:78vh;overflow-y:auto;box-shadow:0 -10px 30px rgba(0,0,0,.15)}
 .panel2.show{display:flex}
 .panel3{position:fixed;inset:0;max-width:500px;margin:0 auto;width:100%;background:#fff;z-index:4000;display:none;flex-direction:column;overflow:hidden}
@@ -26,54 +26,65 @@
 .suggestions{position:absolute;left:0;right:0;top:100%;margin-top:6px;background:#fff;border:1px solid #ddd;border-radius:14px;box-shadow:0 10px 25px rgba(0,0,0,.18);z-index:9999;display:none;max-height:220px;overflow-y:auto}
 .suggestions.show{display:block}
 .suggestion{padding:12px 14px;border-bottom:1px solid #f2f2f2;display:flex;gap:10px;align-items:center;cursor:pointer}
-.btn-cotizar{width:100%;padding:16px;border:none;border-radius:14px;background:#E53935;color:#fff;font-weight:900;font-size:15px;margin-top:10px;cursor:pointer}
-.card{border-radius:20px;padding:16px;display:flex;gap:14px;align-items:center;background:#ffffff;border:2px solid #eeeeee;cursor:pointer;margin-bottom:14px}
-.card.active{border-color:#E53935;background:#fff5f5}
+.btn-cotizar{width:100%;padding:16px;border:none;border-radius:14px;background:#E53935;color:#fff;font-weight:900;font-size:15px;margin-top:10px;cursor:pointer;box-shadow:0 8px 20px rgba(229,57,53,.3)}
+.card{border-radius:20px;padding:16px;display:flex;gap:14px;align-items:center;background:#ffffff;border:2px solid #eeeeee;cursor:pointer;margin-bottom:14px;transition:.2s;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+.card.active{border-color:#E53935;background:#fff5f5;box-shadow:0 0 0 2px rgba(229,57,53,.15), 0 0 22px rgba(229,57,53,.25)}
 .card.disabled{opacity:.4;pointer-events:none;filter:grayscale(1)}
 .card-left{width:88px;height:68px;background:#f7f7f8;border-radius:14px;display:flex;align-items:center;justify-content:center;border:1px solid #eee}
 .card-title{color:#111;font-weight:900;font-size:16px}.card-pass{color:#666;font-size:12px;margin-top:3px;display:flex;align-items:center;gap:4px}
 .price{font-size:22px;font-weight:900;color:#E53935;margin-left:auto;text-shadow:0 0 8px rgba(229,57,53,.35)}
 .btn-elegir{margin-top:12px;width:100%;height:56px;border-radius:16px;border:none;background:#eeeeee;color:#999;font-weight:900;font-size:15px}
-.btn-elegir.ready{background:#E53935;color:#fff}
-.bottom-nav{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);width:calc(100% - 24px);max-width:480px;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border:1px solid rgba(0,0,0,.06);border-radius:20px;padding:8px;display:flex;gap:8px;z-index:2000;box-shadow:0 10px 30px rgba(0,0,0,.15)}
-.btn-nav{flex:1;height:52px;border-radius:14px;border:none;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer}
-.btn-nav.inicio{background:#111;color:#fff}.btn-nav.admin{background:#fff;color:#E53935;border:1px solid #f0f0f0}
-.btn-nav.admin.active{background:linear-gradient(135deg,#E53935,#ff6b6b);color:#fff}
-.modal-admin{position:fixed;inset:0;max-width:500px;margin:0 auto;background:rgba(15,15,15,.55);backdrop-filter:blur(10px);z-index:5000;display:none;align-items:center;justify-content:center;padding:20px}
+.btn-elegir.ready{background:#E53935;color:#fff;box-shadow:0 0 20px rgba(229,57,53,.45)}
+.bottom-nav{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);width:calc(100% - 24px);max-width:480px;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(0,0,0,.06);border-radius:20px;padding:8px;display:flex;gap:8px;z-index:2000;box-shadow:0 10px 30px rgba(0,0,0,.15), 0 2px 8px rgba(0,0,0,.08)}
+.btn-nav{flex:1;height:52px;border-radius:14px;border:none;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:.25s}
+.btn-nav.inicio{background:#111;color:#fff;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.btn-nav.inicio.active{background:#000;box-shadow:0 6px 16px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.1)}
+.btn-nav.admin{background:#fff;color:#E53935;border:1px solid #f0f0f0;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.btn-nav.admin.active{background:linear-gradient(135deg,#E53935,#ff6b6b);color:#fff;box-shadow:0 6px 20px rgba(229,57,53,.4)}
+.modal-admin{position:fixed;inset:0;max-width:500px;margin:0 auto;background:rgba(15,15,15,.55);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:5000;display:none;align-items:center;justify-content:center;padding:20px}
 .modal-admin.show{display:flex}
-.box-admin{background:#fff;border-radius:26px;padding:26px;width:100%;max-width:360px;box-shadow:0 25px 50px rgba(0,0,0,.25)}
-.input-admin{width:100%;padding:15px 16px;border:1.5px solid #ececec;border-radius:14px;margin-top:12px;font-size:14px;font-weight:600;outline:none;background:#f9f9f9}
-.btn-login{width:100%;padding:15px;border:none;border-radius:14px;background:linear-gradient(135deg,#E53935,#ff5252);color:#fff;font-weight:900;margin-top:16px;cursor:pointer}
-.admin-card{background:#fff;border:1px solid #eee;border-radius:18px;padding:16px;margin-top:14px}
-.toggle{width:52px;height:30px;background:#e5e7eb;border-radius:999px;position:relative;cursor:pointer}
+.box-admin{background:#fff;border-radius:26px;padding:26px;width:100%;max-width:360px;box-shadow:0 25px 50px rgba(0,0,0,.25), 0 0 0 1px rgba(0,0,0,.04)}
+.input-admin{width:100%;padding:15px 16px;border:1.5px solid #ececec;border-radius:14px;margin-top:12px;font-size:14px;font-weight:600;outline:none;background:#f9f9f9;transition:.2s}
+.input-admin:focus{border-color:#E53935;background:#fff;box-shadow:0 0 0 4px rgba(229,57,53,.1)}
+.btn-login{width:100%;padding:15px;border:none;border-radius:14px;background:linear-gradient(135deg,#E53935,#ff5252);color:#fff;font-weight:900;margin-top:16px;cursor:pointer;box-shadow:0 8px 20px rgba(229,57,53,.35);letter-spacing:.3px}
+.admin-card{background:#fff;border:1px solid #eee;border-radius:18px;padding:16px;margin-top:14px;box-shadow:0 4px 12px rgba(0,0,0,.04)}
+.toggle{width:52px;height:30px;background:#e5e7eb;border-radius:999px;position:relative;cursor:pointer;transition:.3s}
 .toggle.on{background:#16a34a}
-.toggle-knob{width:24px;height:24px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.toggle-knob{width:24px;height:24px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px;box-shadow:0 2px 6px rgba(0,0,0,.2);transition:.3s}
 .stat{flex:1;background:#f7f7f8;border:1px solid #eee;border-radius:14px;padding:12px;text-align:center}
-.tabs{display:flex;gap:8px;overflow-x:auto;padding:12px 16px 8px;background:#fff;border-bottom:1px solid #eee;position:sticky;top:60px;z-index:2}
+.tabs{ display:flex; gap:8px; overflow-x:auto; padding:12px 16px 8px; scrollbar-width:none; -webkit-overflow-scrolling:touch; background:#fff; border-bottom:1px solid #eee; position:sticky; top:60px; z-index:2; }
 .tabs::-webkit-scrollbar{display:none}
-.tab{white-space:nowrap;padding:10px 16px;border-radius:999px;font-size:12px;font-weight:800;border:1px solid #eee;background:#f7f7f8;color:#666;cursor:pointer;flex-shrink:0}
-.tab.active{background:#111;color:#fff;border-color:#111}
-.tab-content{display:none}.tab-content.active{display:block}
+.tab{ white-space:nowrap; padding:10px 16px; border-radius:999px; font-size:12px; font-weight:800; border:1px solid #eee; background:#f7f7f8; color:#666; cursor:pointer; display:flex; align-items:center; gap:6px; flex-shrink:0; transition:.2s }
+.tab.active{ background:#111; color:#fff; border-color:#111; box-shadow:0 4px 12px rgba(0,0,0,.15) }
+.tab-content{display:none}
+.tab-content.active{display:block}
 </style>
 </head>
 <body>
 <div class="app">
-<div class="map-container"><div id="map"></div></div>
+<div class="map-container">
+<div id="map"></div>
+<div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:999;background:white;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.25)"><img src="https://firebasestorage.googleapis.com/v0/b/glide-prod.appspot.com/o/icon-images%2Fanonymous-ba983199-acce-404e-b058-c75e9633b325.jpeg?alt=media&token=a58284c1-111c-4874-b60f-35380cf5fbe3" style="width:32px;height:32px;border-radius:50%"></div>
+</div>
 <div id="panel1" class="panel">
 <div class="step"><div style="font-size:11px;font-weight:800;color:#666;margin-bottom:6px">Dirección de Origen.</div><div class="input-wrap"><i data-lucide="map-pin" style="position:absolute;left:12px;width:16px;color:#16a34a;z-index:2"></i><input id="pickupInput" class="colonia-input" placeholder="Ej: Hidalgo 15, Centro..." autocomplete="off"><div class="input-actions"><button id="btnClearOrigen" class="btn-icon clear" onclick="limpiarOrigen()"><i data-lucide="x" style="width:14px"></i></button><button id="btnUbicacion" class="btn-icon loc" onclick="usarMiUbicacion()"><i data-lucide="crosshair" style="width:16px;color:#fff"></i></button></div><div id="pickupSuggestions" class="suggestions"></div></div></div>
 <div class="step"><div style="font-size:11px;font-weight:800;color:#666;margin-bottom:6px">Dirección de Destino.</div><div style="position:relative"><i data-lucide="flag" style="position:absolute;left:12px;top:15px;width:16px;color:#dc2626"></i><input id="destinationInput" class="colonia-input" style="padding-right:14px" placeholder="Ej: Guerrero 20, Lindavista..." autocomplete="off"><div id="destinationSuggestions" class="suggestions"></div></div></div>
 <button id="calculateButton" class="btn-cotizar">CONFIRMAR DIRECCIÓN</button>
+<div style="height:20px"></div>
 </div>
+
 <div class="bottom-nav">
 <button id="btnNavInicio" class="btn-nav inicio active" onclick="irInicio()"><i data-lucide="compass" style="width:18px"></i> Inicio</button>
 <button id="btnNavAdmin" class="btn-nav admin" onclick="abrirAdmin()"><i data-lucide="shield-check" style="width:18px"></i> Admin</button>
 </div>
+
 </div>
 
 <div id="modalAdmin" class="modal-admin">
 <div class="box-admin">
-<div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:900;font-size:20px;color:#111">Panel Admin</div><div style="font-size:11px;color:#888">Acceso privado</div></div><button onclick="cerrarAdmin()" style="width:36px;height:36px;border-radius:12px;border:1px solid #eee;background:#f9f9f9;display:flex;align-items:center;justify-content:center"><i data-lucide="x" style="width:16px"></i></button></div>
-<input id="adminUser" class="input-admin" placeholder="Usuario"><input id="adminPass" type="password" class="input-admin" placeholder="Contraseña">
+<div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:900;font-size:20px;color:#111">Panel Admin</div><div style="font-size:11px;color:#888;margin-top:2px">Acceso privado</div></div><button onclick="cerrarAdmin()" style="width:36px;height:36px;border-radius:12px;border:1px solid #eee;background:#f9f9f9;display:flex;align-items:center;justify-content:center"><i data-lucide="x" style="width:16px"></i></button></div>
+<input id="adminUser" class="input-admin" placeholder="Usuario">
+<input id="adminPass" type="password" class="input-admin" placeholder="Contraseña">
 <button class="btn-login" onclick="loginAdmin()">INGRESAR</button>
 <div id="adminError" style="color:#E53935;font-size:12px;font-weight:700;margin-top:12px;display:none;text-align:center;background:#fff1f1;padding:8px;border-radius:8px">Datos incorrectos</div>
 </div>
@@ -82,16 +93,19 @@
 <div id="panelAdmin" style="position:fixed;inset:0;max-width:500px;margin:0 auto;background:#f8f8f9;z-index:4500;display:none;flex-direction:column;overflow-y:auto;padding-bottom:120px">
 <div style="background:#fff;padding:18px 20px 12px;border-bottom:1px solid #eee;position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:12px">
 <button onclick="irInicio()" style="width:42px;height:42px;border-radius:14px;background:#f1f1f1;border:1px solid #eee;display:flex;align-items:center;justify-content:center"><i data-lucide="arrow-left" style="width:18px"></i></button>
-<div><div style="font-weight:900;font-size:18px;color:#111" id="nombrePlataformaTitulo">Kigo Xpress • Admin</div><div style="font-size:11px;color:#16a34a;font-weight:700">Sesión activa en este dispositivo</div></div>
+<div><div style="font-weight:900;font-size:18px;color:#111" id="nombrePlataformaTitulo">Kigo Xpress • Admin</div><div style="font-size:11px;color:#16a34a;font-weight:700;display:flex;align-items:center;gap:4px"><i data-lucide="circle" style="width:8px;fill:#16a34a"></i> Sesión activa en este teléfono</div></div>
 <div style="margin-left:auto"><button onclick="cerrarSesionAdmin()" style="background:#fff1f1;border:1px solid #ffdede;color:#E53935;border-radius:10px;padding:8px 12px;font-weight:800;font-size:11px">Cerrar sesión</button></div>
 </div>
+
 <div class="tabs">
 <button class="tab active" onclick="switchTab('ajustes')"><i data-lucide="sliders-horizontal" style="width:14px"></i> Ajustes</button>
 <button class="tab" onclick="switchTab('config')"><i data-lucide="settings-2" style="width:14px"></i> Configuraciones</button>
 <button class="tab" onclick="switchTab('registros')"><i data-lucide="history" style="width:14px"></i> Registros</button>
 <button class="tab" onclick="switchTab('estadisticas')"><i data-lucide="bar-chart-3" style="width:14px"></i> Estadísticas</button>
 </div>
+
 <div style="padding:16px">
+
 <div id="tab-ajustes" class="tab-content active">
 <div class="admin-card">
 <div style="font-weight:900;color:#111;display:flex;align-items:center;gap:8px"><i data-lucide="sliders-horizontal" style="width:16px;color:#E53935"></i> Ajustes de Plataforma</div>
@@ -103,6 +117,7 @@
 <button onclick="guardarAjustes()" style="width:100%;margin-top:14px;padding:13px;border:none;border-radius:12px;background:#111;color:#fff;font-weight:800">Guardar Ajustes</button>
 </div>
 </div>
+
 <div id="tab-config" class="tab-content">
 <div class="admin-card">
 <div style="font-weight:900;color:#111;display:flex;align-items:center;gap:8px"><i data-lucide="settings-2" style="width:16px;color:#E53935"></i> Configuraciones Generales</div>
@@ -112,6 +127,7 @@
 </div>
 <button onclick="guardarAjustes()" style="width:100%;margin-top:14px;padding:13px;border:none;border-radius:12px;background:#111;color:#fff;font-weight:800">Guardar Configuraciones</button>
 </div>
+
 <div class="admin-card">
 <div style="font-weight:900;color:#111;display:flex;align-items:center;gap:8px"><i data-lucide="truck" style="width:16px;color:#E53935"></i> Disponibilidad en Tiempo Real</div>
 <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding:12px;background:#f7f7f8;border-radius:12px">
@@ -124,30 +140,33 @@
 </div>
 </div>
 </div>
+
 <div id="tab-registros" class="tab-content">
 <div class="admin-card">
 <div style="display:flex;justify-content:space-between;align-items:center"><div style="font-weight:900;color:#111;display:flex;align-items:center;gap:8px"><i data-lucide="history" style="width:16px;color:#E53935"></i> Historial de Finalizar</div><button onclick="borrarHistorial()" style="font-size:11px;color:#E53935;background:#fff1f1;border:1px solid #ffdede;border-radius:8px;padding:6px 10px;font-weight:700">Borrar</button></div>
 <div id="historialBox" style="margin-top:12px;max-height:400px;overflow-y:auto">Sin historial</div>
 </div>
 </div>
+
 <div id="tab-estadisticas" class="tab-content">
 <div style="display:flex;gap:10px">
-<div class="stat"><div style="font-size:22px;font-weight:900;color:#111" id="statTotal">0</div><div style="font-size:10px;color:#666;font-weight:700">CLICKS FINALIZAR</div></div>
-<div class="stat"><div style="font-size:22px;font-weight:900;color:#E53935" id="statMoto">0</div><div style="font-size:10px;color:#666;font-weight:700">MOTO</div></div>
-<div class="stat"><div style="font-size:22px;font-weight:900;color:#111" id="statCarro">0</div><div style="font-size:10px;color:#666;font-weight:700">CARRO</div></div>
+<div class="stat"><div style="font-size:22px;font-weight:900;color:#111" id="statTotal">0</div><div style="font-size:10px;color:#666;font-weight:700;margin-top:2px">CLICKS FINALIZAR</div></div>
+<div class="stat"><div style="font-size:22px;font-weight:900;color:#E53935" id="statMoto">0</div><div style="font-size:10px;color:#666;font-weight:700;margin-top:2px">MOTO</div></div>
+<div class="stat"><div style="font-size:22px;font-weight:900;color:#111" id="statCarro">0</div><div style="font-size:10px;color:#666;font-weight:700;margin-top:2px">CARRO</div></div>
 </div>
 <div class="admin-card">
 <div style="font-weight:900;color:#111;display:flex;align-items:center;gap:8px"><i data-lucide="bar-chart-3" style="width:16px;color:#E53935"></i> Servicio más adquirido</div>
-<div style="margin-top:12px"><div style="background:#111;color:#fff;border-radius:12px;padding:12px;text-align:center;font-size:12px" id="servicioMasTxt">Aún sin datos</div></div>
+<div id="servicioMas" style="margin-top:12px;display:flex;gap:10px"><div style="flex:1;background:#111;color:#fff;border-radius:12px;padding:12px;text-align:center"><div style="font-size:12px" id="servicioMasTxt">Aún sin datos</div></div></div>
 </div>
 <div class="admin-card">
 <div style="font-weight:900;color:#111;display:flex;align-items:center;gap:8px"><i data-lucide="clock-3" style="width:16px;color:#E53935"></i> Horarios con más demanda</div>
 <div id="horariosBox" style="margin-top:10px;font-size:12px;color:#666">Aún sin datos</div>
 </div>
 </div>
+
 </div>
-  </div>
-  <div id="panel2" class="panel2">
+</div>
+<div id="panel2" class="panel2">
 <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
 <button onclick="volver()" style="width:42px;height:42px;border-radius:50%;background:#f1f1f1;border:1px solid #e5e7eb;display:flex;align-items:center;justify-content:center"><i data-lucide="arrow-left" style="width:18px;color:#111"></i></button>
 <div style="flex:1;background:#f7f7f8;border:1px solid #eee;border-radius:999px;padding:8px 12px;display:flex;align-items:center;gap:6px"><i data-lucide="navigation" style="width:14px;color:#E53935"></i><b id="destTxt" style="font-size:11px;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Destino</b><b id="tiempoTxt" style="font-size:11px;color:#111;margin-left:auto">--</b></div>
@@ -172,12 +191,13 @@
 <div style="position:relative;height:58vh;flex-shrink:0">
 <div id="mapConfirm"></div>
 <div style="position:absolute;top:12px;left:12px;right:12px;z-index:999;background:#ffffff;color:#111;border:1px solid #eee;border-radius:16px;padding:12px 14px;display:flex;gap:10px;align-items:center;box-shadow:0 4px 15px rgba(0,0,0,.1)"><button onclick="volverMapa()" style="width:36px;height:36px;border-radius:50%;background:#f1f1f1;border:1px solid #e5e7eb;display:flex;align-items:center;justify-content:center"><i data-lucide="arrow-left" style="width:16px;color:#111"></i></button><div><div style="font-weight:900;font-size:13px;color:#111">Confirma tu punto de recogida</div><div style="font-size:11px;color:#666">Toca el mapa para ajustar, el precio se actualiza solo</div></div></div>
+<div style="position:absolute;bottom:20px;left:50%;transform:translateX(-50%);z-index:999;background:#111;color:#fff;border-radius:999px;padding:8px 14px;font-size:11px;font-weight:800;box-shadow:0 4px 15px rgba(0,0,0,.2);display:flex;align-items:center;gap:6px"><i data-lucide="hand" style="width:14px;color:#E53935"></i> Mueve el pin - precio en vivo</div>
 </div>
 <div style="background:#ffffff;flex:1;border-radius:28px 28px 0 0;margin-top:-28px;z-index:1000;padding:20px 20px 110px 20px;display:flex;flex-direction:column;box-shadow:0 -10px 30px rgba(0,0,0,.12);border-top:1px solid #eee;overflow-y:auto">
 <div style="width:40px;height:4px;background:#e5e7eb;border-radius:999px;margin:0 auto 16px"></div>
-<div style="background:#f7f7f8;border:1px solid #eee;border-radius:16px;padding:14px;display:flex;gap:10px;align-items:center;margin-bottom:14px"><div style="width:40px;height:40px;background:#E53935;border-radius:10px;display:flex;align-items:center;justify-content:center"><i data-lucide="map-pin" style="width:18px;color:#fff"></i></div><div style="flex:1"><div style="color:#111;font-weight:800;font-size:13px">Punto de recogida</div><div id="txtPickupConfirm" style="color:#666;font-size:11px">Cargando...</div></div><button onclick="usarMiUbicacionConfirm()" style="background:#111;border:none;color:#fff;border-radius:8px;padding:8px 10px;font-size:11px;font-weight:700">Mi ubicación</button></div>
-<div style="background:#ffffff;border:1px solid #eee;border-radius:16px;padding:14px;display:flex;gap:10px;align-items:center;margin-bottom:18px"><div style="width:40px;height:40px;background:#f7f7f8;border:1px solid #eee;border-radius:10px;display:flex;align-items:center;justify-content:center"><img id="imgTransporteConfirm" src="" style="width:32px"></div><div><div id="txtTransporteConfirm" style="color:#111;font-weight:800;font-size:14px">Moto</div><div id="txtPrecioConfirm" style="color:#E53935;font-size:13px;font-weight:900"> $35 MXN</div></div><div id="txtDistConfirm" style="margin-left:auto;color:#111;font-weight:900;font-size:13px">1.5 km</div></div>
-<button onclick="confirmarViajeFinal()" style="width:100%;height:56px;border-radius:16px;border:none;background:#E53935;color:#fff;font-weight:900;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px"><i data-lucide="check" style="width:18px"></i> CONFIRMAR RECOGIDA</button>
+<div style="background:#f7f7f8;border:1px solid #eee;border-radius:16px;padding:14px;display:flex;gap:10px;align-items:center;margin-bottom:14px"><div style="width:40px;height:40px;background:#E53935;border-radius:10px;display:flex;align-items:center;justify-content:center"><i data-lucide="map-pin" style="width:18px;color:#fff"></i></div><div style="flex:1"><div style="color:#111;font-weight:800;font-size:13px">Punto de recogida</div><div id="txtPickupConfirm" style="color:#666;font-size:11px">Cargando...</div></div><button onclick="usarMiUbicacionConfirm()" style="background:#111;border:none;color:#fff;border-radius:8px;padding:8px 10px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:4px"><i data-lucide="crosshair" style="width:12px"></i> Mi ubicación</button></div>
+<div style="background:#ffffff;border:1px solid #eee;border-radius:16px;padding:14px;display:flex;gap:10px;align-items:center;margin-bottom:18px;box-shadow:0 2px 10px rgba(0,0,0,.04)"><div style="width:40px;height:40px;background:#f7f7f8;border:1px solid #eee;border-radius:10px;display:flex;align-items:center;justify-content:center"><img id="imgTransporteConfirm" src="" style="width:32px"></div><div><div id="txtTransporteConfirm" style="color:#111;font-weight:800;font-size:14px">Moto</div><div id="txtPrecioConfirm" style="color:#E53935;font-size:13px;font-weight:900;text-shadow:0 0 8px rgba(229,57,53,.3)">$35 MXN</div></div><div id="txtDistConfirm" style="margin-left:auto;color:#111;font-weight:900;font-size:13px">1.5 km</div></div>
+<button onclick="confirmarViajeFinal()" style="width:100%;height:56px;border-radius:16px;border:none;background:#E53935;color:#fff;font-weight:900;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 0 20px rgba(229,57,53,.35)"><i data-lucide="check" style="width:18px"></i> CONFIRMAR RECOGIDA</button>
 </div>
 </div>
 
@@ -211,10 +231,10 @@ async function buscarColonias(t){
   resultados.sort((a,b)=> b.exact - a.exact); const unicos=[];const seen=new Set(); for(let r of resultados){const key=r.lat.toFixed(5)+","+r.lon.toFixed(5);if(!seen.has(key)){seen.add(key);unicos.push(r);}} return unicos.slice(0,8);
 }
 function mostrar(c,res,tipoS){
- c.innerHTML=""; if(!res.length){c.innerHTML='<div style="padding:14px;text-align:center;font-size:12px;color:#777">Escribe calle y número</div>';c.classList.add("show");return;}
+ c.innerHTML=""; if(!res.length){c.innerHTML='<div style="padding:14px;text-align:center;font-size:12px;color:#777">Escribe calle y número, ej: Hidalgo 12, Centro</div>';c.classList.add("show");return;}
  res.forEach(r=>{
   const el=document.createElement("div");el.className="suggestion";
-  el.innerHTML=`<div style="width:32px;height:32px;background:${r.exact>=1? '#16a34a' : '#111'};border-radius:50%;display:flex;align-items:center;justify-content:center"><i data-lucide="map-pin" style="width:16px;color:#fff"></i></div><div style="flex:1;overflow:hidden"><div style="font-weight:800;font-size:13px">${r.name}</div><div style="font-size:11px;color:#666">${r.direccion.substring(0,70)}</div></div>`;
+  el.innerHTML=`<div style="width:32px;height:32px;background:${r.exact>=1? '#16a34a' : '#111'};border-radius:50%;display:flex;align-items:center;justify-content:center"><i data-lucide="map-pin" style="width:16px;color:#fff"></i></div><div style="flex:1;overflow:hidden"><div style="font-weight:800;font-size:13px">${r.name}</div><div style="font-size:11px;color:#666">${r.direccion.substring(0,70)}</div>${r.exact>=1? '<div style="font-size:9px;color:#16a34a;font-weight:700;margin-top:2px">📍 Dirección exacta</div>' : ''}</div>`;
   el.onclick=async()=>{
    if(tipoS==="pickup"){ pickupLat=r.lat;pickupLng=r.lon;pickupName=r.name;pickupInput.value=r.name;pickupSuggestions.classList.remove("show"); if(pickupMarker)map.removeLayer(pickupMarker);pickupMarker=L.marker([r.lat,r.lon]).addTo(map); mostrarX(); }else{ destinationLat=r.lat;destinationLng=r.lon;destName=r.name;destinationInput.value=r.name;destinationSuggestions.classList.remove("show"); if(destinationMarker)map.removeLayer(destinationMarker);destinationMarker=L.marker([r.lat,r.lon]).addTo(map); }
    if(pickupLat && destinationLat){ try{ const url=`https://router.project-osrm.org/route/v1/driving/${pickupLng},${pickupLat};${destinationLng},${destinationLat}?overview=full&geometries=geojson`; const rr=await fetch(url);const dd=await rr.json(); if(dd.routes&&dd.routes[0]){ if(routeLayer)map.removeLayer(routeLayer); routeLayer=L.geoJSON(dd.routes[0].geometry,{style:{color:"#E53935",weight:6}}).addTo(map); map.fitBounds(routeLayer.getBounds(),{padding:[40,40]}); } }catch(e){} }else{ if(pickupLat) map.setView([pickupLat,pickupLng],16); if(destinationLat) map.setView([destinationLat,destinationLng],16); } lucide.createIcons();
@@ -242,8 +262,8 @@ async function usarMiUbicacion(){navigator.geolocation.getCurrentPosition(async 
 };
 function volver(){ document.getElementById('panel2').classList.remove('show'); }
 function seleccionar(t){
- if(t==='moto' &&!cfg.motoDisp){alert('Moto no disponible');return;}
- if(t==='carro' &&!cfg.carroDisp){alert('Carro no disponible');return;}
+ if(t==='moto' &&!cfg.motoDisp){alert('Moto no disponible por el momento');return;}
+ if(t==='carro' &&!cfg.carroDisp){alert('Carro no disponible por el momento');return;}
  tipo=t; document.querySelectorAll('.card').forEach(c=>c.classList.remove('active')); document.getElementById('card'+t.charAt(0).toUpperCase()+t.slice(1)).classList.add('active');
  const btn=document.getElementById('btnElegir'); btn.classList.add('ready');
  if(t==='moto') document.getElementById('btnTxt').innerText=`Elegir Moto • $${datosViaje.precioMoto} MXN`; else document.getElementById('btnTxt').innerText=`Elegir Carro • $${datosViaje.precioCarro} MXN`; lucide.createIcons();
@@ -276,19 +296,31 @@ async function recalcularPrecioTiempoReal(lat,lng){
   const url=`https://router.project-osrm.org/route/v1/driving/${lng},${lat};${destinationLng},${destinationLat}?overview=full&geometries=geojson`;
   const r=await fetch(url); const d=await r.json();
   if(d.routes && d.routes[0]){
-   const route=d.routes[0]; const km = route.distance/1000; const tiempo = Math.ceil(route.duration/60);
+   const route=d.routes[0];
+   const km = route.distance/1000;
+   const tiempo = Math.ceil(route.duration/60);
    let baseMoto = cfg.baseMoto, baseCarro = cfg.baseCarro;
    if(route.distance>2000){ let extra=route.distance-2000; baseMoto=cfg.baseMoto+Math.ceil(extra/650)*cfg.extraMoto; baseCarro=cfg.baseCarro+Math.ceil(extra/650)*cfg.extraCarro; }
    if(distMts(lat,lng,CENTRO.lat,CENTRO.lng)>800 && distMts(destinationLat,destinationLng,CENTRO.lat,CENTRO.lng)>800){ baseMoto+=5; baseCarro+=10; }
    baseMoto+=extraLluvia; baseCarro+=extraLluvia;
-   datosViaje.distKm = km.toFixed(2); datosViaje.tiempoMin = tiempo; datosViaje.precioMoto = baseMoto; datosViaje.precioCarro = baseCarro; datosViaje.origenLat = lat; datosViaje.origenLng = lng;
+   datosViaje.distKm = km.toFixed(2);
+   datosViaje.tiempoMin = tiempo;
+   datosViaje.precioMoto = baseMoto;
+   datosViaje.precioCarro = baseCarro;
+   datosViaje.origenLat = lat;
+   datosViaje.origenLng = lng;
    document.getElementById('txtDistConfirm').innerText = km.toFixed(2)+' km';
    document.getElementById('txtPrecioConfirm').innerText = tipo==='moto'? `$${baseMoto} MXN` : `$${baseCarro} MXN`;
-   document.getElementById('motoPrice').innerText = `$${baseMoto} MXN`; document.getElementById('carroPrice').innerText = `$${baseCarro} MXN`;
-   document.getElementById('rutaSub').innerText = `${km.toFixed(2)} km • Ruta actualizada`; document.getElementById('tiempoTxt').innerText = tiempo+' min';
-   document.getElementById('motoTime').innerText = `Tiempo estimado: ${tiempo} min`; document.getElementById('carroTime').innerText = `Tiempo estimado: ${tiempo+2} min`;
-   if(tipo==='moto') document.getElementById('btnTxt').innerText = `Elegir Moto • $${baseMoto} MXN`; else document.getElementById('btnTxt').innerText = `Elegir Carro • $${baseCarro} MXN`;
-   if(routeConfirmLayer) mapConfirm.removeLayer(routeConfirmLayer); routeConfirmLayer = L.geoJSON(route.geometry,{style:{color:"#E53935",weight:6}}).addTo(mapConfirm);
+   document.getElementById('motoPrice').innerText = `$${baseMoto} MXN`;
+   document.getElementById('carroPrice').innerText = `$${baseCarro} MXN`;
+   document.getElementById('rutaSub').innerText = `${km.toFixed(2)} km • Ruta actualizada`;
+   document.getElementById('tiempoTxt').innerText = tiempo+' min';
+   document.getElementById('motoTime').innerText = `Tiempo estimado: ${tiempo} min`;
+   document.getElementById('carroTime').innerText = `Tiempo estimado: ${tiempo+2} min`;
+   if(tipo==='moto') document.getElementById('btnTxt').innerText = `Elegir Moto • $${baseMoto} MXN`;
+   else document.getElementById('btnTxt').innerText = `Elegir Carro • $${baseCarro} MXN`;
+   if(routeConfirmLayer) mapConfirm.removeLayer(routeConfirmLayer);
+   routeConfirmLayer = L.geoJSON(route.geometry,{style:{color:"#E53935",weight:6}}).addTo(mapConfirm);
   }
  }catch(e){}
 }
@@ -300,44 +332,47 @@ async function actualizarDireccionConfirm(lat,lng){
  }catch(e){ document.getElementById('txtPickupConfirm').innerText = lat.toFixed(6)+", "+lng.toFixed(6); }
  recalcularPrecioTiempoReal(lat,lng);
 }
-function usarMiUbicacionConfirm(){ navigator.geolocation.getCurrentPosition(pos=>{ finalPickupLat = pos.coords.latitude; finalPickupLng = pos.coords.longitude; markerConfirm.setLatLng([finalPickupLat,finalPickupLng]); mapConfirm.setView([finalPickupLat,finalPickupLng],18); actualizarDireccionConfirm(finalPickupLat,finalPickupLng); }); }
+function usarMiUbicacionConfirm(){
+ navigator.geolocation.getCurrentPosition(pos=>{
+  finalPickupLat = pos.coords.latitude; finalPickupLng = pos.coords.longitude;
+  markerConfirm.setLatLng([finalPickupLat,finalPickupLng]);
+  mapConfirm.setView([finalPickupLat,finalPickupLng],18);
+  actualizarDireccionConfirm(finalPickupLat,finalPickupLng);
+ });
+}
 function volverMapa(){ document.getElementById('panel3').classList.remove('show'); document.getElementById('panel2').classList.add('show'); }
 
 function confirmarViajeFinal(){
  let precio=tipo==='moto'?datosViaje.precioMoto:datosViaje.precioCarro;
- let hist=JSON.parse(localStorage.getItem('kigo_hist')||'[]');
- let numeroServicio = hist.length + 1;
- let contadorGlobal = parseInt(localStorage.getItem('kigo_contador')||'0')+1;
- localStorage.setItem('kigo_contador',contadorGlobal.toString());
+ let contador = parseInt(localStorage.getItem('kigo_contador')||'0')+1;
+ localStorage.setItem('kigo_contador',contador.toString());
  let ahora = new Date();
- let horaStr = ahora.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit',hour12:true});
- let fechaStr = ahora.toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'});
+ let hora = ahora.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit',hour12:true});
+ let fecha = ahora.toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'});
  let linkRuta = `https://www.google.com/maps/dir/${finalPickupLat},${finalPickupLng}/${datosViaje.destLat},${datosViaje.destLng}`;
  let linkPunto = `https://www.google.com/maps?q=${finalPickupLat},${finalPickupLng}`;
  registrarEstadistica(tipo,precio);
 
- let msg = `🚀 *${cfg.nombre.toUpperCase()} - NUEVO SERVICIO*
+ let msg = `🏢 *${cfg.nombre.toUpperCase()}*
 ━━━━━━━━━━━━━━━━━━━━
-🕒 *HORA DEL PEDIDO:* ${horaStr} - ${fechaStr}
-🔢 *No. SERVICIO:* #${contadorGlobal.toString().padStart(4,'0')}
-🛵 *TIPO DE SERVICIO:* ${tipo.toUpperCase()} ${tipo==='moto'?'🏍️':'🚗'}
+⏰ *HORA:* ${hora} - ${fecha}
+🔢 *SERVICIO No.:* #${contador.toString().padStart(4,'0')}
+🚦 *TIPO:* ${tipo.toUpperCase()} ${tipo==='moto'?'🏍️':'🚗'}
 ━━━━━━━━━━━━━━━━━━━━
-📍 *DIRECCIÓN DE RECOGIDA:*
+📍 *RECOGIDA:*
 ${pickupName}
-📌 Punto exacto: ${linkPunto}
+📌 ${linkPunto}
 
-🏁 *DIRECCIÓN DE DESTINO:*
+🏁 *DESTINO:*
 ${datosViaje.destino}
 
-🗺️ *RUTA COMPLETA (Toca para abrir en Google Maps):*
+🗺️ *RUTA:*
 ${linkRuta}
-
 ━━━━━━━━━━━━━━━━━━━━
 📏 *DISTANCIA:* ${datosViaje.distKm} km
-⏱️ *TIEMPO ESTIMADO:* ${datosViaje.tiempoMin} min
 💰 *PRECIO:* $${precio} MXN
 ━━━━━━━━━━━━━━━━━━━━
-✅ *Cliente esperando confirmación*`;
+✅ Cliente esperando`;
 
  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
 }
@@ -358,7 +393,7 @@ function abrirAdmin(){
   document.getElementById('btnNavInicio').classList.remove('active');
   cargarAdmin(); return;
  }
- document.getElementById('modalAdmin').classList.add('show'); document.getElementById('btnNavAdmin').classList.add('active');
+ document.getElementById('modalAdmin').classList.add('show'); document.getElementById('btnNavAdmin').classList.add('active'); lucide.createIcons();
 }
 function cerrarAdmin(){ document.getElementById('modalAdmin').classList.remove('show'); document.getElementById('btnNavAdmin').classList.remove('active'); document.getElementById('btnNavInicio').classList.add('active'); document.getElementById('adminError').style.display='none'; }
 function irInicio(){
@@ -378,7 +413,7 @@ function loginAdmin(){
   document.getElementById('adminError').style.display='none';
   document.getElementById('btnNavAdmin').classList.add('active');
   document.getElementById('btnNavInicio').classList.remove('active');
-  cargarAdmin();
+  cargarAdmin(); lucide.createIcons();
  }else{ document.getElementById('adminError').style.display='block'; }
 }
 function sincronizarTiempoReal(){
@@ -409,7 +444,7 @@ function guardarAjustes(){ localStorage.setItem('kigo_cfg',JSON.stringify(cfg));
 function toggleVehiculo(t){ if(t==='moto'){ cfg.motoDisp=!cfg.motoDisp; document.getElementById('toggleMoto').className=cfg.motoDisp?'toggle on':'toggle'; document.getElementById('estadoMotoTxt').innerText=cfg.motoDisp?'Disponible':'Bloqueado'; } if(t==='carro'){ cfg.carroDisp=!cfg.carroDisp; document.getElementById('toggleCarro').className=cfg.carroDisp?'toggle on':'toggle'; document.getElementById('estadoCarroTxt').innerText=cfg.carroDisp?'Disponible':'Bloqueado'; } localStorage.setItem('kigo_cfg',JSON.stringify(cfg)); aplicarDisponibilidad(); }
 function aplicarDisponibilidad(){ const m=document.getElementById('cardMoto'); const c=document.getElementById('cardCarro'); if(cfg.motoDisp){ m.classList.remove('disabled'); } else { m.classList.add('disabled'); } if(cfg.carroDisp){ c.classList.remove('disabled'); } else { c.classList.add('disabled'); } }
 function registrarEstadistica(tipoViaje,precio){ let hist=JSON.parse(localStorage.getItem('kigo_hist')||'[]'); const ahora=new Date(); hist.unshift({tipo:tipoViaje,precio:precio,fecha:ahora.toLocaleString(),hora:ahora.getHours(),origen:pickupName,destino:destName,km:datosViaje.distKm}); if(hist.length>100) hist=hist.slice(0,100); localStorage.setItem('kigo_hist',JSON.stringify(hist)); }
-function actualizarStats(){ let hist=JSON.parse(localStorage.getItem('kigo_hist')||'[]'); document.getElementById('statTotal').innerText=hist.length; document.getElementById('statMoto').innerText=hist.filter(h=>h.tipo==='moto').length; document.getElementById('statCarro').innerText=hist.filter(h=>h.tipo==='carro').length; let horas={}; hist.forEach(h=>{ horas[h.hora]=(horas[h.hora]||0)+1; }); let mas='Sin datos'; let max=0; for(let k in horas){ if(horas[k]>max){ max=horas[k]; mas=k+':00 hrs - '+horas[k]+' viajes'; } } document.getElementById('horariosBox').innerText=hist.length? 'Pico: '+mas : 'Aún sin datos'; let moto=hist.filter(h=>h.tipo==='moto').length; let carro=hist.filter(h=>h.tipo==='carro').length; let masTxt='Aún sin datos'; if(hist.length){ masTxt = moto>carro? 'MOTO más pedido ('+moto+')' : carro>moto? 'CARRO más pedido ('+carro+')' : 'Empate MOTO y CARRO'; } document.getElementById('servicioMasTxt').innerText=masTxt; let box=document.getElementById('historialBox'); if(!hist.length){ box.innerHTML='<div style="text-align:center;padding:20px;color:#999;font-size:12px">Sin historial</div>'; return; } box.innerHTML=hist.map(h=>`<div style="padding:10px;border-bottom:1px solid #f0f0f0;display:flex;gap:10px;align-items:center"><div style="width:36px;height:36px;background:${h.tipo==='moto'?'#111':'#E53935'};border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:10px">${h.tipo==='moto'?'M':'C'}</div><div style="flex:1"><div style="font-weight:800;font-size:12px;color:#111">${h.tipo.toUpperCase()} • $${h.precio} MXN • ${h.km} km</div><div style="font-size:10px;color:#666">${h.origen} → ${h.destino}</div><div style="font-size:10px;color:#999">${h.fecha}</div></div></div>`).join(''); }
+function actualizarStats(){ let hist=JSON.parse(localStorage.getItem('kigo_hist')||'[]'); document.getElementById('statTotal').innerText=hist.length; document.getElementById('statMoto').innerText=hist.filter(h=>h.tipo==='moto').length; document.getElementById('statCarro').innerText=hist.filter(h=>h.tipo==='carro').length; let horas={}; hist.forEach(h=>{ horas[h.hora]=(horas[h.hora]||0)+1; }); let mas='Sin datos'; let max=0; for(let k in horas){ if(horas[k]>max){ max=horas[k]; mas=k+':00 hrs - '+horas[k]+' viajes'; } } document.getElementById('horariosBox').innerText=hist.length? 'Pico: '+mas : 'Aún sin datos'; let moto=hist.filter(h=>h.tipo==='moto').length; let carro=hist.filter(h=>h.tipo==='carro').length; let masTxt='Aún sin datos'; if(hist.length){ masTxt = moto>carro? 'MOTO más pedido ('+moto+')' : carro>moto? 'CARRO más pedido ('+carro+')' : 'Empate MOTO y CARRO'; } document.getElementById('servicioMasTxt').innerText=masTxt; let box=document.getElementById('historialBox'); if(!hist.length){ box.innerHTML='<div style="text-align:center;padding:20px;color:#999;font-size:12px">Aún no hay clicks en CONFIRMAR RECOGIDA</div>'; return; } box.innerHTML=hist.map(h=>`<div style="padding:10px;border-bottom:1px solid #f0f0f0;display:flex;gap:10px;align-items:center"><div style="width:36px;height:36px;background:${h.tipo==='moto'?'#111':'#E53935'};border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:10px">${h.tipo==='moto'?'M':'C'}</div><div style="flex:1"><div style="font-weight:800;font-size:12px;color:#111">${h.tipo.toUpperCase()} • $${h.precio} MXN • ${h.km} km</div><div style="font-size:10px;color:#666">${h.origen} → ${h.destino}</div><div style="font-size:10px;color:#999">${h.fecha}</div></div></div>`).join(''); }
 function borrarHistorial(){ if(confirm('¿Borrar historial?')){ localStorage.removeItem('kigo_hist'); actualizarStats(); } }
 function cerrarPanelAdmin(){ document.getElementById('panelAdmin').style.display='none'; document.getElementById('btnNavInicio').classList.add('active'); document.getElementById('btnNavAdmin').classList.remove('active'); map.invalidateSize(); }
 function cerrarSesionAdmin(){ if(confirm('¿Cerrar sesión?')){ localStorage.removeItem('kigo_admin_sesion'); document.getElementById('panelAdmin').style.display='none'; document.getElementById('btnNavInicio').classList.add('active'); document.getElementById('btnNavAdmin').classList.remove('active'); map.invalidateSize(); } }
