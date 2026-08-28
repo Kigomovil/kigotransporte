@@ -24,13 +24,13 @@
 .suggestions.show{display:block}
 .suggestion{padding:12px 14px;border-bottom:1px solid #f2f2f2;display:flex;gap:10px;align-items:center;cursor:pointer}
 .btn-cotizar{width:100%;padding:16px;border:none;border-radius:14px;background:#E53935;color:#fff;font-weight:900;font-size:15px;margin-top:10px;cursor:pointer}
-.card{border-radius:20px;padding:16px;display:flex;gap:14px;align-items:center;background:#1c1c1f;border:2px solid transparent;cursor:pointer;margin-bottom:14px}
-.card.active{border-color:#38bdf8;background:#1e293b}
+.card{border-radius:20px;padding:16px;display:flex;gap:14px;align-items:center;background:#1c1c1f;border:2px solid transparent;cursor:pointer;margin-bottom:14px;transition:.2s}
+.card.active{border-color:#E53935;background:#2a1212;box-shadow:0 0 0 2px rgba(229,57,53,.3), 0 0 18px rgba(229,57,53,.35)}
 .card-left{width:88px;height:68px;background:#fff;border-radius:14px;display:flex;align-items:center;justify-content:center}
-.card-title{color:#fff;font-weight:800;font-size:16px}.card-pass{color:#a1a1aa;font-size:12px;margin-top:3px}
+.card-title{color:#fff;font-weight:800;font-size:16px}.card-pass{color:#a1a1aa;font-size:12px;margin-top:3px;display:flex;align-items:center;gap:4px}
 .price{font-size:20px;font-weight:900;color:#fff;margin-left:auto}
 .btn-elegir{margin-top:12px;width:100%;height:56px;border-radius:16px;border:none;background:#27272a;color:#71717a;font-weight:900;font-size:15px}
-.btn-elegir.ready{background:#38bdf8;color:#000}
+.btn-elegir.ready{background:#E53935;color:#fff;box-shadow:0 0 18px rgba(229,57,53,.5)}
 </style>
 </head>
 <body>
@@ -49,21 +49,24 @@
 <div id="panel2" class="panel2">
 <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
 <button onclick="volver()" style="width:42px;height:42px;border-radius:50%;background:#fff;border:none;display:flex;align-items:center;justify-content:center"><i data-lucide="arrow-left" style="width:18px"></i></button>
-<div style="flex:1;background:#fff;border-radius:999px;padding:8px 12px;display:flex;align-items:center;gap:6px"><i data-lucide="navigation" style="width:14px;color:#0ea5e9"></i><b id="destTxt" style="font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Destino</b><b id="tiempoTxt" style="font-size:11px;margin-left:auto">--</b></div>
+<div style="flex:1;background:#fff;border-radius:999px;padding:8px 12px;display:flex;align-items:center;gap:6px"><i data-lucide="navigation" style="width:14px;color:#E53935"></i><b id="destTxt" style="font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Destino</b><b id="tiempoTxt" style="font-size:11px;margin-left:auto">--</b></div>
 </div>
 <div style="width:40px;height:4px;background:#3f3f46;border-radius:999px;margin:8px auto 12px"></div>
 <h2 style="color:#fff;margin:0 0 4px;font-size:22px;font-weight:900">Elige tu viaje</h2>
 <div id="rutaSub" style="color:#a1a1aa;font-size:12px;margin-bottom:14px">Selecciona tu transporte</div>
+
 <div id="cardMoto" class="card" onclick="seleccionar('moto')">
 <div class="card-left"><img src="https://img.icons8.com/3d-fluency/94/motorcycle.png" style="width:70px"></div>
-<div style="flex:1"><div class="card-title">Moto</div><div class="card-pass">👤 1 pasajero</div><div style="color:#71717a;font-size:11px;margin-top:4px" id="motoTime">--</div></div>
+<div style="flex:1"><div class="card-title">Moto</div><div class="card-pass"><i data-lucide="user" style="width:12px"></i> 1 pasajero</div><div style="color:#71717a;font-size:11px;margin-top:4px" id="motoTime">--</div></div>
 <div class="price" id="motoPrice">$--</div>
 </div>
+
 <div id="cardCarro" class="card" onclick="seleccionar('carro')">
 <div class="card-left"><img src="https://img.icons8.com/3d-fluency/94/car.png" style="width:70px"></div>
-<div style="flex:1"><div class="card-title">Carro</div><div class="card-pass">👤 Hasta 4 pasajeros</div><div style="color:#71717a;font-size:11px;margin-top:4px" id="carroTime">--</div></div>
+<div style="flex:1"><div class="card-title">Carro</div><div class="card-pass"><i data-lucide="users" style="width:12px"></i> Hasta 4 pasajeros</div><div style="color:#71717a;font-size:11px;margin-top:4px" id="carroTime">--</div></div>
 <div class="price" id="carroPrice">$--</div>
 </div>
+
 <button id="btnElegir" class="btn-elegir" onclick="confirmarViaje()"><span id="btnTxt">Selecciona una opción</span></button>
 </div>
 
@@ -75,10 +78,7 @@ let extraLluvia=0;
 const map=L.map("map",{zoomControl:false}).setView([CENTRO.lat,CENTRO.lng],14);
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19}).addTo(map);
 const pickupInput=document.getElementById("pickupInput"),destinationInput=document.getElementById("destinationInput"),pickupSuggestions=document.getElementById("pickupSuggestions"),destinationSuggestions=document.getElementById("destinationSuggestions"),btnClear=document.getElementById("btnClearOrigen");
-
 function distMts(a,b,c,d){const R=6371000;const dLat=(c-a)*Math.PI/180;const dLon=(d-b)*Math.PI/180;const x=Math.sin(dLat/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dLon/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
-
-// BUSQUEDA 100% EXACTA - CALLE + NUMERO + COLONIA
 async function buscarColonias(t){
   if(!t || t.length < 2) return [];
   const texto = t.trim();
@@ -127,15 +127,13 @@ async function buscarColonias(t){
   for(let r of resultados){const key=r.lat.toFixed(5)+","+r.lon.toFixed(5);if(!seen.has(key)){seen.add(key);unicos.push(r);}}
   return unicos.slice(0,8);
 }
-
 function mostrar(c,res,tipoS){
  c.innerHTML="";
  if(!res.length){c.innerHTML='<div style="padding:14px;text-align:center;font-size:12px;color:#777">Escribe calle y número, ej: Hidalgo 12, Centro</div>';c.classList.add("show");return;}
  res.forEach(r=>{
   const el=document.createElement("div");el.className="suggestion";
-  const esExacta = r.exact >= 1;
   el.innerHTML=`
-    <div style="width:32px;height:32px;background:${esExacta? '#16a34a' : '#111'};border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i data-lucide="map-pin" style="width:16px;color:#fff"></i></div>
+    <div style="width:32px;height:32px;background:${r.exact>=1? '#16a34a' : '#111'};border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i data-lucide="map-pin" style="width:16px;color:#fff"></i></div>
     <div style="flex:1;overflow:hidden">
       <div style="font-weight:800;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.name}</div>
       <div style="font-size:11px;color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.direccion}</div>
@@ -171,13 +169,11 @@ function mostrar(c,res,tipoS){
  c.classList.add("show");
  lucide.createIcons();
 }
-
 let t1=null;pickupInput.addEventListener("input",function(){mostrarX();if(t1)clearTimeout(t1);if(this.value.trim().length<2){pickupSuggestions.classList.remove("show");return;}t1=setTimeout(async()=>{const res=await buscarColonias(this.value.trim());mostrar(pickupSuggestions,res,"pickup");},180);});
 let t2=null;destinationInput.addEventListener("input",function(){if(t2)clearTimeout(t2);if(this.value.trim().length<2){destinationSuggestions.classList.remove("show");return;}t2=setTimeout(async()=>{const res=await buscarColonias(this.value.trim());mostrar(destinationSuggestions,res,"destination");},180);});
 function mostrarX(){btnClear.style.display=pickupInput.value.length>0?'flex':'none';}
 function limpiarOrigen(){pickupInput.value="";pickupLat=null;pickupLng=null;pickupName="";btnClear.style.display='none';if(pickupMarker)map.removeLayer(pickupMarker);if(routeLayer)map.removeLayer(routeLayer);pickupInput.focus();}
 async function usarMiUbicacion(){navigator.geolocation.getCurrentPosition(async pos=>{pickupLat=pos.coords.latitude;pickupLng=pos.coords.longitude;try{const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${pickupLat}&lon=${pickupLng}&addressdetails=1`);const d=await r.json();const a=d.address||{};const calle=(a.road||"")+(a.house_number?" #"+a.house_number:"");pickupInput.value=calle? calle+" - "+(a.neighbourhood||a.suburb||"") : d.display_name.split(",").slice(0,2).join(", ");pickupName=pickupInput.value;}catch(e){pickupInput.value="Mi ubicación actual";pickupName="Mi ubicación";}if(pickupMarker)map.removeLayer(pickupMarker);pickupMarker=L.marker([pickupLat,pickupLng]).addTo(map);map.setView([pickupLat,pickupLng],17);mostrarX();});}
-
 document.getElementById("calculateButton").onclick=async()=>{
  if(!pickupLat||!destinationLat){alert("Llena Dirección de Origen y Dirección de Destino");return;}
  let km=1.5, tiempo=8, baseMoto=35, baseCarro=55;
@@ -203,7 +199,6 @@ document.getElementById("calculateButton").onclick=async()=>{
  document.getElementById('carroPrice').innerText=`$${baseCarro} MXN`;
  lucide.createIcons();
 };
-
 function volver(){ document.getElementById('panel2').classList.remove('show'); }
 function seleccionar(t){
  tipo=t;
@@ -212,6 +207,7 @@ function seleccionar(t){
  const btn=document.getElementById('btnElegir'); btn.classList.add('ready');
  if(t==='moto') document.getElementById('btnTxt').innerText=`Elegir Moto • $${datosViaje.precioMoto} MXN`;
  else document.getElementById('btnTxt').innerText=`Elegir Carro • $${datosViaje.precioCarro} MXN`;
+ lucide.createIcons();
 }
 function confirmarViaje(){
  if(!tipo){alert('Selecciona Moto o Carro');return;}
@@ -224,4 +220,4 @@ document.addEventListener("click",e=>{if(!e.target.closest('.input-wrap')){picku
 lucide.createIcons();
 </script>
 </body>
- </html>
+</html>
