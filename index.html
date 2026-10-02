@@ -30,14 +30,16 @@
 .btn-icon.loc{background:#2563eb;border:none;width:30px;height:30px;box-shadow:0 2px 8px rgba(37,99,235,.3)}
 .btn-icon.clear{display:none}
 .btn-cotizar{width:100%;padding:14px;border:none;border-radius:14px;background:#E53935;color:#fff;font-weight:900;font-size:14px;margin-top:10px;cursor:pointer;box-shadow:0 8px 20px rgba(229,57,53,.3);display:flex;align-items:center;justify-content:center;gap:8px}
-.card{border-radius:20px;padding:16px;display:flex;gap:14px;align-items:center;background:#ffffff;border:2px solid #eeeeee;cursor:pointer;margin-bottom:14px;transition:.2s;box-shadow:0 2px 10px rgba(0,0,0,.04)}
-.card.active{border-color:#E53935;background:#fff5f5;box-shadow:0 0 0 2px rgba(229,57,53,.15), 0 0 22px rgba(229,57,53,.25)}
+.card{border-radius:16px;padding:12px 12px;display:flex;gap:10px;align-items:center;background:#ffffff;border:1.5px solid #eeeeee;cursor:pointer;margin-bottom:10px;transition:.2s;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.card.active{border-color:#E53935;background:#fff5f5;box-shadow:0 0 0 2px rgba(229,57,53,.12), 0 0 18px rgba(229,57,53,.20)}
 .card.disabled{opacity:.4;pointer-events:none;filter:grayscale(1)}
-.card-left{width:88px;height:68px;background:#f7f7f8;border-radius:14px;display:flex;align-items:center;justify-content:center;border:1px solid #eee}
-.card-title{color:#111;font-weight:900;font-size:16px}.card-pass{color:#666;font-size:12px;margin-top:3px;display:flex;align-items:center;gap:4px}
-.price{font-size:22px;font-weight:900;color:#E53935;margin-left:auto;text-shadow:0 0 8px rgba(229,57,53,.35)}
-.btn-elegir{margin-top:12px;width:100%;height:56px;border-radius:16px;border:none;background:#eeeeee;color:#999;font-weight:900;font-size:15px}
-.btn-elegir.ready{background:#E53935;color:#fff;box-shadow:0 0 20px rgba(229,57,53,.45)}
+.card-left{width:66px;height:52px;background:#f7f7f8;border-radius:12px;display:flex;align-items:center;justify-content:center;border:1px solid #eee;flex-shrink:0}
+.card-left img{width:52px !important}
+.card-title{color:#111;font-weight:900;font-size:14px}
+.card-pass{color:#666;font-size:11px;margin-top:2px;display:flex;align-items:center;gap:4px}
+.price{font-size:18px;font-weight:900;color:#E53935;margin-left:auto;text-shadow:0 0 8px rgba(229,57,53,.25)}
+.btn-elegir{margin-top:16px;width:100%;height:62px;border-radius:16px;border:none;background:#eeeeee;color:#999;font-weight:900;font-size:15px;letter-spacing:.2px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.btn-elegir.ready{background:#E53935;color:#fff;box-shadow:0 8px 22px rgba(229,57,53,.45)}
 .bottom-nav{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);width:calc(100% - 24px);max-width:480px;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(0,0,0,.06);border-radius:20px;padding:8px;display:flex;gap:8px;z-index:2000;box-shadow:0 10px 30px rgba(0,0,0,.15), 0 2px 8px rgba(0,0,0,.08)}
 .btn-nav{flex:1;height:52px;border-radius:14px;border:none;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:.25s}
 .btn-nav.inicio{background:#111;color:#fff;box-shadow:0 4px 12px rgba(0,0,0,.2)}
@@ -222,12 +224,12 @@
 <h2 style="color:#111;margin:0 0 4px;font-size:22px;font-weight:900">Elige tu viaje</h2>
 <div id="rutaSub" style="color:#666;font-size:12px;margin-bottom:14px">Selecciona tu transporte - Google Maps</div>
 <div id="cardMoto" class="card" onclick="seleccionar('moto')">
-<div class="card-left"><img src="https://img.icons8.com/3d-fluency/94/motorcycle.png" style="width:70px"></div>
+<div class="card-left"><img src="https://img.icons8.com/3d-fluency/94/motorcycle.png"></div>
 <div style="flex:1"><div class="card-title">Moto</div><div class="card-pass"><i data-lucide="user" style="width:12px;pointer-events:none"></i> 1 pasajero</div><div style="color:#888;font-size:11px;margin-top:4px" id="motoTime">--</div></div>
 <div class="price" id="motoPrice">$--</div>
 </div>
 <div id="cardCarro" class="card" onclick="seleccionar('carro')">
-<div class="card-left"><img src="https://img.icons8.com/3d-fluency/94/car.png" style="width:70px"></div>
+<div class="card-left"><img src="https://img.icons8.com/3d-fluency/94/car.png"></div>
 <div style="flex:1"><div class="card-title">Carro</div><div class="card-pass"><i data-lucide="users" style="width:12px;pointer-events:none"></i> Hasta 4 pasajeros</div><div style="color:#888;font-size:11px;margin-top:4px" id="carroTime">--</div></div>
 <div class="price" id="carroPrice">$--</div>
 </div>
@@ -319,48 +321,27 @@ function initGoogleMaps(){
   directionsService = new google.maps.DirectionsService();
   directionsRenderer = new google.maps.DirectionsRenderer({map:map,suppressMarkers:true,polylineOptions:{strokeColor:"#E53935",strokeWeight:6,strokeOpacity:0.9}});
   directionsRendererConfirm = new google.maps.DirectionsRenderer({map:mapConfirm,suppressMarkers:true,polylineOptions:{strokeColor:"#E53935",strokeWeight:6,strokeOpacity:0.9}});
-
   const pickupInput = document.getElementById("pickupInput");
   const destInput = document.getElementById("destinationInput");
-
   const autoPickup = new google.maps.places.Autocomplete(pickupInput,{componentRestrictions:{country:["mx"]},fields:["geometry","formatted_address","name"]});
   autoPickup.addListener("place_changed",()=>{
-    const p=autoPickup.getPlace();
-    if(!p.geometry) return;
-    pickupLat=p.geometry.location.lat();
-    pickupLng=p.geometry.location.lng();
-    pickupName=p.name||p.formatted_address;
+    const p=autoPickup.getPlace(); if(!p.geometry) return;
+    pickupLat=p.geometry.location.lat(); pickupLng=p.geometry.location.lng(); pickupName=p.name||p.formatted_address;
     if(pickupMarker) pickupMarker.setMap(null);
     pickupMarker=new google.maps.Marker({position:p.geometry.location,map:map,icon:{path:google.maps.SymbolPath.CIRCLE,scale:10,fillColor:"#16a34a",fillOpacity:1,strokeColor:"#fff",strokeWeight:3}});
-    map.setCenter(p.geometry.location); map.setZoom(16);
-    mostrarX();
-    if(destinationLat) trazarRutaGoogle();
+    map.setCenter(p.geometry.location); map.setZoom(16); mostrarX(); if(destinationLat) trazarRutaGoogle();
   });
-
   const autoDest = new google.maps.places.Autocomplete(destInput,{componentRestrictions:{country:["mx"]},fields:["geometry","formatted_address","name"]});
   autoDest.addListener("place_changed",()=>{
-    const p=autoDest.getPlace();
-    if(!p.geometry) return;
-    destinationLat=p.geometry.location.lat();
-    destinationLng=p.geometry.location.lng();
-    destName=p.name||p.formatted_address;
+    const p=autoDest.getPlace(); if(!p.geometry) return;
+    destinationLat=p.geometry.location.lat(); destinationLng=p.geometry.location.lng(); destName=p.name||p.formatted_address;
     if(destinationMarker) destinationMarker.setMap(null);
     destinationMarker=new google.maps.Marker({position:p.geometry.location,map:map,icon:{path:google.maps.SymbolPath.CIRCLE,scale:10,fillColor:"#dc2626",fillOpacity:1,strokeColor:"#fff",strokeWeight:3}});
-    map.setCenter(p.geometry.location); map.setZoom(16);
-    mostrarXDestino();
-    if(pickupLat) trazarRutaGoogle();
+    map.setCenter(p.geometry.location); map.setZoom(16); mostrarXDestino(); if(pickupLat) trazarRutaGoogle();
   });
-
-  mapConfirm.addListener("click",(e)=>{
-    finalPickupLat=e.latLng.lat(); finalPickupLng=e.latLng.lng();
-    if(markerConfirm) markerConfirm.setPosition(e.latLng); else markerConfirm=new google.maps.Marker({position:e.latLng,map:mapConfirm,draggable:true});
-    actualizarDireccionConfirm(finalPickupLat,finalPickupLng);
-  });
-
-  lucide.createIcons();
-  detectarLluviaDolores();
+  mapConfirm.addListener("click",(e)=>{ finalPickupLat=e.latLng.lat(); finalPickupLng=e.latLng.lng(); if(markerConfirm) markerConfirm.setPosition(e.latLng); else markerConfirm=new google.maps.Marker({position:e.latLng,map:mapConfirm,draggable:true}); actualizarDireccionConfirm(finalPickupLat,finalPickupLng); });
+  lucide.createIcons(); detectarLluviaDolores();
 }
-
 function trazarRutaGoogle(){
   if(!pickupLat||!destinationLat) return;
   directionsService.route({origin:{lat:pickupLat,lng:pickupLng},destination:{lat:destinationLat,lng:destinationLng},travelMode:google.maps.TravelMode.DRIVING,provideRouteAlternatives:true},(res,sta)=>{
@@ -371,49 +352,27 @@ function trazarRutaGoogle(){
     directionsRenderer.setDirections(res); directionsRenderer.setRouteIndex(idx);
   });
 }
-
-// X QUE APARECE AL ESCRIBIR - ORIGEN Y DESTINO
 function mostrarX(){ const b=document.getElementById("btnClearOrigen"); if(!b) return; b.style.display=document.getElementById("pickupInput").value.length>0?'flex':'none'; }
 function mostrarXDestino(){ const b=document.getElementById("btnClearDestino"); if(!b) return; b.style.display=document.getElementById("destinationInput").value.length>0?'flex':'none'; }
-function limpiarOrigen(){
-  document.getElementById("pickupInput").value=""; pickupLat=null; pickupLng=null; pickupName="";
-  document.getElementById("btnClearOrigen").style.display='none';
-  if(pickupMarker){ pickupMarker.setMap(null); pickupMarker=null; }
-  if(directionsRenderer) directionsRenderer.setDirections({routes:[]});
-}
-function limpiarDestino(){
-  document.getElementById("destinationInput").value=""; destinationLat=null; destinationLng=null; destName="";
-  const bd=document.getElementById("btnClearDestino"); if(bd) bd.style.display='none';
-  if(destinationMarker){ destinationMarker.setMap(null); destinationMarker=null; }
-  if(directionsRenderer) directionsRenderer.setDirections({routes:[]});
-}
-
+function limpiarOrigen(){ document.getElementById("pickupInput").value=""; pickupLat=null; pickupLng=null; pickupName=""; document.getElementById("btnClearOrigen").style.display='none'; if(pickupMarker){ pickupMarker.setMap(null); pickupMarker=null; } if(directionsRenderer) directionsRenderer.setDirections({routes:[]}); }
+function limpiarDestino(){ document.getElementById("destinationInput").value=""; destinationLat=null; destinationLng=null; destName=""; const bd=document.getElementById("btnClearDestino"); if(bd) bd.style.display='none'; if(destinationMarker){ destinationMarker.setMap(null); destinationMarker=null; } if(directionsRenderer) directionsRenderer.setDirections({routes:[]}); }
 async function usarMiUbicacion(){
   navigator.geolocation.getCurrentPosition(pos=>{
-    pickupLat=pos.coords.latitude; pickupLng=pos.coords.longitude;
-    const ll={lat:pickupLat,lng:pickupLng};
-    geocoder.geocode({location:ll},(res,sta)=>{
-      if(sta==="OK"&&res[0]){ document.getElementById("pickupInput").value=res[0].formatted_address.split(",").slice(0,3).join(", "); pickupName=res[0].formatted_address; }
-      else{ document.getElementById("pickupInput").value="Mi ubicación"; pickupName="Mi ubicación"; }
-      mostrarX();
-    });
+    pickupLat=pos.coords.latitude; pickupLng=pos.coords.longitude; const ll={lat:pickupLat,lng:pickupLng};
+    geocoder.geocode({location:ll},(res,sta)=>{ if(sta==="OK"&&res[0]){ document.getElementById("pickupInput").value=res[0].formatted_address.split(",").slice(0,3).join(", "); pickupName=res[0].formatted_address; } else{ document.getElementById("pickupInput").value="Mi ubicación"; pickupName="Mi ubicación"; } mostrarX(); });
     if(pickupMarker) pickupMarker.setMap(null);
     pickupMarker=new google.maps.Marker({position:ll,map:map,icon:{path:google.maps.SymbolPath.CIRCLE,scale:10,fillColor:"#16a34a",fillOpacity:1,strokeColor:"#fff",strokeWeight:3}});
-    map.setCenter(ll); map.setZoom(17);
-    if(destinationLat) trazarRutaGoogle();
+    map.setCenter(ll); map.setZoom(17); if(destinationLat) trazarRutaGoogle();
   });
 }
-
 document.getElementById("calculateButton").onclick=()=>{
   if(!pickupLat||!destinationLat){ alert("Llena origen y destino con Google Maps"); return; }
   directionsService.route({origin:{lat:pickupLat,lng:pickupLng},destination:{lat:destinationLat,lng:destinationLng},travelMode:google.maps.TravelMode.DRIVING,provideRouteAlternatives:true},(res,sta)=>{
     if(sta!=="OK"||!res.routes.length){ alert("No se pudo calcular ruta"); return; }
     let best=res.routes[0]; let bestDist=best.legs[0].distance.value;
     for(let r of res.routes){ if(r.legs[0].distance.value<bestDist){ best=r; bestDist=r.legs[0].distance.value; } }
-    const idx=res.routes.indexOf(best);
-    directionsRenderer.setDirections(res); directionsRenderer.setRouteIndex(idx);
-    const leg=best.legs[0];
-    let km=leg.distance.value/1000; let tiempo=Math.ceil(leg.duration.value/60);
+    const idx=res.routes.indexOf(best); directionsRenderer.setDirections(res); directionsRenderer.setRouteIndex(idx);
+    const leg=best.legs[0]; let km=leg.distance.value/1000; let tiempo=Math.ceil(leg.duration.value/60);
     let baseMoto=cfg.baseMoto, baseCarro=cfg.baseCarro;
     if(leg.distance.value>2000){ let e=leg.distance.value-2000; baseMoto=cfg.baseMoto+Math.ceil(e/650)*cfg.extraMoto; baseCarro=cfg.baseCarro+Math.ceil(e/650)*cfg.extraCarro; }
     if(distMts(pickupLat,pickupLng,CENTRO.lat,CENTRO.lng)>800 && distMts(destinationLat,destinationLng,CENTRO.lat,CENTRO.lng)>800){ baseMoto+=5; baseCarro+=10; }
@@ -426,7 +385,6 @@ document.getElementById("calculateButton").onclick=()=>{
     aplicarDisponibilidad(); lucide.createIcons();
   });
 };
-
 function volver(){ document.getElementById('panel2').classList.remove('show'); }
 function seleccionar(t){
  if(t==='moto'&&!cfg.motoDisp){alert('Moto no disponible');return;}
@@ -445,20 +403,17 @@ function abrirMapaConfirm(){
  document.getElementById('txtDistConfirm').innerText=datosViaje.distKm+' km';
  document.getElementById('imgTransporteConfirm').src=tipo==='moto'?'https://img.icons8.com/3d-fluency/94/motorcycle.png':'https://img.icons8.com/3d-fluency/94/car.png';
  setTimeout(()=>{
-   const pos={lat:pickupLat,lng:pickupLng};
-   mapConfirm.setCenter(pos); mapConfirm.setZoom(18);
+   const pos={lat:pickupLat,lng:pickupLng}; mapConfirm.setCenter(pos); mapConfirm.setZoom(18);
    if(markerConfirm) markerConfirm.setMap(null);
    markerConfirm=new google.maps.Marker({position:pos,map:mapConfirm,draggable:true});
    markerConfirm.addListener('dragend',e=>{ finalPickupLat=e.latLng.lat(); finalPickupLng=e.latLng.lng(); actualizarDireccionConfirm(finalPickupLat,finalPickupLng); });
-   directionsRendererConfirm.setDirections({routes:[]});
-   google.maps.event.trigger(mapConfirm,'resize');
+   directionsRendererConfirm.setDirections({routes:[]}); google.maps.event.trigger(mapConfirm,'resize');
  },200);
 }
 function recalcularPrecioTiempoReal(lat,lng){
   directionsService.route({origin:{lat:lat,lng:lng},destination:{lat:destinationLat,lng:destinationLng},travelMode:google.maps.TravelMode.DRIVING},(res,sta)=>{
     if(sta!=="OK"||!res.routes.length) return;
-    const leg=res.routes[0].legs[0];
-    const km=leg.distance.value/1000; const tiempo=Math.ceil(leg.duration.value/60);
+    const leg=res.routes[0].legs[0]; const km=leg.distance.value/1000; const tiempo=Math.ceil(leg.duration.value/60);
     let baseMoto=cfg.baseMoto, baseCarro=cfg.baseCarro;
     if(leg.distance.value>2000){ let e=leg.distance.value-2000; baseMoto=cfg.baseMoto+Math.ceil(e/650)*cfg.extraMoto; baseCarro=cfg.baseCarro+Math.ceil(e/650)*cfg.extraCarro; }
     if(distMts(lat,lng,CENTRO.lat,CENTRO.lng)>800 && distMts(destinationLat,destinationLng,CENTRO.lat,CENTRO.lng)>800){ baseMoto+=5; baseCarro+=10; }
@@ -471,19 +426,10 @@ function recalcularPrecioTiempoReal(lat,lng){
   });
 }
 function actualizarDireccionConfirm(lat,lng){
-  geocoder.geocode({location:{lat:lat,lng:lng}},(res,sta)=>{
-    if(sta==="OK"&&res[0]){ document.getElementById('txtPickupConfirm').innerText=res[0].formatted_address.split(",").slice(0,3).join(", "); }
-  });
+  geocoder.geocode({location:{lat:lat,lng:lng}},(res,sta)=>{ if(sta==="OK"&&res[0]){ document.getElementById('txtPickupConfirm').innerText=res[0].formatted_address.split(",").slice(0,3).join(", "); } });
   recalcularPrecioTiempoReal(lat,lng);
 }
-function usarMiUbicacionConfirm(){
-  navigator.geolocation.getCurrentPosition(pos=>{
-    finalPickupLat=pos.coords.latitude; finalPickupLng=pos.coords.longitude;
-    const ll={lat:finalPickupLat,lng:finalPickupLng};
-    markerConfirm.setPosition(ll); mapConfirm.setCenter(ll); mapConfirm.setZoom(18);
-    actualizarDireccionConfirm(finalPickupLat,finalPickupLng);
-  });
-}
+function usarMiUbicacionConfirm(){ navigator.geolocation.getCurrentPosition(pos=>{ finalPickupLat=pos.coords.latitude; finalPickupLng=pos.coords.longitude; const ll={lat:finalPickupLat,lng:finalPickupLng}; markerConfirm.setPosition(ll); mapConfirm.setCenter(ll); mapConfirm.setZoom(18); actualizarDireccionConfirm(finalPickupLat,finalPickupLng); }); }
 function volverMapa(){ document.getElementById('panel3').classList.remove('show'); document.getElementById('panel2').classList.add('show'); }
 function confirmarViajeFinal(){
  let precio=tipo==='moto'?datosViaje.precioMoto:datosViaje.precioCarro;
@@ -499,67 +445,18 @@ function confirmarViajeFinal(){
 function switchTab(name){ document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active')); document.getElementById('tab-'+name).classList.add('active'); const m={'ajustes':0,'config':1,'registros':2,'estadisticas':3}; const tabs=document.querySelectorAll('.tab'); if(m[name]!==undefined) tabs[m[name]].classList.add('active'); }
 function abrirAdmin(){ if(localStorage.getItem('kigo_admin_sesion')==='1'){ document.getElementById('panelAdmin').style.display='flex'; cargarAdmin(); detectarLluviaDolores(); return; } document.getElementById('modalAdmin').classList.add('show'); }
 function cerrarAdmin(){ document.getElementById('modalAdmin').classList.remove('show'); }
-function irInicioForzado(){
- const p=document.getElementById('panelAdmin'); if(p) p.style.display='none';
- document.getElementById('panel2').classList.remove('show');
- document.getElementById('panel3').classList.remove('show');
- document.getElementById('modalAdmin').classList.remove('show');
- document.getElementById('btnNavInicio').classList.add('active');
- document.getElementById('btnNavAdmin').classList.remove('active');
- setTimeout(()=>{ if(map) google.maps.event.trigger(map,'resize'); if(mapConfirm) google.maps.event.trigger(mapConfirm,'resize'); },150);
-}
+function irInicioForzado(){ const p=document.getElementById('panelAdmin'); if(p) p.style.display='none'; document.getElementById('panel2').classList.remove('show'); document.getElementById('panel3').classList.remove('show'); document.getElementById('modalAdmin').classList.remove('show'); document.getElementById('btnNavInicio').classList.add('active'); document.getElementById('btnNavAdmin').classList.remove('active'); setTimeout(()=>{ if(map) google.maps.event.trigger(map,'resize'); if(mapConfirm) google.maps.event.trigger(mapConfirm,'resize'); },150); }
 function irInicio(){ irInicioForzado(); }
 function loginAdmin(){ const u=document.getElementById('adminUser').value.trim(); const p=document.getElementById('adminPass').value.trim(); if(u==='admin'&&p==='0831'){ localStorage.setItem('kigo_admin_sesion','1'); document.getElementById('modalAdmin').classList.remove('show'); document.getElementById('panelAdmin').style.display='flex'; cargarAdmin(); detectarLluviaDolores(); }else{ document.getElementById('adminError').style.display='block'; } }
-function cargarAdmin(){
- const g=(id)=>document.getElementById(id);
- if(g('cfgNombre')) g('cfgNombre').value=cfg.nombre;
- if(g('cfgMoto')) g('cfgMoto').value=cfg.baseMoto;
- if(g('cfgCarro')) g('cfgCarro').value=cfg.baseCarro;
- if(g('cfgExtraMoto')) g('cfgExtraMoto').value=cfg.extraMoto;
- if(g('cfgExtraCarro')) g('cfgExtraCarro').value=cfg.extraCarro;
- if(g('cfgLluviaLeve')) g('cfgLluviaLeve').value=cfg.precioLeve;
- if(g('cfgLluviaMod')) g('cfgLluviaMod').value=cfg.precioMod;
- if(g('cfgLluviaFuerte')) g('cfgLluviaFuerte').value=cfg.precioFuerte;
- if(g('nombrePlataformaTitulo')) g('nombrePlataformaTitulo').innerText=cfg.nombre+' • Admin';
- aplicarDisponibilidad(); actualizarStats(); actualizarBotonesLluvia();
-}
-function guardarAjustes(){
- const g=(id)=>document.getElementById(id);
- if(g('cfgNombre')&&g('cfgNombre').value) cfg.nombre=g('cfgNombre').value;
- if(g('cfgMoto')) cfg.baseMoto=parseInt(g('cfgMoto').value)||35;
- if(g('cfgCarro')) cfg.baseCarro=parseInt(g('cfgCarro').value)||55;
- if(g('cfgExtraMoto')) cfg.extraMoto=parseInt(g('cfgExtraMoto').value)||5;
- if(g('cfgExtraCarro')) cfg.extraCarro=parseInt(g('cfgExtraCarro').value)||8;
- if(g('cfgLluviaLeve')) cfg.precioLeve=parseInt(g('cfgLluviaLeve').value)||0;
- if(g('cfgLluviaMod')) cfg.precioMod=parseInt(g('cfgLluviaMod').value)||5;
- if(g('cfgLluviaFuerte')) cfg.precioFuerte=parseInt(g('cfgLluviaFuerte').value)||10;
- pushConfig();
- alert('✅ Guardado y sincronizado a TODOS - Google Maps');
-}
+function cargarAdmin(){ const g=(id)=>document.getElementById(id); if(g('cfgNombre')) g('cfgNombre').value=cfg.nombre; if(g('cfgMoto')) g('cfgMoto').value=cfg.baseMoto; if(g('cfgCarro')) g('cfgCarro').value=cfg.baseCarro; if(g('cfgExtraMoto')) g('cfgExtraMoto').value=cfg.extraMoto; if(g('cfgExtraCarro')) g('cfgExtraCarro').value=cfg.extraCarro; if(g('cfgLluviaLeve')) g('cfgLluviaLeve').value=cfg.precioLeve; if(g('cfgLluviaMod')) g('cfgLluviaMod').value=cfg.precioMod; if(g('cfgLluviaFuerte')) g('cfgLluviaFuerte').value=cfg.precioFuerte; if(g('nombrePlataformaTitulo')) g('nombrePlataformaTitulo').innerText=cfg.nombre+' • Admin'; aplicarDisponibilidad(); actualizarStats(); actualizarBotonesLluvia(); }
+function guardarAjustes(){ const g=(id)=>document.getElementById(id); if(g('cfgNombre')&&g('cfgNombre').value) cfg.nombre=g('cfgNombre').value; if(g('cfgMoto')) cfg.baseMoto=parseInt(g('cfgMoto').value)||35; if(g('cfgCarro')) cfg.baseCarro=parseInt(g('cfgCarro').value)||55; if(g('cfgExtraMoto')) cfg.extraMoto=parseInt(g('cfgExtraMoto').value)||5; if(g('cfgExtraCarro')) cfg.extraCarro=parseInt(g('cfgExtraCarro').value)||8; if(g('cfgLluviaLeve')) cfg.precioLeve=parseInt(g('cfgLluviaLeve').value)||0; if(g('cfgLluviaMod')) cfg.precioMod=parseInt(g('cfgLluviaMod').value)||5; if(g('cfgLluviaFuerte')) cfg.precioFuerte=parseInt(g('cfgLluviaFuerte').value)||10; pushConfig(); alert('✅ Guardado y sincronizado a TODOS - Google Maps'); }
 function toggleVehiculo(t){ if(t==='moto') cfg.motoDisp=!cfg.motoDisp; if(t==='carro') cfg.carroDisp=!cfg.carroDisp; pushConfig(); cargarAdmin(); }
-function aplicarDisponibilidad(){
- const m=document.getElementById('cardMoto'); const c=document.getElementById('cardCarro');
- if(m){ if(cfg.motoDisp) m.classList.remove('disabled'); else m.classList.add('disabled'); }
- if(c){ if(cfg.carroDisp) c.classList.remove('disabled'); else c.classList.add('disabled'); }
- const tm=document.getElementById('toggleMoto'); if(tm) tm.className=cfg.motoDisp?'toggle on':'toggle';
- const tc=document.getElementById('toggleCarro'); if(tc) tc.className=cfg.carroDisp?'toggle on':'toggle';
- const em=document.getElementById('estadoMotoTxt'); if(em) em.innerText=cfg.motoDisp?'Disponible':'Bloqueado';
- const ec=document.getElementById('estadoCarroTxt'); if(ec) ec.innerText=cfg.carroDisp?'Disponible':'Bloqueado';
-}
+function aplicarDisponibilidad(){ const m=document.getElementById('cardMoto'); const c=document.getElementById('cardCarro'); if(m){ if(cfg.motoDisp) m.classList.remove('disabled'); else m.classList.add('disabled'); } if(c){ if(cfg.carroDisp) c.classList.remove('disabled'); else c.classList.add('disabled'); } const tm=document.getElementById('toggleMoto'); if(tm) tm.className=cfg.motoDisp?'toggle on':'toggle'; const tc=document.getElementById('toggleCarro'); if(tc) tc.className=cfg.carroDisp?'toggle on':'toggle'; const em=document.getElementById('estadoMotoTxt'); if(em) em.innerText=cfg.motoDisp?'Disponible':'Bloqueado'; const ec=document.getElementById('estadoCarroTxt'); if(ec) ec.innerText=cfg.carroDisp?'Disponible':'Bloqueado'; }
 function actualizarStats(){ let hist=JSON.parse(localStorage.getItem('kigo_hist')||'[]'); document.getElementById('statTotal').innerText=hist.length; document.getElementById('statMoto').innerText=hist.filter(h=>h.tipo==='moto').length; document.getElementById('statCarro').innerText=hist.filter(h=>h.tipo==='carro').length; let box=document.getElementById('historialBox'); if(!hist.length){ box.innerHTML='<div style="text-align:center;padding:20px;color:#999;font-size:12px">Sin historial</div>'; return; } box.innerHTML=hist.map(h=>`<div style="padding:10px;border-bottom:1px solid #f0f0f0"><b>${h.tipo.toUpperCase()} $${h.precio} ${h.km}km</b><br><small>${h.origen} → ${h.destino}</small><br><small>${h.fecha}</small></div>`).join(''); }
 function borrarHistorial(){ if(confirm('Borrar?')){ localStorage.removeItem('kigo_hist'); actualizarStats(); } }
 function cerrarSesionAdmin(){ localStorage.removeItem('kigo_admin_sesion'); irInicioForzado(); }
-
-if(db){
-  db.ref('config').on('value',snap=>{
-    const data=snap.val(); if(!data) return;
-    isSyncing=true;
-    cfg=data; localStorage.setItem('kigo_cfg',JSON.stringify(cfg));
-    cargarAdmin(); aplicarDisponibilidad(); actualizarUIClima(); actualizarWeatherWidget();
-    isSyncing=false;
-  });
-}
+if(db){ db.ref('config').on('value',snap=>{ const data=snap.val(); if(!data) return; isSyncing=true; cfg=data; localStorage.setItem('kigo_cfg',JSON.stringify(cfg)); cargarAdmin(); aplicarDisponibilidad(); actualizarUIClima(); actualizarWeatherWidget(); isSyncing=false; }); }
 </script>
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCTV1sm6McEIkv-cheaVFCD_svp_a--6wg&libraries=places&callback=initGoogleMaps"></script>
 </body>
-</html>
+</html>  
