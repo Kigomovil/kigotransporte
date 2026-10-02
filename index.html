@@ -246,7 +246,7 @@
 <div id="alertaLluviaConfirm" style="display:none;background:#dbeafe;border:1px solid #bfdbfe;border-radius:12px;padding:8px 12px;margin-bottom:12px;font-size:11px;font-weight:700;color:#1e40af"></div>
 <div style="background:#f7f7f8;border:1px solid #eee;border-radius:16px;padding:14px;display:flex;gap:10px;align-items:center;margin-bottom:14px"><div style="width:40px;height:40px;background:#E53935;border-radius:10px;display:flex;align-items:center;justify-content:center"><i data-lucide="map-pin" style="width:18px;color:#fff;pointer-events:none"></i></div><div style="flex:1"><div style="color:#111;font-weight:800;font-size:13px">Punto de recogida</div><div id="txtPickupConfirm" style="color:#666;font-size:11px">Cargando...</div></div><button type="button" onclick="usarMiUbicacionConfirm()" style="background:#111;border:none;color:#fff;border-radius:8px;padding:8px 10px;font-size:11px;font-weight:700">Mi ubicación</button></div>
 <div style="background:#ffffff;border:1px solid #eee;border-radius:16px;padding:14px;display:flex;gap:10px;align-items:center;margin-bottom:18px"><div style="width:40px;height:40px;background:#f7f7f8;border:1px solid #eee;border-radius:10px;display:flex;align-items:center;justify-content:center"><img id="imgTransporteConfirm" src="" style="width:32px"></div><div><div id="txtTransporteConfirm" style="color:#111;font-weight:800;font-size:14px">Moto</div><div id="txtPrecioConfirm" style="color:#E53935;font-size:13px;font-weight:900">$35 MXN</div></div><div id="txtDistConfirm" style="margin-left:auto;color:#111;font-weight:900;font-size:13px">1.5 km</div></div>
-<button type="button" onclick="confirmarViajeFinal()" style="width:100%;height:56px;border-radius:16px;border:none;background:#E53935;color:#fff;font-weight:900;font-size:15px">CONFIRMAR RECOGIDA</button>
+<button type="button" onclick="confirmarViajeFinal()" style="width:100%;height:62px;border-radius:16px;border:none;background:#E53935;color:#fff;font-weight:900;font-size:15px;letter-spacing:.3px;box-shadow:0 8px 22px rgba(229,57,53,.45)">CONFIRMAR RECOGIDA</button>
 </div>
 </div>
 <script>
@@ -431,17 +431,42 @@ function actualizarDireccionConfirm(lat,lng){
 }
 function usarMiUbicacionConfirm(){ navigator.geolocation.getCurrentPosition(pos=>{ finalPickupLat=pos.coords.latitude; finalPickupLng=pos.coords.longitude; const ll={lat:finalPickupLat,lng:finalPickupLng}; markerConfirm.setPosition(ll); mapConfirm.setCenter(ll); mapConfirm.setZoom(18); actualizarDireccionConfirm(finalPickupLat,finalPickupLng); }); }
 function volverMapa(){ document.getElementById('panel3').classList.remove('show'); document.getElementById('panel2').classList.add('show'); }
+
+// MENSAJE ORGANIZADO + WHATSAPP FIJO 4182371993
 function confirmarViajeFinal(){
  let precio=tipo==='moto'?datosViaje.precioMoto:datosViaje.precioCarro;
- let contador=parseInt(localStorage.getItem('kigo_contador')||'0')+1; localStorage.setItem('kigo_contador',contador.toString());
- let ahora=new Date(); let hora=ahora.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit',hour12:true}); let fecha=ahora.toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'});
+ let contador=parseInt(localStorage.getItem('kigo_contador')||'0')+1;
+ localStorage.setItem('kigo_contador',contador.toString());
+ let ahora=new Date();
+ let hora=ahora.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit',hour12:true});
+ let fecha=ahora.toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'});
+ let linkOrigen=`https://www.google.com/maps?q=${finalPickupLat},${finalPickupLng}`;
+ let linkDestino=`https://www.google.com/maps?q=${datosViaje.destLat},${datosViaje.destLng}`;
  let linkRuta=`https://www.google.com/maps/dir/${finalPickupLat},${finalPickupLng}/${datosViaje.destLat},${datosViaje.destLng}`;
- let linkPunto=`https://www.google.com/maps?q=${finalPickupLat},${finalPickupLng}`;
- let lluviaLinea=''; if(datosViaje.lluviaExtra>0) lluviaLinea=`🌧️ CLIMA: ${datosViaje.lluviaNivel.toUpperCase()} +$${datosViaje.lluviaExtra}\n`;
- let msg=`🏢 *${cfg.nombre.toUpperCase()}*\n⏰ ${hora} - ${fecha}\n#${contador.toString().padStart(4,'0')} - ${tipo.toUpperCase()}\n${lluviaLinea}\n📍 ${pickupName}\n📌 ${linkPunto}\n🏁 ${datosViaje.destino}\n🗺️ ${linkRuta}\n📏 ${datosViaje.distKm} km (Google Maps) - 💰 $${precio} MXN`;
- window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
- let hist=JSON.parse(localStorage.getItem('kigo_hist')||'[]'); hist.unshift({tipo:tipo,precio:precio,fecha:ahora.toLocaleString(),hora:ahora.getHours(),origen:pickupName,destino:destName,km:datosViaje.distKm}); if(hist.length>100) hist=hist.slice(0,100); localStorage.setItem('kigo_hist',JSON.stringify(hist));
+
+ let msg=`*Kigo xpress*
+📅 ${fecha} - ${hora}
+🧾 Pedido #${contador.toString().padStart(4,'0')} - ${tipo.toUpperCase()}
+
+📍 *Dirección de Origen:*
+${pickupName}
+${linkOrigen}
+
+🏁 *Dirección de Destino:*
+${datosViaje.destino}
+${linkDestino}
+
+🗺️ Ruta: ${linkRuta}
+📏 ${datosViaje.distKm} km - ⏱️ ${datosViaje.tiempoMin} min
+💰 *Valor del servicio: $${precio} MXN*`;
+
+ window.open(`https://wa.me/524182371993?text=${encodeURIComponent(msg)}`,'_blank');
+ let hist=JSON.parse(localStorage.getItem('kigo_hist')||'[]');
+ hist.unshift({tipo:tipo,precio:precio,fecha:ahora.toLocaleString(),hora:ahora.getHours(),origen:pickupName,destino:destName,km:datosViaje.distKm});
+ if(hist.length>100) hist=hist.slice(0,100);
+ localStorage.setItem('kigo_hist',JSON.stringify(hist));
 }
+
 function switchTab(name){ document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active')); document.getElementById('tab-'+name).classList.add('active'); const m={'ajustes':0,'config':1,'registros':2,'estadisticas':3}; const tabs=document.querySelectorAll('.tab'); if(m[name]!==undefined) tabs[m[name]].classList.add('active'); }
 function abrirAdmin(){ if(localStorage.getItem('kigo_admin_sesion')==='1'){ document.getElementById('panelAdmin').style.display='flex'; cargarAdmin(); detectarLluviaDolores(); return; } document.getElementById('modalAdmin').classList.add('show'); }
 function cerrarAdmin(){ document.getElementById('modalAdmin').classList.remove('show'); }
@@ -459,4 +484,4 @@ if(db){ db.ref('config').on('value',snap=>{ const data=snap.val(); if(!data) ret
 </script>
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCTV1sm6McEIkv-cheaVFCD_svp_a--6wg&libraries=places&callback=initGoogleMaps"></script>
 </body>
-</html>  
+</html>
