@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Kigo xpress</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
@@ -80,8 +79,8 @@
 </div>
 </div>
 <div id="panel1" class="panel">
-<div class="step"><div style="font-size:11px;font-weight:800;color:#666;margin-bottom:6px">Dirección de Origen.</div><div class="input-wrap"><i data-lucide="map-pin" style="position:absolute;left:12px;width:16px;color:#16a34a;z-index:2"></i><input id="pickupInput" class="colonia-input" placeholder="Ej: Hidalgo 15, Centro..." autocomplete="off"><div class="input-actions"><button id="btnClearOrigen" class="btn-icon clear" onclick="limpiarOrigen()"><i data-lucide="x" style="width:14px"></i></button><button id="btnUbicacion" class="btn-icon loc" onclick="usarMiUbicacion()"><i data-lucide="crosshair" style="width:16px;color:#fff"></i></button></div><div id="pickupSuggestions" class="suggestions"></div></div></div>
-<div class="step"><div style="font-size:11px;font-weight:800;color:#666;margin-bottom:6px">Dirección de Destino.</div><div style="position:relative"><i data-lucide="flag" style="position:absolute;left:12px;top:15px;width:16px;color:#dc2626"></i><input id="destinationInput" class="colonia-input" style="padding-right:14px" placeholder="Ej: Guerrero 20, Lindavista..." autocomplete="off"><div id="destinationSuggestions" class="suggestions"></div></div></div>
+<div class="step"><div style="font-size:11px;font-weight:800;color:#666;margin-bottom:6px">Dirección de Origen (Google Maps).</div><div class="input-wrap"><i data-lucide="map-pin" style="position:absolute;left:12px;width:16px;color:#16a34a;z-index:2"></i><input id="pickupInput" class="colonia-input" placeholder="Ej: Hidalgo 15, Centro..." autocomplete="off"><div class="input-actions"><button id="btnClearOrigen" class="btn-icon clear" onclick="limpiarOrigen()"><i data-lucide="x" style="width:14px"></i></button><button id="btnUbicacion" class="btn-icon loc" onclick="usarMiUbicacion()"><i data-lucide="crosshair" style="width:16px;color:#fff"></i></button></div></div></div>
+<div class="step"><div style="font-size:11px;font-weight:800;color:#666;margin-bottom:6px">Dirección de Destino (Google Maps).</div><div style="position:relative"><i data-lucide="flag" style="position:absolute;left:12px;top:15px;width:16px;color:#dc2626"></i><input id="destinationInput" class="colonia-input" style="padding-right:14px" placeholder="Ej: Guerrero 20, Lindavista..." autocomplete="off"></div></div>
 <button id="calculateButton" class="btn-cotizar">CONFIRMAR DIRECCIÓN</button>
 <div style="height:20px"></div>
 </div>
@@ -102,7 +101,7 @@
 <div id="panelAdmin" style="position:fixed;inset:0;max-width:500px;margin:0 auto;background:#f8f8f9;z-index:4500;display:none;flex-direction:column;overflow-y:auto;padding-bottom:120px">
 <div style="background:#fff;padding:18px 20px 12px;border-bottom:1px solid #eee;position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:12px">
 <button type="button" id="btnBackAdmin" onclick="irInicioForzado()" style="width:42px;height:42px;border-radius:14px;background:#111;color:#fff;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:11"><i data-lucide="arrow-left" style="width:18px;pointer-events:none"></i></button>
-<div><div style="font-weight:900;font-size:18px;color:#111" id="nombrePlataformaTitulo">Kigo Xpress • Admin</div><div style="font-size:11px;color:#16a34a;font-weight:700">Tiempo real ON</div></div>
+<div><div style="font-weight:900;font-size:18px;color:#111" id="nombrePlataformaTitulo">Kigo Xpress • Admin</div><div style="font-size:11px;color:#16a34a;font-weight:700">Tiempo real ON - Google Maps</div></div>
 <div style="margin-left:auto"><button type="button" onclick="cerrarSesionAdmin()" style="background:#fff1f1;border:1px solid #ffdede;color:#E53935;border-radius:10px;padding:8px 12px;font-weight:800;font-size:11px">Cerrar</button></div>
 </div>
 <div class="tabs">
@@ -152,7 +151,7 @@
 <button type="button" onclick="guardarAjustes()" style="width:100%;margin-top:14px;padding:13px;border:none;border-radius:12px;background:#111;color:#fff;font-weight:800">Guardar Lluvia</button>
 </div>
 <div class="admin-card">
-<div style="font-weight:900;color:#111">Configuraciones</div>
+<div style="font-weight:900;color:#111">Configuraciones Google Maps</div>
 <div style="display:flex;gap:10px;margin-top:12px">
 <div style="flex:1"><div style="font-size:11px;font-weight:800;color:#666">$ EXTRA MOTO 650m</div><input id="cfgExtraMoto" type="number" class="input-admin" style="margin-top:6px" value="5"></div>
 <div style="flex:1"><div style="font-size:11px;font-weight:800;color:#666">$ EXTRA CARRO 650m</div><input id="cfgExtraCarro" type="number" class="input-admin" style="margin-top:6px" value="8"></div>
@@ -202,7 +201,7 @@
 <div id="alertaLluviaPanel2" style="display:none;background:#dbeafe;border:1px solid #bfdbfe;border-radius:12px;padding:8px 12px;margin-bottom:10px;font-size:11px;font-weight:700;color:#1e40af"></div>
 <div style="width:40px;height:4px;background:#e5e7eb;border-radius:999px;margin:8px auto 12px"></div>
 <h2 style="color:#111;margin:0 0 4px;font-size:22px;font-weight:900">Elige tu viaje</h2>
-<div id="rutaSub" style="color:#666;font-size:12px;margin-bottom:14px">Selecciona tu transporte</div>
+<div id="rutaSub" style="color:#666;font-size:12px;margin-bottom:14px">Selecciona tu transporte - Google Maps</div>
 <div id="cardMoto" class="card" onclick="seleccionar('moto')">
 <div class="card-left"><img src="https://img.icons8.com/3d-fluency/94/motorcycle.png" style="width:70px"></div>
 <div style="flex:1"><div class="card-title">Moto</div><div class="card-pass"><i data-lucide="user" style="width:12px;pointer-events:none"></i> 1 pasajero</div><div style="color:#888;font-size:11px;margin-top:4px" id="motoTime">--</div></div>
@@ -218,7 +217,7 @@
 <div id="panel3" class="panel3">
 <div style="position:relative;height:58vh;flex-shrink:0">
 <div id="mapConfirm"></div>
-<div style="position:absolute;top:12px;left:12px;right:12px;z-index:999;background:#ffffff;color:#111;border:1px solid #eee;border-radius:16px;padding:12px 14px;display:flex;gap:10px;align-items:center;box-shadow:0 4px 15px rgba(0,0,0,.1)"><button type="button" onclick="volverMapa()" style="width:36px;height:36px;border-radius:50%;background:#f1f1f1;border:1px solid #e5e7eb;display:flex;align-items:center;justify-content:center"><i data-lucide="arrow-left" style="width:16px;color:#111;pointer-events:none"></i></button><div><div style="font-weight:900;font-size:13px;color:#111">Confirma tu punto de recogida</div><div style="font-size:11px;color:#666">Toca el mapa para ajustar</div></div></div>
+<div style="position:absolute;top:12px;left:12px;right:12px;z-index:999;background:#ffffff;color:#111;border:1px solid #eee;border-radius:16px;padding:12px 14px;display:flex;gap:10px;align-items:center;box-shadow:0 4px 15px rgba(0,0,0,.1)"><button type="button" onclick="volverMapa()" style="width:36px;height:36px;border-radius:50%;background:#f1f1f1;border:1px solid #e5e7eb;display:flex;align-items:center;justify-content:center"><i data-lucide="arrow-left" style="width:16px;color:#111;pointer-events:none"></i></button><div><div style="font-weight:900;font-size:13px;color:#111">Confirma tu punto de recogida</div><div style="font-size:11px;color:#666">Toca el mapa para ajustar - Google Maps</div></div></div>
 <div style="position:absolute;bottom:20px;left:50%;transform:translateX(-50%);z-index:999;background:#111;color:#fff;border-radius:999px;padding:8px 14px;font-size:11px;font-weight:800;box-shadow:0 4px 15px rgba(0,0,0,.2)">Mueve el pin - precio en vivo</div>
 </div>
 <div style="background:#ffffff;flex:1;border-radius:28px 28px 0 0;margin-top:-28px;z-index:1000;padding:20px 20px 110px 20px;display:flex;flex-direction:column;box-shadow:0 -10px 30px rgba(0,0,0,.12);border-top:1px solid #eee;overflow-y:auto">
@@ -229,7 +228,6 @@
 <button type="button" onclick="confirmarViajeFinal()" style="width:100%;height:56px;border-radius:16px;border:none;background:#E53935;color:#fff;font-weight:900;font-size:15px">CONFIRMAR RECOGIDA</button>
 </div>
 </div>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyDjxi5qxVVbC7lufDPdBWRUzkiSZ2o9gnE",
@@ -241,16 +239,18 @@ const firebaseConfig = {
   appId: "1:801039406106:web:0ca2bf1d7646849d6a2da3",
   measurementId: "G-W8RKEMYBTP"
 };
-let db=null; try{ firebase.initializeApp(firebaseConfig); db=firebase.database(); }catch(e){ console.error(e); }
+let db=null; try{ firebase.initializeApp(firebaseConfig); db=firebase.database(); }catch(e){}
 const CENTRO={lat:21.1561,lng:-100.9333};
-let pickupLat=null,pickupLng=null,destinationLat=null,destinationLng=null,pickupMarker=null,destinationMarker=null,routeLayer=null,pickupName="",destName="",tipo="",datosViaje={};
-let mapConfirm=null, markerConfirm=null, finalPickupLat=null, finalPickupLng=null, routeConfirmLayer=null;
+let pickupLat=null,pickupLng=null,destinationLat=null,destinationLng=null;
+let pickupMarker=null,destinationMarker=null;
+let map=null,mapConfirm=null,markerConfirm=null;
+let geocoder=null,directionsService=null,directionsRenderer=null,directionsRendererConfirm=null;
+let pickupName="",destName="",tipo="",datosViaje={};
+let finalPickupLat=null,finalPickupLng=null;
 let estadoLluviaActual={nivel:'ninguna',precip:0,txt:'Sin lluvia',extra:0,temp:24,code:0,isDay:1};
 let isSyncing=false;
 let cfg = JSON.parse(localStorage.getItem('kigo_cfg')||'{"nombre":"Kigo Xpress","baseMoto":35,"baseCarro":55,"extraMoto":5,"extraCarro":8,"motoDisp":true,"carroDisp":true,"precioLeve":0,"precioMod":5,"precioFuerte":10,"lluviaNivel":"ninguna","lluviaAuto":true}');
-const map=L.map("map",{zoomControl:false}).setView([CENTRO.lat,CENTRO.lng],14);
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19}).addTo(map);
-const pickupInput=document.getElementById("pickupInput"),destinationInput=document.getElementById("destinationInput"),pickupSuggestions=document.getElementById("pickupSuggestions"),destinationSuggestions=document.getElementById("destinationSuggestions"),btnClear=document.getElementById("btnClearOrigen");
+
 function distMts(a,b,c,d){const R=6371000;const dLat=(c-a)*Math.PI/180;const dLon=(d-b)*Math.PI/180;const x=Math.sin(dLat/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dLon/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
 function getExtraLluviaPorNivel(nivel){ if(nivel==='leve') return parseInt(cfg.precioLeve)||0; if(nivel==='moderada') return parseInt(cfg.precioMod)||5; if(nivel==='fuerte') return parseInt(cfg.precioFuerte)||10; return 0; }
 function iconoClimaReal(code,isDay){ let icon='☀️'; let desc='Soleado'; if(code===0){ icon=isDay?'☀️':'🌙'; desc=isDay?'Soleado':'Noche despejada'; } else if([1].includes(code)){ icon=isDay?'🌤️':'🌙'; desc='Mayormente soleado'; } else if([2].includes(code)){ icon='⛅'; desc='Parcial nublado'; } else if([3].includes(code)){ icon='☁️'; desc='Nublado'; } else if([45,48].includes(code)){ icon='🌫️'; desc='Niebla'; } else if([51,53,55,61,63,65,80,81,82].includes(code)){ icon='🌧️'; desc='Lluvia'; } else if([95,96,99].includes(code)){ icon='⛈️'; desc='Tormenta'; } return {icon,desc}; }
@@ -292,35 +292,114 @@ function pushConfig(){
 }
 function toggleAutoLluvia(){ cfg.lluviaAuto=!cfg.lluviaAuto; pushConfig(); actualizarBotonesLluvia(); if(cfg.lluviaAuto) detectarLluviaDolores(); }
 function setLluviaManual(n){ cfg.lluviaNivel=n; cfg.lluviaAuto=false; pushConfig(); actualizarBotonesLluvia(); }
-async function buscarColonias(t){
-  if(!t||t.length<2) return []; let texto=t.trim(); let res=[]; const viewbox="-100.98,21.10,-100.85,21.20";
-  try{ const q=encodeURIComponent(texto+", Dolores Hidalgo, Guanajuato"); const url=`https://nominatim.openstreetmap.org/search?format=json&q=${q}&limit=8&addressdetails=1&countrycodes=mx&viewbox=${viewbox}&bounded=1`; const r=await fetch(url); const d=await r.json(); res=d.map(x=>({lat:parseFloat(x.lat),lon:parseFloat(x.lon),name:(x.address?.road||x.display_name.split(",")[0]).substring(0,60),direccion:x.display_name})); }catch(e){}
-  return res.slice(0,8);
+
+function initGoogleMaps(){
+  map = new google.maps.Map(document.getElementById("map"),{center:CENTRO,zoom:14,disableDefaultUI:true,zoomControl:false});
+  mapConfirm = new google.maps.Map(document.getElementById("mapConfirm"),{center:CENTRO,zoom:17,disableDefaultUI:true,zoomControl:false});
+  geocoder = new google.maps.Geocoder();
+  directionsService = new google.maps.DirectionsService();
+  directionsRenderer = new google.maps.DirectionsRenderer({map:map,suppressMarkers:true,polylineOptions:{strokeColor:"#E53935",strokeWeight:6,strokeOpacity:0.9}});
+  directionsRendererConfirm = new google.maps.DirectionsRenderer({map:mapConfirm,suppressMarkers:true,polylineOptions:{strokeColor:"#E53935",strokeWeight:6,strokeOpacity:0.9}});
+
+  const pickupInput = document.getElementById("pickupInput");
+  const destInput = document.getElementById("destinationInput");
+
+  const autoPickup = new google.maps.places.Autocomplete(pickupInput,{componentRestrictions:{country:["mx"]},fields:["geometry","formatted_address","name"]});
+  autoPickup.addListener("place_changed",()=>{
+    const p=autoPickup.getPlace();
+    if(!p.geometry) return;
+    pickupLat=p.geometry.location.lat();
+    pickupLng=p.geometry.location.lng();
+    pickupName=p.name||p.formatted_address;
+    if(pickupMarker) pickupMarker.setMap(null);
+    pickupMarker=new google.maps.Marker({position:p.geometry.location,map:map,icon:{path:google.maps.SymbolPath.CIRCLE,scale:10,fillColor:"#16a34a",fillOpacity:1,strokeColor:"#fff",strokeWeight:3}});
+    map.setCenter(p.geometry.location); map.setZoom(16);
+    mostrarX();
+    if(destinationLat) trazarRutaGoogle();
+  });
+
+  const autoDest = new google.maps.places.Autocomplete(destInput,{componentRestrictions:{country:["mx"]},fields:["geometry","formatted_address","name"]});
+  autoDest.addListener("place_changed",()=>{
+    const p=autoDest.getPlace();
+    if(!p.geometry) return;
+    destinationLat=p.geometry.location.lat();
+    destinationLng=p.geometry.location.lng();
+    destName=p.name||p.formatted_address;
+    if(destinationMarker) destinationMarker.setMap(null);
+    destinationMarker=new google.maps.Marker({position:p.geometry.location,map:map,icon:{path:google.maps.SymbolPath.CIRCLE,scale:10,fillColor:"#dc2626",fillOpacity:1,strokeColor:"#fff",strokeWeight:3}});
+    map.setCenter(p.geometry.location); map.setZoom(16);
+    if(pickupLat) trazarRutaGoogle();
+  });
+
+  // Confirm map click
+  mapConfirm.addListener("click",(e)=>{
+    finalPickupLat=e.latLng.lat(); finalPickupLng=e.latLng.lng();
+    if(markerConfirm) markerConfirm.setPosition(e.latLng); else markerConfirm=new google.maps.Marker({position:e.latLng,map:mapConfirm,draggable:true});
+    actualizarDireccionConfirm(finalPickupLat,finalPickupLng);
+  });
+
+  lucide.createIcons();
+  detectarLluviaDolores();
 }
-function mostrar(c,res,tipoS){
- c.innerHTML=""; if(!res.length){c.innerHTML='<div style="padding:14px;text-align:center;font-size:12px;color:#777">Sin resultados</div>';c.classList.add("show");return;}
- res.forEach(r=>{ const el=document.createElement("div"); el.className="suggestion"; el.innerHTML=`<div style="width:32px;height:32px;background:#111;border-radius:50%;display:flex;align-items:center;justify-content:center"><i data-lucide="map-pin" style="width:16px;color:#fff;pointer-events:none"></i></div><div style="flex:1"><div style="font-weight:800;font-size:13px">${r.name}</div><div style="font-size:11px;color:#666">${r.direccion.substring(0,70)}</div></div>`; el.onclick=async()=>{ if(tipoS==="pickup"){ pickupLat=r.lat;pickupLng=r.lon;pickupName=r.name;pickupInput.value=r.name;pickupSuggestions.classList.remove("show"); if(pickupMarker)map.removeLayer(pickupMarker);pickupMarker=L.marker([r.lat,r.lon]).addTo(map); mostrarX(); }else{ destinationLat=r.lat;destinationLng=r.lon;destName=r.name;destinationInput.value=r.name;destinationSuggestions.classList.remove("show"); if(destinationMarker)map.removeLayer(destinationMarker);destinationMarker=L.marker([r.lat,r.lon]).addTo(map); } if(pickupLat&&destinationLat){ try{ const url=`https://router.project-osrm.org/route/v1/driving/${pickupLng},${pickupLat};${destinationLng},${destinationLat}?overview=full&geometries=geojson`; const rr=await fetch(url);const dd=await rr.json(); if(dd.routes&&dd.routes[0]){ if(routeLayer)map.removeLayer(routeLayer); routeLayer=L.geoJSON(dd.routes[0].geometry,{style:{color:"#E53935",weight:6}}).addTo(map); map.fitBounds(routeLayer.getBounds(),{padding:[40,40]}); } }catch(e){} } lucide.createIcons(); }; c.appendChild(el); }); c.classList.add("show"); lucide.createIcons();
+
+function trazarRutaGoogle(){
+  if(!pickupLat||!destinationLat) return;
+  directionsService.route({origin:{lat:pickupLat,lng:pickupLng},destination:{lat:destinationLat,lng:destinationLng},travelMode:google.maps.TravelMode.DRIVING,provideRouteAlternatives:true},(res,sta)=>{
+    if(sta!=="OK"||!res.routes.length) return;
+    let best=res.routes[0]; let bestDist=best.legs[0].distance.value;
+    for(let r of res.routes){ if(r.legs[0].distance.value<bestDist){ best=r; bestDist=r.legs[0].distance.value; } }
+    const idx=res.routes.indexOf(best);
+    directionsRenderer.setDirections(res); directionsRenderer.setRouteIndex(idx);
+  });
 }
-let t1=null;pickupInput.addEventListener("input",function(){mostrarX();if(t1)clearTimeout(t1);if(this.value.trim().length<2){pickupSuggestions.classList.remove("show");return;}t1=setTimeout(async()=>{const res=await buscarColonias(this.value.trim());mostrar(pickupSuggestions,res,"pickup");},200);});
-let t2=null;destinationInput.addEventListener("input",function(){if(t2)clearTimeout(t2);if(this.value.trim().length<2){destinationSuggestions.classList.remove("show");return;}t2=setTimeout(async()=>{const res=await buscarColonias(this.value.trim());mostrar(destinationSuggestions,res,"destination");},200);});
-function mostrarX(){btnClear.style.display=pickupInput.value.length>0?'flex':'none';}
-function limpiarOrigen(){pickupInput.value="";pickupLat=null;pickupLng=null;pickupName="";btnClear.style.display='none';if(pickupMarker)map.removeLayer(pickupMarker);if(routeLayer)map.removeLayer(routeLayer);}
-async function usarMiUbicacion(){navigator.geolocation.getCurrentPosition(async pos=>{pickupLat=pos.coords.latitude;pickupLng=pos.coords.longitude;try{const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${pickupLat}&lon=${pickupLng}`);const d=await r.json();pickupInput.value=d.display_name.split(",").slice(0,2).join(", ");pickupName=pickupInput.value;}catch(e){pickupInput.value="Mi ubicación";pickupName="Mi ubicación";}if(pickupMarker)map.removeLayer(pickupMarker);pickupMarker=L.marker([pickupLat,pickupLng]).addTo(map);map.setView([pickupLat,pickupLng],17);mostrarX();});}
-  document.getElementById("calculateButton").onclick=async()=>{
- if(!pickupLat||!destinationLat){alert("Llena origen y destino");return;}
- let km=1.5, tiempo=8, baseMoto=cfg.baseMoto, baseCarro=cfg.baseCarro;
- let extra=getExtraLluviaPorNivel(cfg.lluviaNivel);
- try{
-  const url=`https://router.project-osrm.org/route/v1/driving/${pickupLng},${pickupLat};${destinationLng},${destinationLat}?overview=full&geometries=geojson`;
-  const r=await fetch(url);const d=await r.json();
-  if(d.routes&&d.routes[0]){ const route=d.routes[0]; km=route.distance/1000; tiempo=Math.ceil(route.duration/60); if(route.distance>2000){let e=route.distance-2000;baseMoto=cfg.baseMoto+Math.ceil(e/650)*cfg.extraMoto; baseCarro=cfg.baseCarro+Math.ceil(e/650)*cfg.extraCarro;} if(distMts(pickupLat,pickupLng,CENTRO.lat,CENTRO.lng)>800&&distMts(destinationLat,destinationLng,CENTRO.lat,CENTRO.lng)>800){baseMoto+=5; baseCarro+=10;} baseMoto+=extra; baseCarro+=extra; if(routeLayer)map.removeLayer(routeLayer);routeLayer=L.geoJSON(route.geometry,{style:{color:"#E53935",weight:6}}).addTo(map);map.fitBounds(routeLayer.getBounds(),{padding:[40,40]}); }
- }catch(e){ baseMoto+=extra; baseCarro+=extra; }
- datosViaje={origen:pickupName,destino:destName,distKm:km.toFixed(2),tiempoMin:tiempo,precioMoto:baseMoto,precioCarro:baseCarro,origenLat:pickupLat,origenLng:pickupLng,destLat:destinationLat,destLng:destinationLng,lluviaNivel:cfg.lluviaNivel,lluviaExtra:extra};
- document.getElementById('panel2').classList.add('show');
- document.getElementById('destTxt').innerText=destName; document.getElementById('tiempoTxt').innerText=tiempo+' min'; document.getElementById('rutaSub').innerText=`${km.toFixed(2)} km`;
- document.getElementById('motoTime').innerText=`${tiempo} min`; document.getElementById('carroTime').innerText=`${tiempo+2} min`;
- document.getElementById('motoPrice').innerText=`$${baseMoto} MXN`; document.getElementById('carroPrice').innerText=`$${baseCarro} MXN`; aplicarDisponibilidad(); lucide.createIcons();
+
+function mostrarX(){ const b=document.getElementById("btnClearOrigen"); if(!b) return; b.style.display=document.getElementById("pickupInput").value.length>0?'flex':'none'; }
+function limpiarOrigen(){
+  document.getElementById("pickupInput").value=""; pickupLat=null; pickupLng=null; pickupName="";
+  document.getElementById("btnClearOrigen").style.display='none';
+  if(pickupMarker){ pickupMarker.setMap(null); pickupMarker=null; }
+  if(directionsRenderer) directionsRenderer.setDirections({routes:[]});
+}
+
+async function usarMiUbicacion(){
+  navigator.geolocation.getCurrentPosition(pos=>{
+    pickupLat=pos.coords.latitude; pickupLng=pos.coords.longitude;
+    const ll={lat:pickupLat,lng:pickupLng};
+    geocoder.geocode({location:ll},(res,sta)=>{
+      if(sta==="OK"&&res[0]){ document.getElementById("pickupInput").value=res[0].formatted_address.split(",").slice(0,3).join(", "); pickupName=res[0].formatted_address; }
+      else{ document.getElementById("pickupInput").value="Mi ubicación"; pickupName="Mi ubicación"; }
+    });
+    if(pickupMarker) pickupMarker.setMap(null);
+    pickupMarker=new google.maps.Marker({position:ll,map:map,icon:{path:google.maps.SymbolPath.CIRCLE,scale:10,fillColor:"#16a34a",fillOpacity:1,strokeColor:"#fff",strokeWeight:3}});
+    map.setCenter(ll); map.setZoom(17);
+    mostrarX();
+    if(destinationLat) trazarRutaGoogle();
+  });
+}
+
+document.getElementById("calculateButton").onclick=()=>{
+  if(!pickupLat||!destinationLat){ alert("Llena origen y destino con Google Maps"); return; }
+  directionsService.route({origin:{lat:pickupLat,lng:pickupLng},destination:{lat:destinationLat,lng:destinationLng},travelMode:google.maps.TravelMode.DRIVING,provideRouteAlternatives:true},(res,sta)=>{
+    if(sta!=="OK"||!res.routes.length){ alert("No se pudo calcular ruta"); return; }
+    let best=res.routes[0]; let bestDist=best.legs[0].distance.value;
+    for(let r of res.routes){ if(r.legs[0].distance.value<bestDist){ best=r; bestDist=r.legs[0].distance.value; } }
+    const idx=res.routes.indexOf(best);
+    directionsRenderer.setDirections(res); directionsRenderer.setRouteIndex(idx);
+    const leg=best.legs[0];
+    let km=leg.distance.value/1000; let tiempo=Math.ceil(leg.duration.value/60);
+    let baseMoto=cfg.baseMoto, baseCarro=cfg.baseCarro;
+    if(leg.distance.value>2000){ let e=leg.distance.value-2000; baseMoto=cfg.baseMoto+Math.ceil(e/650)*cfg.extraMoto; baseCarro=cfg.baseCarro+Math.ceil(e/650)*cfg.extraCarro; }
+    if(distMts(pickupLat,pickupLng,CENTRO.lat,CENTRO.lng)>800 && distMts(destinationLat,destinationLng,CENTRO.lat,CENTRO.lng)>800){ baseMoto+=5; baseCarro+=10; }
+    let extra=getExtraLluviaPorNivel(cfg.lluviaNivel); baseMoto+=extra; baseCarro+=extra;
+    datosViaje={origen:pickupName,destino:destName,distKm:km.toFixed(2),tiempoMin:tiempo,precioMoto:baseMoto,precioCarro:baseCarro,origenLat:pickupLat,origenLng:pickupLng,destLat:destinationLat,destLng:destinationLng,lluviaNivel:cfg.lluviaNivel,lluviaExtra:extra,distanciaMetros:leg.distance.value};
+    document.getElementById('panel2').classList.add('show');
+    document.getElementById('destTxt').innerText=destName; document.getElementById('tiempoTxt').innerText=tiempo+' min'; document.getElementById('rutaSub').innerText=`${km.toFixed(2)} km - Google Maps`;
+    document.getElementById('motoTime').innerText=`${tiempo} min`; document.getElementById('carroTime').innerText=`${tiempo+2} min`;
+    document.getElementById('motoPrice').innerText=`$${baseMoto} MXN`; document.getElementById('carroPrice').innerText=`$${baseCarro} MXN`;
+    aplicarDisponibilidad(); lucide.createIcons();
+  });
 };
+
 function volver(){ document.getElementById('panel2').classList.remove('show'); }
 function seleccionar(t){
  if(t==='moto'&&!cfg.motoDisp){alert('Moto no disponible');return;}
@@ -339,25 +418,45 @@ function abrirMapaConfirm(){
  document.getElementById('txtDistConfirm').innerText=datosViaje.distKm+' km';
  document.getElementById('imgTransporteConfirm').src=tipo==='moto'?'https://img.icons8.com/3d-fluency/94/motorcycle.png':'https://img.icons8.com/3d-fluency/94/car.png';
  setTimeout(()=>{
-   if(!mapConfirm){
-     mapConfirm=L.map("mapConfirm",{zoomControl:false}).setView([pickupLat,pickupLng],18);
-     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19}).addTo(mapConfirm);
-     markerConfirm=L.marker([pickupLat,pickupLng],{draggable:true}).addTo(mapConfirm);
-     markerConfirm.on('dragend',e=>{const p=e.target.getLatLng(); finalPickupLat=p.lat; finalPickupLng=p.lng; actualizarDireccionConfirm(p.lat,p.lng);});
-     mapConfirm.on('click',e=>{finalPickupLat=e.latlng.lat;finalPickupLng=e.latlng.lng;markerConfirm.setLatLng(e.latlng);actualizarDireccionConfirm(e.latlng.lat,e.latlng.lng);});
-   }else{ mapConfirm.setView([pickupLat,pickupLng],18); markerConfirm.setLatLng([pickupLat,pickupLng]); }
-   mapConfirm.invalidateSize();
+   const pos={lat:pickupLat,lng:pickupLng};
+   mapConfirm.setCenter(pos); mapConfirm.setZoom(18);
+   if(markerConfirm) markerConfirm.setMap(null);
+   markerConfirm=new google.maps.Marker({position:pos,map:mapConfirm,draggable:true});
+   markerConfirm.addListener('dragend',e=>{ finalPickupLat=e.latLng.lat(); finalPickupLng=e.latLng.lng(); actualizarDireccionConfirm(finalPickupLat,finalPickupLng); });
+   directionsRendererConfirm.setDirections({routes:[]});
+   google.maps.event.trigger(mapConfirm,'resize');
  },200);
 }
-async function recalcularPrecioTiempoReal(lat,lng){
- try{
-  const url=`https://router.project-osrm.org/route/v1/driving/${lng},${lat};${destinationLng},${destinationLat}?overview=full&geometries=geojson`;
-  const r=await fetch(url); const d=await r.json();
-  if(d.routes&&d.routes[0]){ const route=d.routes[0]; const km=route.distance/1000; const tiempo=Math.ceil(route.duration/60); let baseMoto=cfg.baseMoto, baseCarro=cfg.baseCarro; if(route.distance>2000){let e=route.distance-2000;baseMoto=cfg.baseMoto+Math.ceil(e/650)*cfg.extraMoto; baseCarro=cfg.baseCarro+Math.ceil(e/650)*cfg.extraCarro;} if(distMts(lat,lng,CENTRO.lat,CENTRO.lng)>800&&distMts(destinationLat,destinationLng,CENTRO.lat,CENTRO.lng)>800){baseMoto+=5;baseCarro+=10;} let extra=getExtraLluviaPorNivel(cfg.lluviaNivel); baseMoto+=extra; baseCarro+=extra; datosViaje.distKm=km.toFixed(2); datosViaje.tiempoMin=tiempo; datosViaje.precioMoto=baseMoto; datosViaje.precioCarro=baseCarro; document.getElementById('txtDistConfirm').innerText=km.toFixed(2)+' km'; document.getElementById('txtPrecioConfirm').innerText=tipo==='moto'?`$${baseMoto} MXN`:`$${baseCarro} MXN`; document.getElementById('motoPrice').innerText=`$${baseMoto} MXN`; document.getElementById('carroPrice').innerText=`$${baseCarro} MXN`; if(routeConfirmLayer) mapConfirm.removeLayer(routeConfirmLayer); routeConfirmLayer=L.geoJSON(route.geometry,{style:{color:"#E53935",weight:6}}).addTo(mapConfirm); }
- }catch(e){}
+function recalcularPrecioTiempoReal(lat,lng){
+  directionsService.route({origin:{lat:lat,lng:lng},destination:{lat:destinationLat,lng:destinationLng},travelMode:google.maps.TravelMode.DRIVING},(res,sta)=>{
+    if(sta!=="OK"||!res.routes.length) return;
+    const leg=res.routes[0].legs[0];
+    const km=leg.distance.value/1000; const tiempo=Math.ceil(leg.duration.value/60);
+    let baseMoto=cfg.baseMoto, baseCarro=cfg.baseCarro;
+    if(leg.distance.value>2000){ let e=leg.distance.value-2000; baseMoto=cfg.baseMoto+Math.ceil(e/650)*cfg.extraMoto; baseCarro=cfg.baseCarro+Math.ceil(e/650)*cfg.extraCarro; }
+    if(distMts(lat,lng,CENTRO.lat,CENTRO.lng)>800 && distMts(destinationLat,destinationLng,CENTRO.lat,CENTRO.lng)>800){ baseMoto+=5; baseCarro+=10; }
+    let extra=getExtraLluviaPorNivel(cfg.lluviaNivel); baseMoto+=extra; baseCarro+=extra;
+    datosViaje.distKm=km.toFixed(2); datosViaje.tiempoMin=tiempo; datosViaje.precioMoto=baseMoto; datosViaje.precioCarro=baseCarro; datosViaje.distanciaMetros=leg.distance.value;
+    document.getElementById('txtDistConfirm').innerText=km.toFixed(2)+' km';
+    document.getElementById('txtPrecioConfirm').innerText=tipo==='moto'?`$${baseMoto} MXN`:`$${baseCarro} MXN`;
+    document.getElementById('motoPrice').innerText=`$${baseMoto} MXN`; document.getElementById('carroPrice').innerText=`$${baseCarro} MXN`;
+    directionsRendererConfirm.setDirections(res);
+  });
 }
-async function actualizarDireccionConfirm(lat,lng){ try{ const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`); const d=await r.json(); document.getElementById('txtPickupConfirm').innerText=d.display_name.split(",").slice(0,3).join(", "); }catch(e){} recalcularPrecioTiempoReal(lat,lng); }
-function usarMiUbicacionConfirm(){ navigator.geolocation.getCurrentPosition(pos=>{ finalPickupLat=pos.coords.latitude; finalPickupLng=pos.coords.longitude; markerConfirm.setLatLng([finalPickupLat,finalPickupLng]); mapConfirm.setView([finalPickupLat,finalPickupLng],18); actualizarDireccionConfirm(finalPickupLat,finalPickupLng); }); }
+function actualizarDireccionConfirm(lat,lng){
+  geocoder.geocode({location:{lat:lat,lng:lng}},(res,sta)=>{
+    if(sta==="OK"&&res[0]){ document.getElementById('txtPickupConfirm').innerText=res[0].formatted_address.split(",").slice(0,3).join(", "); }
+  });
+  recalcularPrecioTiempoReal(lat,lng);
+}
+function usarMiUbicacionConfirm(){
+  navigator.geolocation.getCurrentPosition(pos=>{
+    finalPickupLat=pos.coords.latitude; finalPickupLng=pos.coords.longitude;
+    const ll={lat:finalPickupLat,lng:finalPickupLng};
+    markerConfirm.setPosition(ll); mapConfirm.setCenter(ll); mapConfirm.setZoom(18);
+    actualizarDireccionConfirm(finalPickupLat,finalPickupLng);
+  });
+}
 function volverMapa(){ document.getElementById('panel3').classList.remove('show'); document.getElementById('panel2').classList.add('show'); }
 function confirmarViajeFinal(){
  let precio=tipo==='moto'?datosViaje.precioMoto:datosViaje.precioCarro;
@@ -366,7 +465,7 @@ function confirmarViajeFinal(){
  let linkRuta=`https://www.google.com/maps/dir/${finalPickupLat},${finalPickupLng}/${datosViaje.destLat},${datosViaje.destLng}`;
  let linkPunto=`https://www.google.com/maps?q=${finalPickupLat},${finalPickupLng}`;
  let lluviaLinea=''; if(datosViaje.lluviaExtra>0) lluviaLinea=`🌧️ CLIMA: ${datosViaje.lluviaNivel.toUpperCase()} +$${datosViaje.lluviaExtra}\n`;
- let msg=`🏢 *${cfg.nombre.toUpperCase()}*\n⏰ ${hora} - ${fecha}\n#${contador.toString().padStart(4,'0')} - ${tipo.toUpperCase()}\n${lluviaLinea}\n📍 ${pickupName}\n📌 ${linkPunto}\n🏁 ${datosViaje.destino}\n🗺️ ${linkRuta}\n📏 ${datosViaje.distKm} km - 💰 $${precio} MXN`;
+ let msg=`🏢 *${cfg.nombre.toUpperCase()}*\n⏰ ${hora} - ${fecha}\n#${contador.toString().padStart(4,'0')} - ${tipo.toUpperCase()}\n${lluviaLinea}\n📍 ${pickupName}\n📌 ${linkPunto}\n🏁 ${datosViaje.destino}\n🗺️ ${linkRuta}\n📏 ${datosViaje.distKm} km (Google Maps) - 💰 $${precio} MXN`;
  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
  let hist=JSON.parse(localStorage.getItem('kigo_hist')||'[]'); hist.unshift({tipo:tipo,precio:precio,fecha:ahora.toLocaleString(),hora:ahora.getHours(),origen:pickupName,destino:destName,km:datosViaje.distKm}); if(hist.length>100) hist=hist.slice(0,100); localStorage.setItem('kigo_hist',JSON.stringify(hist));
 }
@@ -380,11 +479,10 @@ function irInicioForzado(){
  document.getElementById('modalAdmin').classList.remove('show');
  document.getElementById('btnNavInicio').classList.add('active');
  document.getElementById('btnNavAdmin').classList.remove('active');
- setTimeout(()=>{ map.invalidateSize(); if(mapConfirm) mapConfirm.invalidateSize(); },150);
+ setTimeout(()=>{ if(map) google.maps.event.trigger(map,'resize'); if(mapConfirm) google.maps.event.trigger(mapConfirm,'resize'); },150);
 }
 function irInicio(){ irInicioForzado(); }
 function loginAdmin(){ const u=document.getElementById('adminUser').value.trim(); const p=document.getElementById('adminPass').value.trim(); if(u==='admin'&&p==='0831'){ localStorage.setItem('kigo_admin_sesion','1'); document.getElementById('modalAdmin').classList.remove('show'); document.getElementById('panelAdmin').style.display='flex'; cargarAdmin(); detectarLluviaDolores(); }else{ document.getElementById('adminError').style.display='block'; } }
-function sincronizarTiempoReal(){}
 function cargarAdmin(){
  const g=(id)=>document.getElementById(id);
  if(g('cfgNombre')) g('cfgNombre').value=cfg.nombre;
@@ -409,7 +507,7 @@ function guardarAjustes(){
  if(g('cfgLluviaMod')) cfg.precioMod=parseInt(g('cfgLluviaMod').value)||5;
  if(g('cfgLluviaFuerte')) cfg.precioFuerte=parseInt(g('cfgLluviaFuerte').value)||10;
  pushConfig();
- alert('✅ Guardado y sincronizado a TODOS');
+ alert('✅ Guardado y sincronizado a TODOS - Google Maps');
 }
 function toggleVehiculo(t){ if(t==='moto') cfg.motoDisp=!cfg.motoDisp; if(t==='carro') cfg.carroDisp=!cfg.carroDisp; pushConfig(); cargarAdmin(); }
 function aplicarDisponibilidad(){
@@ -424,7 +522,7 @@ function aplicarDisponibilidad(){
 function actualizarStats(){ let hist=JSON.parse(localStorage.getItem('kigo_hist')||'[]'); document.getElementById('statTotal').innerText=hist.length; document.getElementById('statMoto').innerText=hist.filter(h=>h.tipo==='moto').length; document.getElementById('statCarro').innerText=hist.filter(h=>h.tipo==='carro').length; let box=document.getElementById('historialBox'); if(!hist.length){ box.innerHTML='<div style="text-align:center;padding:20px;color:#999;font-size:12px">Sin historial</div>'; return; } box.innerHTML=hist.map(h=>`<div style="padding:10px;border-bottom:1px solid #f0f0f0"><b>${h.tipo.toUpperCase()} $${h.precio} ${h.km}km</b><br><small>${h.origen} → ${h.destino}</small><br><small>${h.fecha}</small></div>`).join(''); }
 function borrarHistorial(){ if(confirm('Borrar?')){ localStorage.removeItem('kigo_hist'); actualizarStats(); } }
 function cerrarSesionAdmin(){ localStorage.removeItem('kigo_admin_sesion'); irInicioForzado(); }
-document.addEventListener("click",e=>{if(!e.target.closest('.input-wrap')){pickupSuggestions.classList.remove("show");destinationSuggestions.classList.remove("show");}});
+
 if(db){
   db.ref('config').on('value',snap=>{
     const data=snap.val(); if(!data) return;
@@ -434,9 +532,7 @@ if(db){
     isSyncing=false;
   });
 }
-cargarAdmin(); aplicarDisponibilidad(); lucide.createIcons();
-detectarLluviaDolores();
-setInterval(detectarLluviaDolores, 5*60*1000);
 </script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCTV1sm6McEIkv-cheaVFCD_svp_a--6wg&libraries=places&callback=initGoogleMaps"></script>
 </body>
 </html>
