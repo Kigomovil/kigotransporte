@@ -15,21 +15,21 @@
 #mapConfirm{width:100%;height:100%}
 .clima-banner{position:absolute;top:58px;left:12px;right:12px;z-index:1000;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border:1px solid #eee;border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 15px rgba(0,0,0,.1)}
 .weather-widget{position:absolute;top:12px;right:12px;z-index:1000;background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border:1px solid rgba(0,0,0,.08);border-radius:14px;padding:8px 12px;display:flex;align-items:center;gap:8px;box-shadow:0 4px 15px rgba(0,0,0,.12)}
-.panel{padding:16px 16px 110px 16px;border-radius:22px 22px 0 0;margin-top:-22px;position:relative;z-index:1000;background:#fff;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.panel{padding:14px 14px 110px 14px;border-radius:22px 22px 0 0;margin-top:-22px;position:relative;z-index:1000;background:#fff;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .panel2{position:fixed;bottom:0;left:50%;transform:translateX(-50%);max-width:500px;width:100%;background:#ffffff;border-radius:28px 28px 0 0;z-index:3000;padding:16px 16px 110px 16px;display:none;flex-direction:column;max-height:78vh;overflow-y:auto;box-shadow:0 -10px 30px rgba(0,0,0,.15)}
 .panel2.show{display:flex}
 .panel3{position:fixed;inset:0;max-width:500px;margin:0 auto;width:100%;background:#fff;z-index:4000;display:none;flex-direction:column;overflow:hidden}
 .panel3.show{display:flex}
-.step{background:#f7f7f8;border:1px solid #eee;padding:12px;border-radius:14px;margin-bottom:12px}
+.step{background:#fff;border:1.5px solid #eee;padding:10px 12px;border-radius:14px;margin-bottom:10px}
+.step-title{font-size:10px;font-weight:800;color:#111;letter-spacing:.3px;margin-bottom:6px;text-transform:uppercase}
 .input-wrap{position:relative;display:flex;align-items:center}
-.colonia-input{width:100%;padding:14px 68px 14px 38px;border:1.5px solid #ddd;border-radius:12px;font-size:14px;font-weight:600;outline:none}
-.input-actions{position:absolute;right:6px;top:50%;transform:translateY(-50%);display:flex;gap:4px}
-.btn-icon{width:32px;height:32px;border-radius:8px;border:1px solid #e5e7eb;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
-.btn-icon.loc{background:#111}.btn-icon.clear{display:none}
-.suggestions{position:absolute;left:0;right:0;top:100%;margin-top:6px;background:#fff;border:1px solid #ddd;border-radius:14px;box-shadow:0 10px 25px rgba(0,0,0,.18);z-index:9999;display:none;max-height:220px;overflow-y:auto}
-.suggestions.show{display:block}
-.suggestion{padding:12px 14px;border-bottom:1px solid #f2f2f2;display:flex;gap:10px;align-items:center;cursor:pointer}
-.btn-cotizar{width:100%;padding:16px;border:none;border-radius:14px;background:#E53935;color:#fff;font-weight:900;font-size:15px;margin-top:10px;cursor:pointer;box-shadow:0 8px 20px rgba(229,57,53,.3)}
+.colonia-input{width:100%;padding:12px 72px 12px 36px;border:1.5px solid #e5e7eb;border-radius:12px;font-size:13px;font-weight:600;outline:none;background:#f9fafb}
+.colonia-input:focus{border-color:#111;background:#fff}
+.input-actions{position:absolute;right:6px;top:50%;transform:translateY(-50%);display:flex;gap:4px;align-items:center}
+.btn-icon{width:28px;height:28px;border-radius:8px;border:1px solid #e5e7eb;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.btn-icon.loc{background:#2563eb;border:none;width:30px;height:30px;box-shadow:0 2px 8px rgba(37,99,235,.3)}
+.btn-icon.clear{display:none}
+.btn-cotizar{width:100%;padding:14px;border:none;border-radius:14px;background:#E53935;color:#fff;font-weight:900;font-size:14px;margin-top:10px;cursor:pointer;box-shadow:0 8px 20px rgba(229,57,53,.3);display:flex;align-items:center;justify-content:center;gap:8px}
 .card{border-radius:20px;padding:16px;display:flex;gap:14px;align-items:center;background:#ffffff;border:2px solid #eeeeee;cursor:pointer;margin-bottom:14px;transition:.2s;box-shadow:0 2px 10px rgba(0,0,0,.04)}
 .card.active{border-color:#E53935;background:#fff5f5;box-shadow:0 0 0 2px rgba(229,57,53,.15), 0 0 22px rgba(229,57,53,.25)}
 .card.disabled{opacity:.4;pointer-events:none;filter:grayscale(1)}
@@ -79,9 +79,28 @@
 </div>
 </div>
 <div id="panel1" class="panel">
-<div class="step"><div style="font-size:11px;font-weight:800;color:#666;margin-bottom:6px">Dirección de Origen (Google Maps).</div><div class="input-wrap"><i data-lucide="map-pin" style="position:absolute;left:12px;width:16px;color:#16a34a;z-index:2"></i><input id="pickupInput" class="colonia-input" placeholder="Ej: Hidalgo 15, Centro..." autocomplete="off"><div class="input-actions"><button id="btnClearOrigen" class="btn-icon clear" onclick="limpiarOrigen()"><i data-lucide="x" style="width:14px"></i></button><button id="btnUbicacion" class="btn-icon loc" onclick="usarMiUbicacion()"><i data-lucide="crosshair" style="width:16px;color:#fff"></i></button></div></div></div>
-<div class="step"><div style="font-size:11px;font-weight:800;color:#666;margin-bottom:6px">Dirección de Destino (Google Maps).</div><div style="position:relative"><i data-lucide="flag" style="position:absolute;left:12px;top:15px;width:16px;color:#dc2626"></i><input id="destinationInput" class="colonia-input" style="padding-right:14px" placeholder="Ej: Guerrero 20, Lindavista..." autocomplete="off"></div></div>
-<button id="calculateButton" class="btn-cotizar">CONFIRMAR DIRECCIÓN</button>
+<div class="step">
+<div class="step-title">Dirección de origen</div>
+<div class="input-wrap">
+<i data-lucide="map-pin" style="position:absolute;left:12px;width:15px;color:#16a34a;z-index:2"></i>
+<input id="pickupInput" class="colonia-input" placeholder="¿Dónde te recogemos?" autocomplete="off" oninput="mostrarX()">
+<div class="input-actions">
+<button id="btnClearOrigen" class="btn-icon clear" onclick="limpiarOrigen()"><i data-lucide="x" style="width:13px"></i></button>
+<button id="btnUbicacion" class="btn-icon loc" onclick="usarMiUbicacion()" title="Mi ubicación"><i data-lucide="navigation" style="width:15px;color:#fff"></i></button>
+</div>
+</div>
+</div>
+<div class="step">
+<div class="step-title">Dirección de destino</div>
+<div class="input-wrap">
+<i data-lucide="flag" style="position:absolute;left:12px;width:15px;color:#dc2626;z-index:2"></i>
+<input id="destinationInput" class="colonia-input" placeholder="¿A dónde vas?" autocomplete="off" oninput="mostrarXDestino()">
+<div class="input-actions">
+<button id="btnClearDestino" class="btn-icon clear" onclick="limpiarDestino()"><i data-lucide="x" style="width:13px"></i></button>
+</div>
+</div>
+</div>
+<button id="calculateButton" class="btn-cotizar"><i data-lucide="check-circle" style="width:18px"></i> Confirmar dirección</button>
 <div style="height:20px"></div>
 </div>
 <div class="bottom-nav">
@@ -328,10 +347,10 @@ function initGoogleMaps(){
     if(destinationMarker) destinationMarker.setMap(null);
     destinationMarker=new google.maps.Marker({position:p.geometry.location,map:map,icon:{path:google.maps.SymbolPath.CIRCLE,scale:10,fillColor:"#dc2626",fillOpacity:1,strokeColor:"#fff",strokeWeight:3}});
     map.setCenter(p.geometry.location); map.setZoom(16);
+    mostrarXDestino();
     if(pickupLat) trazarRutaGoogle();
   });
 
-  // Confirm map click
   mapConfirm.addListener("click",(e)=>{
     finalPickupLat=e.latLng.lat(); finalPickupLng=e.latLng.lng();
     if(markerConfirm) markerConfirm.setPosition(e.latLng); else markerConfirm=new google.maps.Marker({position:e.latLng,map:mapConfirm,draggable:true});
@@ -353,11 +372,19 @@ function trazarRutaGoogle(){
   });
 }
 
+// X QUE APARECE AL ESCRIBIR - ORIGEN Y DESTINO
 function mostrarX(){ const b=document.getElementById("btnClearOrigen"); if(!b) return; b.style.display=document.getElementById("pickupInput").value.length>0?'flex':'none'; }
+function mostrarXDestino(){ const b=document.getElementById("btnClearDestino"); if(!b) return; b.style.display=document.getElementById("destinationInput").value.length>0?'flex':'none'; }
 function limpiarOrigen(){
   document.getElementById("pickupInput").value=""; pickupLat=null; pickupLng=null; pickupName="";
   document.getElementById("btnClearOrigen").style.display='none';
   if(pickupMarker){ pickupMarker.setMap(null); pickupMarker=null; }
+  if(directionsRenderer) directionsRenderer.setDirections({routes:[]});
+}
+function limpiarDestino(){
+  document.getElementById("destinationInput").value=""; destinationLat=null; destinationLng=null; destName="";
+  const bd=document.getElementById("btnClearDestino"); if(bd) bd.style.display='none';
+  if(destinationMarker){ destinationMarker.setMap(null); destinationMarker=null; }
   if(directionsRenderer) directionsRenderer.setDirections({routes:[]});
 }
 
@@ -368,11 +395,11 @@ async function usarMiUbicacion(){
     geocoder.geocode({location:ll},(res,sta)=>{
       if(sta==="OK"&&res[0]){ document.getElementById("pickupInput").value=res[0].formatted_address.split(",").slice(0,3).join(", "); pickupName=res[0].formatted_address; }
       else{ document.getElementById("pickupInput").value="Mi ubicación"; pickupName="Mi ubicación"; }
+      mostrarX();
     });
     if(pickupMarker) pickupMarker.setMap(null);
     pickupMarker=new google.maps.Marker({position:ll,map:map,icon:{path:google.maps.SymbolPath.CIRCLE,scale:10,fillColor:"#16a34a",fillOpacity:1,strokeColor:"#fff",strokeWeight:3}});
     map.setCenter(ll); map.setZoom(17);
-    mostrarX();
     if(destinationLat) trazarRutaGoogle();
   });
 }
