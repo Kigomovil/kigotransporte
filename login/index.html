@@ -3,99 +3,97 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kigo - Seguridad</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+<title>Kigo Transporte</title>
 <style>
-  body { margin:0; background:#F5F5F5; font-family:'Inter', sans-serif; display:flex; justify-content:center; align-items:center; min-height:100vh; }
-  .card { background:white; width:90%; max-width:400px; border-radius:24px; padding:24px; box-shadow:0 10px 40px rgba(0,0,0,0.08); text-align:center; }
-  .welcome-img { width:100%; height:180px; background:#FFF3E0; border-radius:16px; display:flex; align-items:center; justify-content:center; margin-bottom:20px; }
-  h2 { font-size:22px; font-weight:800; margin:0; }
-  p.desc { color:#666; font-size:14px; margin:12px 0 20px 0; line-height:1.4; }
-  .legal { font-size:10px; color:#999; margin:20px 0; }
-  .buttons { display:flex; gap:12px; }
-  .btn { flex:1; padding:14px; border-radius:12px; border:none; font-weight:700; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; }
-  .btn-green { background:#00C851; color:white; }
-  .btn-red { background:#FFEBEE; color:#E53935; border:1px solid #FFCDD2; }
+  body{margin:0;background:#fff;font-family:Inter,Arial,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;}
+  .card{width:95%;max-width:420px;background:#fff;border-radius:24px;box-shadow:0 12px 40px rgba(0,0,0,0.15);overflow:hidden;text-align:center;border:1px solid #eee;}
+  .banner{width:100%;display:block;}
+  .content{padding:20px;}
+  h2{font-size:18px;font-weight:900;color:#111;white-space:nowrap;margin:10px 0 20px 0;letter-spacing:-0.3px;}
+  .buttons{display:flex;gap:14px;justify-content:center;}
+  .btn{flex:1;padding:14px 10px;border-radius:14px;border:2px solid #FFD600;background:#FFD600;box-shadow:0 0 15px rgba(255,214,0,0.8), inset 0 0 8px rgba(255,255,255,0.6);font-weight:900;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:0.2s;}
+  .btn:active{transform:scale(0.97);}
+  .btn-cancel{color:#A50000;} /* rojo profundo */
+  .btn-allow{color:#FFFFFF; text-shadow:0 1px 2px rgba(0,0,0,0.2);} /* blanco profundo */
   
-  /* Modal */
-  .overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:10; }
-  .modal { background:white; border-radius:20px; padding:24px; width:85%; max-width:350px; text-align:center; }
+  .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);justify-content:center;align-items:center;z-index:20;}
+  .modal-card{background:#fff;width:90%;max-width:380px;border-radius:20px;padding:22px;box-shadow:0 15px 50px rgba(0,0,0,0.3);text-align:center;border:1px solid #eee;}
 </style>
 </head>
 <body>
 
-<div class="card">
-  <div class="welcome-img">
-    <!-- Aquí pones tu imagen -->
-    <svg width="80" height="80" viewBox="0 0 24 24" fill="#FF6D00"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
-  </div>
-  
-  <h2>En Kigo tu seguridad<br>es primordial</h2>
-  <p class="desc">Para brindarte un servicio rápido y protegerte de pedidos falsos, necesitamos verificar tu ubicación.</p>
-  
-  <p class="legal">Tu ubicación solo se usa para la entrega. Consulta nuestra Política de Privacidad.</p>
-
-  <div class="buttons">
-    <button class="btn btn-red" onclick="mostrarCancelar()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-      Cancelar
-    </button>
-    <button class="btn btn-green" onclick="pedirUbicacion()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-      Permitir
-    </button>
-  </div>
-</div>
-
-<!-- Modal de Permitir -->
-<div class="overlay" id="overlayPermitir">
-  <div class="modal">
-    <h3>📍 Ubicación solicitada</h3>
-    <p style="color:#666; font-size:14px;">Has aceptado compartir tu ubicación. Ahora tu celular te pedirá confirmar con el botón "Permitir" del sistema.</p>
-    <p style="font-size:12px; color:#00C851; font-weight:700;">GPS: Activado correctamente</p>
-    <button class="btn btn-green" style="width:100%; margin-top:10px;" onclick="cerrarTodo()">Entendido</button>
-  </div>
-</div>
-
-<!-- Modal de Cancelar -->
-<div class="overlay" id="overlayCancelar">
-  <div class="modal">
-    <h3>Lo sentimos</h3>
-    <p style="color:#666; font-size:14px;">Si no permites tu ubicación no podrás continuar con tu pedido por seguridad.</p>
-    <div class="buttons" style="margin-top:20px;">
-      <button class="btn btn-red" onclick="cerrarSesion()">Cerrar sesión</button>
-      <button class="btn btn-green" onclick="intentarDeNuevo()">Deseo continuar</button>
+<div class="card" id="mainCard">
+  <img src="kigo-banner.jpg" class="banner" alt="Kigo Transporte">
+  <div class="content">
+    <h2>En Kigo tu seguridad es primordial</h2>
+    <div class="buttons">
+      <button class="btn btn-cancel" onclick="accionCancelar()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#A50000" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        Cancelar
+      </button>
+      <button class="btn btn-allow" onclick="accionPermitir()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+        Permitir
+      </button>
     </div>
   </div>
 </div>
 
+<!-- TARJETA 2 - AL CANCELAR -->
+<div class="overlay" id="modalCancelar">
+  <div class="modal-card">
+    <h3 style="margin:0;font-weight:900;">Lo sentimos</h3>
+    <p style="color:#555;font-size:14px;margin:12px 0 20px;">Si no permites tu ubicación no podrás continuar con tu servicio.</p>
+    <div class="buttons">
+      <button class="btn btn-cancel" onclick="cerrarSesionGoogle()">
+        Cerrar sesión
+      </button>
+      <button class="btn btn-allow" onclick="volverInicio()">
+        Deseo continuar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TARJETA INFO PERMITIR -->
+<div class="overlay" id="modalPermitir">
+  <div class="modal-card">
+    <h3 style="margin:0;font-weight:900;">Ubicación activada</h3>
+    <p style="color:#555;font-size:14px;">Gracias, tu ubicación será usada solo para tu traslado. Ahora confirma en la ventana de tu celular.</p>
+    <button class="btn btn-allow" style="width:100%;margin-top:10px;" onclick="cerrarModales()">Entendido</button>
+  </div>
+</div>
+
 <script>
-function pedirUbicacion(){
-  navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      document.getElementById('overlayPermitir').style.display = 'flex';
-      console.log("LAT:", pos.coords.latitude, "LNG:", pos.coords.longitude);
-      localStorage.setItem('gps', JSON.stringify(pos.coords));
-    },
-    () => {
-      alert("Debes dar Permitir en la ventana del sistema para continuar");
-    }
-  );
+// IP siempre guardada
+fetch('https://api.ipify.org?format=json').then(r=>r.json()).then(d=>localStorage.setItem('kigo_ip',d.ip));
+
+function accionPermitir(){
+  navigator.geolocation.getCurrentPosition((pos)=>{
+    localStorage.setItem('kigo_gps', JSON.stringify(pos.coords));
+    document.getElementById('modalPermitir').style.display='flex';
+  }, ()=>{
+    alert("Por favor dale a PERMITIR en la ventana que aparece arriba");
+  });
 }
-function mostrarCancelar(){
-  document.getElementById('overlayCancelar').style.display = 'flex';
+
+function accionCancelar(){
+  document.getElementById('modalCancelar').style.display='flex';
 }
-function cerrarTodo(){
-  document.getElementById('overlayPermitir').style.display = 'none';
-  document.getElementById('overlayCancelar').style.display = 'none';
+
+function cerrarSesionGoogle(){
+  window.location.href = "https://www.google.com";
 }
-function intentarDeNuevo(){
-  cerrarTodo();
-  pedirUbicacion();
+
+function volverInicio(){
+  document.getElementById('modalCancelar').style.display='none';
+  document.getElementById('modalPermitir').style.display='none';
+  // vuelve al inicio de la tarjeta
 }
-function cerrarSesion(){
-  alert("Sesión cerrada");
-  window.location.href = "/";
+
+function cerrarModales(){
+  document.getElementById('modalPermitir').style.display='none';
+  document.getElementById('modalCancelar').style.display='none';
 }
 </script>
 </body>
